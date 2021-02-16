@@ -17,7 +17,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, DataSourceComponent, DataSourceManager, DataSource, IMDataSourceInfo, FormattedMessage } from 'jimu-core';
+import { React, DataSourceComponent, DataSourceManager, DataSource, IMDataSourceInfo, FormattedMessage, css } from 'jimu-core';
 import { BaseWidget, AllWidgetProps } from 'jimu-core';
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 import defaultMessages from './translations/default';
@@ -148,19 +148,27 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
     // #endregion DataSource
 
     render() {
+        const notThatBig = css`
+        max-width: '100%';
+        max-height: '100%';
+        overflow: 'hidden';
+      `;
+
         if (!this.isConfigured()) {
             return 'Select a map';
         }
 
         console.log("render", this.props);
 
-        return <div className="shadow-lg p-3 m-4 bg-white" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+        return <div className="shadow-lg p-3 m-4 bg-white" css={notThatBig}>
             <h3><FormattedMessage id="w3w" defaultMessage={defaultMessages.w3w} /></h3>
 
-            {this.props.hasOwnProperty("useMapWidgetIds") && this.props.useMapWidgetIds && this.props.useMapWidgetIds.length === 1
+            {
+                this.props.hasOwnProperty("useMapWidgetIds") && this.props.useMapWidgetIds && this.props.useMapWidgetIds.length === 1
                 && (
                     <JimuMapViewComponent useMapWidgetIds={this.props.useMapWidgetIds} onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
-                )}
+                )
+            }
 
             <table class="table table-striped">
                 <tbody>
@@ -192,6 +200,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
           this.dataRender
         }
       </DataSourceComponent> */}
-        </div>;
+        </div >;
     }
 }
