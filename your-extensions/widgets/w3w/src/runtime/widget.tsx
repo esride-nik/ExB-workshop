@@ -39,6 +39,9 @@ interface State {
 
 export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
     extentWatch: __esri.WatchHandle;
+    centerWatch: __esri.WatchHandle;
+    stationaryWatch: __esri.WatchHandle;
+
     state: State = {
         extent: null,
         center: null,
@@ -49,7 +52,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
     isConfigured = () => {
         return this.props.useMapWidgetIds && this.props.useMapWidgetIds.length === 1;
     }
-    centerWatch: any;
 
     componentDidMount() {
         w3wApi.setOptions({ key: this.props.config.w3wApiKey });
@@ -60,11 +62,33 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
             this.extentWatch.remove();
             this.extentWatch = null;
         }
+        if (this.centerWatch) {
+            this.centerWatch.remove();
+            this.centerWatch = null;
+        }
+        if (this.stationaryWatch) {
+            this.stationaryWatch.remove();
+            this.stationaryWatch = null;
+        }
     }
 
     onActiveViewChange = (jimuMapView: JimuMapView) => {
         if (!jimuMapView) return;
 
+        if (!this.stationaryWatch) {
+            this.stationaryWatch = jimuMapView.view.watch('stationary', stationary => {
+                if (stationary) {
+                    let geoPoint = webMercatorToGeographic(this.state.center) as Point;
+                    w3wApi.convertTo3wa({
+                        lat: geoPoint.y,
+                        lng: geoPoint.x
+                    }).then((w3wAddress: any) =>
+                        this.setState({
+                            w3wAddress
+                        }));
+                }
+            });
+        }
         if (!this.extentWatch) {
             this.extentWatch = jimuMapView.view.watch('extent', extent => {
                 this.setState({
@@ -77,15 +101,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
                 this.setState({
                     center
                 });
-
-                let geoPoint = webMercatorToGeographic(center) as Point;
-                w3wApi.convertTo3wa({
-                    lat: geoPoint.y,
-                    lng: geoPoint.x
-                }).then((w3wAddress: any) =>
-                    this.setState({
-                        w3wAddress
-                    }));
             });
         }
     }
@@ -158,8 +173,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
             return 'Select a map';
         }
 
-        console.log("render", this.props);
-
         return <div className="shadow-lg p-3 m-4 bg-white" css={notThatBig}>
             <h3><FormattedMessage id="w3w" defaultMessage={defaultMessages.w3w} /></h3>
 
@@ -186,12 +199,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
                     </tr>
                 </tbody>
             </table>
-            {/* <div className="d-block-sm">{defaultMessages.ll}: // X: {this.state.extent && this.state.extent.xmin} // Y: {this.state.extent && this.state.extent.ymin} </div>
-            <div>{defaultMessages.center}: // X: {this.state.center && this.state.center.x} // Y: {this.state.center && this.state.center.y} </div>
-            <div>{defaultMessages.w3w}: ///{this.state.w3wAddress && this.state.w3wAddress.words} </div> */}
-
-
-            {/* <div>{ this.state.extent && JSON.stringify(this.state.extent.toJSON())}</div> */}
 
             {/* <DataSourceComponent useDataSource={this.props.useDataSources[0]} query={this.state.query} refresh={this.state.refresh} queryCount onQueryStart={() => this.setState({refresh: false})}> */}
 
