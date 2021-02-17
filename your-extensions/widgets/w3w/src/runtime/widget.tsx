@@ -27,6 +27,8 @@ import { ArcGISDataSourceTypes } from 'jimu-arcgis';
 
 import { webMercatorToGeographic } from 'esri/geometry/support/webMercatorUtils';
 import Point = require('esri/geometry/Point');
+import GraphicsLayer = require('esri/layers/GraphicsLayer');
+import Graphic = require('esri/Graphic');
 
 const w3wApi = require("@what3words/api");
 
@@ -41,6 +43,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
     extentWatch: __esri.WatchHandle;
     centerWatch: __esri.WatchHandle;
     stationaryWatch: __esri.WatchHandle;
+    w3wLayer: GraphicsLayer;
 
     state: State = {
         extent: null,
@@ -55,6 +58,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
 
     componentDidMount() {
         w3wApi.setOptions({ key: this.props.config.w3wApiKey });
+        this.w3wLayer = new GraphicsLayer();
     }
 
     componentWillUnmount() {
@@ -86,6 +90,26 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
                         this.setState({
                             w3wAddress
                         }));
+
+                    const w3wGraphic = new Graphic({
+                        geometry: geoPoint,
+                        symbol: {
+                            type: "simple-marker",
+                            style: "cross",
+                            color: "red",
+                            size: "20px",
+                            outline: {
+                                color: [255, 0, 0],
+                                width: 3  // points
+                            }
+                        }
+                    })
+                    this.w3wLayer.graphics.add(w3wGraphic);
+                    jimuMapView.view.map.add(this.w3wLayer);
+                }
+                else {
+                    this.w3wLayer.graphics.removeAll();
+                    jimuMapView.view.map.remove(this.w3wLayer);
                 }
             });
         }
