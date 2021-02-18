@@ -18,24 +18,39 @@
   LICENSE file.
 */
 import { React, Immutable, DataSourceManager } from 'jimu-core';
-import { BaseWidgetSetting } from 'jimu-for-builder';
-import { JimuMapViewSelector } from 'jimu-ui/advanced/setting-components';
+import { AllWidgetSettingProps } from 'jimu-for-builder';
+import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components';
 import { ArcGISDataSourceTypes } from 'jimu-arcgis';
+import { IMConfig } from "../config";
+import defaultMessages from "./translations/default";
 
-export default class Setting extends BaseWidgetSetting {
-  supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap]);
-  dsManager = DataSourceManager.getInstance();
+export default class Setting extends React.PureComponent<
+    AllWidgetSettingProps<IMConfig>,
+    any
+    > {
+    supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap]);
+    dsManager = DataSourceManager.getInstance();
 
-  onMapSelected = (useMapWidgetIds: string[]) => {
-    this.props.onSettingChange({
-      id: this.props.id,
-      useMapWidgetIds: useMapWidgetIds
-    });
-  }
+    onMapSelected = (useMapWidgetIds: string[]) => {
+        this.props.onSettingChange({
+            id: this.props.id,
+            useMapWidgetIds: useMapWidgetIds
+        });
+    }
 
-  render() {
-    return <div className="sample-use-map-view-setting p-2">
-      <JimuMapViewSelector onSelect={this.onMapSelected} useMapWidgetIds={this.props.useMapWidgetIds} />
-    </div>
-  }
+    render() {
+        return <div className="widget-setting-w3w p-2">
+            <SettingSection
+                className="map-selector-section"
+                title={this.props.intl.formatMessage({
+                    id: "mapWidgetLabel",
+                    defaultMessage: defaultMessages.selectMapWidget
+                })}
+            >
+                <SettingRow>
+                    <JimuMapViewSelector onSelect={this.onMapSelected} useMapWidgetIds={this.props.useMapWidgetIds} />
+                </SettingRow>
+            </SettingSection>
+        </div>
+    }
 }
