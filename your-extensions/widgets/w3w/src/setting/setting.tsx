@@ -17,12 +17,13 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, Immutable, DataSourceManager } from 'jimu-core';
+import { React, Immutable, DataSourceManager, FormattedMessage } from 'jimu-core';
 import { AllWidgetSettingProps } from 'jimu-for-builder';
 import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components';
 import { ArcGISDataSourceTypes } from 'jimu-arcgis';
 import { IMConfig } from "../config";
 import defaultMessages from "./translations/default";
+import { Switch, TextInput } from 'jimu-ui';
 
 export default class Setting extends React.PureComponent<
     AllWidgetSettingProps<IMConfig>,
@@ -38,7 +39,24 @@ export default class Setting extends React.PureComponent<
         });
     }
 
+    switchDisplayMode = (evt: React.FormEvent<HTMLInputElement>) => {
+        this.props.onSettingChange({
+            id: this.props.id,
+            config: this.props.config.set("w3wOnMap", evt.currentTarget.checked)
+        });
+        console.log("switchDisplayMode", this.props.config.w3wOnMap, this.props.config)
+    };
+
+    setW3wApiKey = (w3wApiKey: string) => {
+        this.props.onSettingChange({
+            id: this.props.id,
+            config: this.props.config.set("w3wApiKey", w3wApiKey)
+        });
+        console.log("setW3wApiKey", this.props.config, w3wApiKey)
+    };
+
     render() {
+        console.log(this.props.config.w3wOnMap);
         return <div className="widget-setting-w3w p-2">
             <SettingSection
                 className="map-selector-section"
@@ -49,6 +67,44 @@ export default class Setting extends React.PureComponent<
             >
                 <SettingRow>
                     <JimuMapViewSelector onSelect={this.onMapSelected} useMapWidgetIds={this.props.useMapWidgetIds} />
+                </SettingRow>
+            </SettingSection>
+            <SettingSection
+                className="map-selector-section"
+                title={this.props.intl.formatMessage({
+                    id: "mapWidgetLabel",
+                    defaultMessage: defaultMessages.displayOption
+                })}
+            >
+                <SettingRow>
+                    <div className="w-100 addLayers">
+                        <div className="checkbox-row">
+                            <Switch
+                                checked={
+                                    (this.props.config && this.props.config.w3wOnMap) ||
+                                    false
+                                }
+                                onChange={this.switchDisplayMode}
+                            />
+                            <label>
+                                <FormattedMessage
+                                    id="zoomToLayer"
+                                    defaultMessage={defaultMessages.w3wOnMap}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                </SettingRow>
+            </SettingSection>
+            <SettingSection
+                className="map-selector-section"
+                title={this.props.intl.formatMessage({
+                    id: "mapWidgetLabel",
+                    defaultMessage: defaultMessages.w3wApiKey
+                })}
+            >
+                <SettingRow>
+                    <TextInput placeholder={defaultMessages.w3wApiKey} defaultValue={this.props.config.w3wApiKey} onAcceptValue={this.setW3wApiKey} />
                 </SettingRow>
             </SettingSection>
         </div>

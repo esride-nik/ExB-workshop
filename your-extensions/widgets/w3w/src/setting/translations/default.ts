@@ -18,5 +18,8 @@
   LICENSE file.
 */
 export default {
-    selectMapWidget: 'Please select map'
+    selectMapWidget: 'Please select map',
+    displayOption: 'Display option',
+    w3wOnMap: 'Display w3w coordinate on map',
+    w3wApiKey: 'what3words API Key'
 }
