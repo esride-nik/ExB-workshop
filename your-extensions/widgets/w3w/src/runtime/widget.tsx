@@ -1,3 +1,4 @@
+/** @jsx jsx */
 /**
   Licensing
 
@@ -17,7 +18,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, DataSourceComponent, DataSourceManager, DataSource, IMDataSourceInfo, FormattedMessage, css } from 'jimu-core';
+import { React, DataSourceComponent, DataSourceManager, DataSource, IMDataSourceInfo, FormattedMessage, css, jsx } from 'jimu-core';
 import { BaseWidget, AllWidgetProps } from 'jimu-core';
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 import defaultMessages from './translations/default';
@@ -187,26 +188,26 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
     //   });
     // }
 
-    dataRender = (ds: DataSource, info: IMDataSourceInfo, count: number) => {
-        this.createOutputDs(ds);
-        const fName = this.props.useDataSources[0].fields[0];
-        return <>
-            <div>
-                {/* <input placeholder="Query value" ref={this.cityNameRef}/> */}
-                <button onClick={this.query}>Query</button>
-            </div>
-            <div>Query state: {info.status}</div>
-            <div>Count: {count}</div>
+    // dataRender = (ds: DataSource, info: IMDataSourceInfo, count: number) => {
+    //     this.createOutputDs(ds);
+    //     const fName = this.props.useDataSources[0].fields[0];
+    //     return <>
+    //         <div>
+    //             {/* <input placeholder="Query value" ref={this.cityNameRef}/> */}
+    //             <button onClick={this.query}>Query</button>
+    //         </div>
+    //         <div>Query state: {info.status}</div>
+    //         <div>Count: {count}</div>
 
-            {/* <div className="record-list" style={{width: '100%', marginTop: '20px', height: 'calc(100% - 80px)', overflow: 'auto'}}>
-        {
-          ds && ds.getStatus() === DataSourceStatus.Loaded ? ds.getRecords().map((r, i) => {
-            return <div key={i}>{r.getData()[fName]}</div>
-          }) : null
-        }
-      </div> */}
-        </>
-    }
+    //         {/* <div className="record-list" style={{width: '100%', marginTop: '20px', height: 'calc(100% - 80px)', overflow: 'auto'}}>
+    //     {
+    //       ds && ds.getStatus() === DataSourceStatus.Loaded ? ds.getRecords().map((r, i) => {
+    //         return <div key={i}>{r.getData()[fName]}</div>
+    //       }) : null
+    //     }
+    //   </div> */}
+    //     </>
+    // }
 
     createOutputDs(useDs: DataSource) {
         console.log("createOutputDs", this.props);
@@ -228,17 +229,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
     // #endregion DataSource
 
     render() {
-        const notThatBig = css`
-        max-width: '100%';
-        max-height: '100%';
-        overflow: 'hidden';
-      `;
-
         if (!this.isConfigured()) {
             return 'Select a map';
         }
 
-        return <div className="shadow-lg p-3 m-4 bg-white" css={notThatBig}>
+        return (<div className="widget-w3w shadow-lg p-3 m-4 bg-white">
             <h3><FormattedMessage id="w3w" defaultMessage={defaultMessages.w3w} /></h3>
 
             {
@@ -272,6 +267,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
           this.dataRender
         }
       </DataSourceComponent> */}
-        </div >;
+        </div >);
     }
 }

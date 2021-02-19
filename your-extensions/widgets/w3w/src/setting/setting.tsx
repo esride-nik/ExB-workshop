@@ -1,3 +1,4 @@
+/** @jsx jsx */
 /**
   Licensing
 
@@ -17,7 +18,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, Immutable, DataSourceManager, FormattedMessage } from 'jimu-core';
+import { React, Immutable, DataSourceManager, FormattedMessage, css, jsx } from 'jimu-core';
 import { AllWidgetSettingProps } from 'jimu-for-builder';
 import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components';
 import { ArcGISDataSourceTypes } from 'jimu-arcgis';
@@ -56,8 +57,14 @@ export default class Setting extends React.PureComponent<
     };
 
     render() {
-        console.log(this.props.config.w3wOnMap);
-        return <div className="widget-setting-w3w p-2">
+        const style = css`
+        label {
+            display:inline-flex;
+            margin-left:5px;
+        }
+      `;
+
+        return <div className="widget-setting-w3w p-2" css={style}>
             <SettingSection
                 className="map-selector-section"
                 title={this.props.intl.formatMessage({
