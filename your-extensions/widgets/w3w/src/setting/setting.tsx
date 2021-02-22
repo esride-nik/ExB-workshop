@@ -40,12 +40,18 @@ export default class Setting extends React.PureComponent<
         });
     }
 
-    switchDisplayMode = (evt: React.FormEvent<HTMLInputElement>) => {
+    switchW3wOnMap = (evt: React.FormEvent<HTMLInputElement>) => {
         this.props.onSettingChange({
             id: this.props.id,
             config: this.props.config.set("w3wOnMap", evt.currentTarget.checked)
         });
-        console.log("switchDisplayMode", this.props.config.w3wOnMap, this.props.config)
+    };
+
+    switchShowW3wSquare = (evt: React.FormEvent<HTMLInputElement>) => {
+        this.props.onSettingChange({
+            id: this.props.id,
+            config: this.props.config.set("showW3wSquare", evt.currentTarget.checked)
+        });
     };
 
     setW3wApiKey = (w3wApiKey: string) => {
@@ -53,7 +59,6 @@ export default class Setting extends React.PureComponent<
             id: this.props.id,
             config: this.props.config.set("w3wApiKey", w3wApiKey)
         });
-        console.log("setW3wApiKey", this.props.config, w3wApiKey)
     };
 
     render() {
@@ -84,19 +89,38 @@ export default class Setting extends React.PureComponent<
                 })}
             >
                 <SettingRow>
-                    <div className="w-100 addLayers">
+                    <div className="w-100">
                         <div className="checkbox-row">
                             <Switch
                                 checked={
                                     (this.props.config && this.props.config.w3wOnMap) ||
                                     false
                                 }
-                                onChange={this.switchDisplayMode}
+                                onChange={this.switchW3wOnMap}
                             />
                             <label>
                                 <FormattedMessage
                                     id="zoomToLayer"
                                     defaultMessage={defaultMessages.w3wOnMap}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                </SettingRow>
+                <SettingRow>
+                    <div className="w-100">
+                        <div className="checkbox-row">
+                            <Switch
+                                checked={
+                                    (this.props.config && this.props.config.showW3wSquare) ||
+                                    false
+                                }
+                                onChange={this.switchShowW3wSquare}
+                            />
+                            <label>
+                                <FormattedMessage
+                                    id="zoomToLayer"
+                                    defaultMessage={defaultMessages.showW3wSquare}
                                 />
                             </label>
                         </div>
@@ -111,7 +135,7 @@ export default class Setting extends React.PureComponent<
                 })}
             >
                 <SettingRow>
-                    <TextInput placeholder={defaultMessages.w3wApiKey} defaultValue={this.props.config.w3wApiKey} onAcceptValue={this.setW3wApiKey} />
+                    <TextInput type="password" placeholder={defaultMessages.w3wApiKey} defaultValue={this.props.config.w3wApiKey} onAcceptValue={this.setW3wApiKey} />
                 </SettingRow>
             </SettingSection>
         </div>

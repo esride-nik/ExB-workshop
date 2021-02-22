@@ -22,6 +22,7 @@ import { ImmutableObject } from 'jimu-core';
 export interface Config {
     w3wApiKey: string;
     w3wOnMap: boolean;
+    showW3wSquare: boolean;
 }
 
 export type IMConfig = ImmutableObject<Config>;
