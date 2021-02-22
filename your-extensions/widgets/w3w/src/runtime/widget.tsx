@@ -152,7 +152,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
                         }
                     });
                     this.w3wLayer.graphics.add(w3wGraphic);
-                    // jimuMapView.view.zoom = 15;
                 }
             }
             jimuMapView.view.map.add(this.w3wLayer);
