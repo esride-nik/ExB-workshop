@@ -18,7 +18,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, Immutable, DataSourceManager, FormattedMessage, css, jsx } from 'jimu-core';
+import { React, Immutable, FormattedMessage, css, jsx } from 'jimu-core';
 import { AllWidgetSettingProps } from 'jimu-for-builder';
 import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components';
 import { ArcGISDataSourceTypes } from 'jimu-arcgis';
@@ -31,7 +31,6 @@ export default class Setting extends React.PureComponent<
     any
     > {
     supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap]);
-    dsManager = DataSourceManager.getInstance();
 
     onMapSelected = (useMapWidgetIds: string[]) => {
         this.props.onSettingChange({
