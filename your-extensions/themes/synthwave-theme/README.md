@@ -1,4 +1,4 @@
-# Sample theme
+# Synthwave Theme
 
 This sample contains the minimal required files to create a custom theme.
 
