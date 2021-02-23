@@ -120,26 +120,27 @@
   },
   "surfaces": {
     "1": {
-      "bg": "#326CD1",
+      "bg": "#ffd832d4",
       "border": {
-        "width": "1px",
-        "color": "#E80DC4"
+        "width": "2px",
+        "color": "#07d6ff"
       },
-      "shadow": "none"
+      "color": "#9A2459",
+      "shadow": "0 0 14px 0 #07d6ff"
     },
     "2": {
-      "bg": "#FFC721",
+      "bg": "#21efff52",
       "border": {
-        "width": "1px",
-        "color": "#2D3091"
+        "width": "2px",
+        "color": "#ff00f0"
       },
-      "shadow": "0 0 10px 1px rgba(0,0,0,0.2)"
+      "shadow": "0 0 10px 1px #c8006499"
     },
     "3": {
-      "bg": "#E0511D",
+      "bg": "#ffdf1eba",
       "border": {
         "width": "1px",
-        "color": "#FFC21B"
+        "color": "#941010"
       },
       "shadow": "0 0 6px 0 #941010"
     }

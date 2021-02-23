@@ -187,7 +187,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
             return 'Select a map';
         }
 
-        return (<div className="widget-w3w shadow-lg p-3 m-4 bg-white">
+        return (<div className="widget-w3w p-3 m-4 surface-1">
             <h3><FormattedMessage id="w3w" defaultMessage={defaultMessages.w3w} /></h3>
 
             {
