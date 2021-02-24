@@ -63,7 +63,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State>{
 
     componentDidMount() {
         w3wApi.setOptions({ key: this.props.config.w3wApiKey });
-        this.w3wLayer = new GraphicsLayer();
+        this.w3wLayer = new GraphicsLayer({
+            listMode: "hide"
+        });
     }
 
     componentWillUnmount() {
