@@ -88,33 +88,46 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
     }
 
     componentDidMount() {
-
-        console.log("RENDER", this.state.migData.labels.map((label: string) => label));
-
         const datasetGemeinde = this.state.migData.datasets.filter((dataset: any) => dataset.level == "Gemeinde")[0];
-        const data = datasetGemeinde.data.map((val: number, i: number) => {
+        const dataGemeinde = datasetGemeinde.data.map((val: number, i: number) => {
             return {
                 label: this.state.migData.labels[i],
-                value: val
+                value: val / 100
             };
         });
+        this.mainRef.current.appendChild(this.getBarChart(dataGemeinde, 25, { top: 20, right: 0, bottom: 0, left: 60 }));
+
+        const datasetKreis = this.state.migData.datasets.filter((dataset: any) => dataset.level == "Kreis")[0];
+        const dataKreis = datasetKreis.data.map((val: number, i: number) => {
+            return {
+                label: this.state.migData.labels[i],
+                value: val / 100
+            };
+        });
+        this.mainRef.current.appendChild(this.getBarChart(dataKreis, 25, { top: 20, right: 0, bottom: 0, left: 60 }));
+
+        const datasetRegion = this.state.migData.datasets.filter((dataset: any) => dataset.level == "Region")[0];
+        const dataRegion = datasetRegion.data.map((val: number, i: number) => {
+            return {
+                label: this.state.migData.labels[i],
+                value: val / 100
+            };
+        });
+        this.mainRef.current.appendChild(this.getBarChart(dataRegion, 25, { top: 20, right: 0, bottom: 0, left: 60 }));
 
         // this.letsCrateABarChart(datasetGemeinde, data);
 
-        this.mainRef.current.appendChild(this.getBarChart(data, 25, { top: 30, right: 0, bottom: 10, left: 30 }));
     }
 
     getBarChart(data, barHeight, margin) {
         const height = Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom;
-        const width = height;
-        console.log("height", height, "width", width);
+        const width = Math.ceil((data.length + 0.1) * 100) + margin.left + margin.right;
 
         const svg = d3.create("svg")
-            .attr("viewBox", [0, 0, width, height])
-            .attr("style", "border:1px solid #f00;width:100%;height:100%;");
+            .attr("viewBox", [0, 0, width * 1.1, height]);
 
         const x = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.value)])
+            .domain([0, 1]) //d3.max(data, d => d.value)])
             .range([margin.left, width - margin.right])
 
         const y = d3.scaleBand()
@@ -132,7 +145,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
             .attr("width", d => x(d.value) - x(0))
             .attr("height", y.bandwidth());
 
-        const format = x.tickFormat(20, "%");
+        const precision = "%";
+        const format = x.tickFormat(20, precision);
         svg.append("g")
             .attr("fill", "white")
             .attr("text-anchor", "end")
@@ -151,17 +165,16 @@ export default class Widget extends React.PureComponent<AllWidgetProps<any>, any
                 .attr("fill", "black")
                 .attr("text-anchor", "start"));
 
-
         const xAxis = g => g
             .attr("transform", `translate(0,${margin.top})`)
-            .call(d3.axisTop(x).ticks(width / 80, data.format))
+            .call(d3.axisTop(x).ticks(width / 80, "%"))
             .call(g => g.select(".domain").remove())
         svg.append("g")
             .call(xAxis);
 
         const yAxis = g => g
             .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(y).tickFormat(i => data[i].name).tickSizeOuter(0));
+            .call(d3.axisLeft(y).tickFormat(i => data[i].label).tickSizeOuter(0));
         svg.append("g")
             .call(yAxis);
 
