@@ -8,8 +8,8 @@ module.exports = {
         {
             files: ['*.html', '*.json', 'webpack.config.js'],
             options: {
-                'tabWidth': 2
-            }
-        }
-    ]
+                tabWidth: 2,
+            },
+        },
+    ],
 };

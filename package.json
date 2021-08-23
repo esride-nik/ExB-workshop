@@ -8,12 +8,5 @@
   "dependencies": {
     "@what3words/api": "^3.3.6"
   },
-  "devDependencies": {
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-prettier": "^3.4.1",
-    "prettier": "^2.3.2",
-    "prettier-eslint-cli": "^5.0.1",
-    "prettier-stylelint": "^0.4.2",
-    "react-test-renderer": "^16.14.0"
-  }
+  "devDependencies": {}
 }

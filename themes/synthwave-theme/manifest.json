@@ -9,8 +9,5 @@
   "description": "This theme captures all your favourite 80s vibe.",
   "copyright": "",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
-  "translatedLocales": [
-    "en",
-    "zh-cn"
-  ]
+  "translatedLocales": ["en", "zh-cn"]
 }

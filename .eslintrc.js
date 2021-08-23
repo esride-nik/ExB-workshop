@@ -13,7 +13,7 @@ module.exports = {
     parserOptions: {
         ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
         sourceType: 'module', // Allows for the use of imports env=es6 doesn't include modules, which we are using
-        project: 'tsconfig.json'
+        project: 'tsconfig.json',
     },
     settings: {
         react: {
