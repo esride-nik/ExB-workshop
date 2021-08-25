@@ -1,35 +1,15 @@
 /** @jsx jsx */
-/**
-  Licensing
-
-  Copyright 2020 Esri
-
-  Licensed under the Apache License, Version 2.0 (the "License"); You
-  may not use this file except in compliance with the License. You may
-  obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-  implied. See the License for the specific language governing
-  permissions and limitations under the License.
-
-  A copy of the license is available in the repository's
-  LICENSE file.
-*/
-import { FormattedMessage, jsx } from 'jimu-core';
-import { BaseWidget, AllWidgetProps } from 'jimu-core';
+import { React, AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core';
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 import defaultMessages from './translations/default';
 import { IMConfig } from '../config';
 
 import { webMercatorToGeographic } from 'esri/geometry/support/webMercatorUtils';
-import Point = require('esri/geometry/Point');
-import GraphicsLayer = require('esri/layers/GraphicsLayer');
-import Graphic = require('esri/Graphic');
-import PictureMarkerSymbol = require('esri/symbols/PictureMarkerSymbol');
-import Polygon = require('esri/geometry/Polygon');
+import * as Point from 'esri/geometry/Point';
+import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
+import * as Graphic from 'esri/Graphic';
+import * as PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
+import * as Polygon from 'esri/geometry/Polygon';
 
 const w3wApi = require('@what3words/api');
 
@@ -201,11 +181,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                     this.props.useMapWidgetIds &&
                     this.props.useMapWidgetIds.length === 1 && (
                         <JimuMapViewComponent
-                            useMapWidgetIds={this.props.useMapWidgetIds}
+                            useMapWidgetId={this.props.useMapWidgetIds?.[0]}
                             onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
                     )}
 
-                <table class="table table-striped">
+                <table className="table table-striped">
                     <tbody>
                         <tr>
                             <td scope="row">X</td>
