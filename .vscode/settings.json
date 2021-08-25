@@ -15,5 +15,6 @@
         "titleBar.inactiveBackground": "#cccccc99",
         "titleBar.inactiveForeground": "#15202b99"
     },
-    "peacock.color": "#cccccc"
+    "peacock.color": "#cccccc",
+    "jest.jestCommandLine": "node_modules\\.bin\\jest"
 }
