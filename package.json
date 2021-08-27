@@ -6,7 +6,8 @@
   "scripts": {},
   "author": "",
   "dependencies": {
-    "@what3words/api": "^3.3.6"
+    "@what3words/api": "^3.3.6",
+    "axios": "^0.21.1"
   },
   "devDependencies": {}
 }
