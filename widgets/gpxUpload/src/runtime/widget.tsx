@@ -9,6 +9,7 @@ import {
     DataSourceComponent,
 } from 'jimu-core';
 import { useDropzone } from 'react-dropzone';
+import { gpx } from '@tmcw/togeojson';
 
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 import defaultMessages from './translations/default';
@@ -50,12 +51,16 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
 
             reader.readAsText(file);
             reader.onloadend = () => {
-                console.log(reader.result);
-                // var xmlData = $(reader.result);
+                parseGpx(reader.result.toString());
             };
         });
     }, []);
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+    const parseGpx = (gpxText: string) => {
+        console.log(gpx(new DOMParser().parseFromString(gpxText, 'text/xml')));
+    };
 
     if (!isConfigured()) {
         return 'Select a map';
