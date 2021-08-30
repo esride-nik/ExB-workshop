@@ -1,0 +1,17 @@
+{
+  "name": "gpxUpload",
+  "label": "GPX upload and interpretation",
+  "type": "widget",
+  "dependency": ["jimu-arcgis"],
+  "version": "0.1.0",
+  "exbVersion": "1.5.0",
+  "author": "Niklas Köhn, Esri Deutschland GmbH",
+  "description": "Derived from the showextent demo widget, this widget queries the w3w API for a position.",
+  "copyright": "Esri Deutschland GmbH, 2021",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "defaultSize": {
+    "width": 400,
+    "height": 400
+  },
+  "translatedLocales": ["en", "de"]
+}
