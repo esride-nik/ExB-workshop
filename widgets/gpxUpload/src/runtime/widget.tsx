@@ -21,6 +21,7 @@ import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
 import * as Graphic from 'esri/Graphic';
 import * as PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import * as Polygon from 'esri/geometry/Polygon';
+import { Polyline } from 'esri/geometry';
 
 const { useState, useEffect, useRef, useCallback } = React;
 
@@ -31,6 +32,9 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
     useEffect(() => {
         // queryFunc();
     }, []);
+
+    let gpxLayer: GraphicsLayer;
+    let jimuMapView: JimuMapView;
 
     const isConfigured = () => {
         return props.useMapWidgetIds && props.useMapWidgetIds.length === 1;
@@ -59,7 +63,37 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
     const parseGpx = (gpxText: string) => {
-        console.log(gpx(new DOMParser().parseFromString(gpxText, 'text/xml')));
+        const geoJson = gpx(new DOMParser().parseFromString(gpxText, 'text/xml'));
+        console.log(geoJson);
+        const esriFeatures: Graphic[] = geoJson?.features.map((feature: any) => {
+            if (feature.geometry.type === 'LineString') {
+                return new Graphic({
+                    geometry: new Polyline({
+                        hasZ: true,
+                        hasM: false,
+                        paths: feature.geometry.coordinates,
+                        spatialReference: { wkid: 4326 },
+                    }),
+                    attributes: feature.properties,
+                });
+            }
+        });
+        addTrackToMap(esriFeatures);
+    };
+
+    const addTrackToMap = (esriFeatures: Graphic[]) => {
+        gpxLayer = new GraphicsLayer({
+            listMode: 'hide',
+        });
+        gpxLayer.addMany(esriFeatures);
+        if (jimuMapView) {
+            jimuMapView.view.map.add(gpxLayer);
+            jimuMapView.view.goTo(esriFeatures);
+        }
+    };
+
+    const activeViewChangeHandler = (jmv: JimuMapView) => {
+        jimuMapView = jmv;
     };
 
     if (!isConfigured()) {
@@ -79,6 +113,13 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
                     <p>Drag 'n' drop some files here, or click to select files</p>
                 )}
             </div>
+
+            {props.hasOwnProperty('useMapWidgetIds') && props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
+                <JimuMapViewComponent
+                    useMapWidgetId={props.useMapWidgetIds?.[0]}
+                    onActiveViewChange={activeViewChangeHandler}
+                />
+            )}
         </div>
     );
 }
