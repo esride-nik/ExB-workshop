@@ -27,9 +27,6 @@ const { useState, useEffect, useRef, useCallback } = React;
  * This widget will show features from a configured feature layer
  */
 export default function Widget(props: AllWidgetProps<{ Config }>) {
-    const [query, setQuery] = useState<FeatureLayerQueryParams>(null);
-    const cityNameRef = useRef<HTMLInputElement>(null);
-
     useEffect(() => {
         // queryFunc();
     }, []);
@@ -39,20 +36,23 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
     };
 
     const onDrop = useCallback((acceptedFiles) => {
-        // Do something with the files
-        console.log('dropped files', acceptedFiles);
-
         acceptedFiles.forEach((file) => {
             const reader = new FileReader();
 
             reader.onabort = () => console.log('file reading was aborted');
             reader.onerror = () => console.log('file reading has failed');
-            reader.onload = () => {
-                // Do whatever you want with the file contents
-                const binaryStr = reader.result;
-                console.log(binaryStr);
+            // reader.onload = () => {
+            //     // Do whatever you want with the file contents
+            //     const binaryStr = reader.result;
+            //     console.log(binaryStr);
+            // };
+            // reader.readAsArrayBuffer(file);
+
+            reader.readAsText(file);
+            reader.onloadend = () => {
+                console.log(reader.result);
+                // var xmlData = $(reader.result);
             };
-            reader.readAsArrayBuffer(file);
         });
     }, []);
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
