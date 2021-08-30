@@ -8,6 +8,7 @@ import {
     AllWidgetProps,
     DataSourceComponent,
 } from 'jimu-core';
+import { useDropzone } from 'react-dropzone';
 
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 import defaultMessages from './translations/default';
@@ -20,7 +21,7 @@ import * as Graphic from 'esri/Graphic';
 import * as PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import * as Polygon from 'esri/geometry/Polygon';
 
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
 
 /**
  * This widget will show features from a configured feature layer
@@ -37,6 +38,12 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
         return props.useMapWidgetIds && props.useMapWidgetIds.length === 1;
     };
 
+    const onDrop = useCallback((acceptedFiles) => {
+        // Do something with the files
+        console.log('dropped files', acceptedFiles);
+    }, []);
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
     if (!isConfigured()) {
         return 'Select a map';
     }
@@ -45,13 +52,15 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
             className="widget-gpx-upload"
             style={{ width: '100%', height: '100%', maxHeight: '800px', overflow: 'auto' }}>
             <h3>Drop this</h3>
-            {console.log('Drop this', props.config)}
 
-            {/* <DataSourceComponent useDataSource={props.useDataSources[0]} query={query} widgetId={props.id} queryCount>
-                {dataRender}
-            </DataSourceComponent> */}
-
-            {/* return <div className="widget-w3w p-3 m-4 surface-1">Drop this</div>; */}
+            <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                    <p>Drop the files here ...</p>
+                ) : (
+                    <p>Drag 'n' drop some files here, or click to select files</p>
+                )}
+            </div>
         </div>
     );
 }
