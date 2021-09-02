@@ -1,27 +1,15 @@
-import {
-    React,
-    IMDataSourceInfo,
-    DataSource,
-    DataSourceManager,
-    DataSourceStatus,
-    FeatureLayerQueryParams,
-    AllWidgetProps,
-    DataSourceComponent,
-} from 'jimu-core';
+import { React, AllWidgetProps } from 'jimu-core';
 import { useDropzone } from 'react-dropzone';
 import { gpx } from '@tmcw/togeojson';
 
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
-import defaultMessages from './translations/default';
-import { Config } from '../config';
 
-import { webMercatorToGeographic } from 'esri/geometry/support/webMercatorUtils';
-import * as Point from 'esri/geometry/Point';
 import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
 import * as Graphic from 'esri/Graphic';
-import * as PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
-import * as Polygon from 'esri/geometry/Polygon';
-import { Polyline } from 'esri/geometry';
+import * as geometryEngine from 'esri/geometry/geometryEngine';
+import { Polygon, Polyline } from 'esri/geometry';
+import * as Geometry from 'esri/geometry/Geometry';
+import { geographicToWebMercator } from 'esri/geometry/support/webMercatorUtils';
 
 const { useState, useEffect, useRef, useCallback } = React;
 
@@ -64,7 +52,7 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
 
     const parseGpx = (gpxText: string) => {
         const geoJson = gpx(new DOMParser().parseFromString(gpxText, 'text/xml'));
-        console.log(geoJson);
+        console.log('geoJson', geoJson);
         const esriFeatures: Graphic[] = geoJson?.features.map((feature: any) => {
             if (feature.geometry.type === 'LineString') {
                 return new Graphic({
@@ -89,6 +77,30 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
         if (jimuMapView) {
             jimuMapView.view.map.add(gpxLayer);
             jimuMapView.view.goTo(esriFeatures);
+        }
+
+        // produktiv bitte Array-Inhalt verifizieren
+        createBuffer(esriFeatures.map((graphic: Graphic) => geographicToWebMercator(graphic.geometry)));
+    };
+
+    const createBuffer = (inputGeometries: Geometry[]) => {
+        const buffers = geometryEngine.buffer(inputGeometries, 50, 'meters', true) as Polygon[];
+        const oneBuffer = buffers.length > 0 ? buffers[0] : null;
+        if (oneBuffer) {
+            let polygonSymbol = {
+                type: 'simple-fill',
+                color: [51, 51, 204, 0.9],
+                style: 'solid',
+                outline: {
+                    color: 'white',
+                    width: 1,
+                },
+            };
+            const bufferGraphic = new Graphic({
+                geometry: oneBuffer,
+                symbol: polygonSymbol,
+            });
+            gpxLayer.add(bufferGraphic);
         }
     };
 

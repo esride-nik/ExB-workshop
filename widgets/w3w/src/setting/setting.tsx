@@ -89,10 +89,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                     <SettingRow>
                         <div className="w-100">
                             <div className="checkbox-row">
-                                <Switch
-                                    checked={(this.props.config && this.props.config.w3wOnMap) || false}
-                                    onChange={this.switchW3wOnMap}
-                                />
+                                <Switch checked={this.props.config?.w3wOnMap || false} onChange={this.switchW3wOnMap} />
                                 <label>
                                     <FormattedMessage id="zoomToLayer" defaultMessage={defaultMessages.w3wOnMap} />
                                 </label>
@@ -132,3 +129,4 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
         );
     }
 }
+
