@@ -10,6 +10,8 @@ import * as geometryEngine from 'esri/geometry/geometryEngine';
 import { Polygon, Polyline } from 'esri/geometry';
 import * as Geometry from 'esri/geometry/Geometry';
 import { geographicToWebMercator } from 'esri/geometry/support/webMercatorUtils';
+import * as Layer from 'esri/layers/Layer';
+import * as FeatureLayer from 'esri/layers/FeatureLayer';
 
 const { useState, useEffect, useRef, useCallback } = React;
 
@@ -83,7 +85,7 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
         createBuffer(esriFeatures.map((graphic: Graphic) => geographicToWebMercator(graphic.geometry)));
     };
 
-    const createBuffer = (inputGeometries: Geometry[]) => {
+    const createBuffer = async (inputGeometries: Geometry[]) => {
         const buffers = geometryEngine.buffer(inputGeometries, 50, 'meters', true) as Polygon[];
         const oneBuffer = buffers.length > 0 ? buffers[0] : null;
         if (oneBuffer) {
@@ -101,7 +103,40 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
                 symbol: polygonSymbol,
             });
             gpxLayer.add(bufferGraphic);
+
+            const polygonLayer = findPolygonLayer();
+            const polyQuery = polygonLayer.createQuery();
+            polyQuery.geometry = oneBuffer;
+            const featuresUnderBuffer = await polygonLayer.queryFeatures(polyQuery);
+            console.log('featuresUnderBuffer', featuresUnderBuffer);
+
+            console.log(
+                'fieldNames',
+                featuresUnderBuffer.fields.map((f) => f.alias)
+            );
+            // Valider Feldname: 'anzahl_ges'
+            const anzahlGes = featuresUnderBuffer.features.map((f) => f.attributes['anzahl_ges']);
+
+            const reducer = (accumulator, currentValue) => accumulator + currentValue;
+            const anzahlGesSum = anzahlGes.reduce(reducer);
+            console.log('Gesamtanzahl der Coronafälle in durchjoggten Stadtteilen', anzahlGesSum);
         }
+    };
+
+    const findPolygonLayer = (): FeatureLayer => {
+        console.log(
+            'item types',
+            jimuMapView.view.map.allLayers.items.map((item) => item.type)
+        );
+
+        const featureLayers = jimuMapView.view.map.allLayers.items.filter((layer: Layer) => layer.type === 'feature');
+        console.log('featureLayers only', featureLayers);
+
+        const polygonLayers = featureLayers.filter((fl: FeatureLayer) => fl.geometryType === 'polygon');
+        console.log('polygonLayers only', polygonLayers);
+
+        // nehmen wir einfach mal den ersten
+        return polygonLayers[0];
     };
 
     const activeViewChangeHandler = (jmv: JimuMapView) => {
