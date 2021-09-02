@@ -149,6 +149,11 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
     if (!isConfigured()) {
         return 'Select a map';
     }
+    const dropzoneStyle = {
+        border: '1px solid #ddd',
+        padding: '20px',
+        background: '#eee',
+    };
     return (
         <div
             className="widget-gpx-upload"
@@ -158,9 +163,13 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
             <div {...getRootProps()}>
                 <input {...getInputProps()} />
                 {isDragActive ? (
-                    <p>Drop the files here ...</p>
+                    <p className="dropzone" style={dropzoneStyle}>
+                        Drop the files here ...
+                    </p>
                 ) : (
-                    <p>Drag 'n' drop some files here, or click to select files</p>
+                    <p className="dropzone" style={dropzoneStyle}>
+                        Drag 'n' drop some files here, or click to select files
+                    </p>
                 )}
             </div>
 
