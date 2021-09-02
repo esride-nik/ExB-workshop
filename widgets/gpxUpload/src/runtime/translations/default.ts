@@ -19,11 +19,5 @@
 */
 export default {
     _widgetLabel: 'GPX Upload',
-    widgetProperties: 'Widget Properties',
-    widgetFunctions: 'Widget Functions',
-    widgetName: 'widget name:',
-    widgetProps: 'widget props:',
-    ll: 'Lower Left',
-    center: 'Center',
-    w3w: 'what3words Center',
+    jogTrackResults: 'jog track illnesses',
 };

@@ -2,6 +2,7 @@ import { React, AllWidgetProps } from 'jimu-core';
 import { useDropzone } from 'react-dropzone';
 import { gpx } from '@tmcw/togeojson';
 
+import defaultMessages from './translations/default';
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 
 import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
@@ -19,6 +20,8 @@ const { useState, useEffect, useRef, useCallback } = React;
  * This widget will show features from a configured feature layer
  */
 export default function Widget(props: AllWidgetProps<{ Config }>) {
+    const [anzahlGesSum, setAnzahlGesSum] = useState<number>(0);
+
     useEffect(() => {
         // queryFunc();
     }, []);
@@ -118,7 +121,7 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
             const anzahlGes = featuresUnderBuffer.features.map((f) => f.attributes['anzahl_ges']);
 
             const reducer = (accumulator, currentValue) => accumulator + currentValue;
-            const anzahlGesSum = anzahlGes.reduce(reducer);
+            setAnzahlGesSum(anzahlGes.reduce(reducer));
             console.log('Gesamtanzahl der Coronafälle in durchjoggten Stadtteilen', anzahlGesSum);
         }
     };
@@ -160,6 +163,10 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
                     <p>Drag 'n' drop some files here, or click to select files</p>
                 )}
             </div>
+
+            <h1>
+                {anzahlGesSum} {defaultMessages.jogTrackResults}
+            </h1>
 
             {props.hasOwnProperty('useMapWidgetIds') && props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
                 <JimuMapViewComponent
