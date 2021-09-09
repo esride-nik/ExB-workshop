@@ -3,10 +3,7 @@
 This sample watches for changes on the map view and pushes the center point into the what3words REST API to display the w3w address in the widget.
 
 ## How to use the sample
-Clone the sample repo and paste the "w3w" folder in the Experience Builder client/your-extensions/widget. Install the npm package "@what3words/api".
-
-Clone the sample repo and paste the folder contents in the client/your-extensions/widgets
-folder of your Experience Builder installation. 
+Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
 
 ## How it works
 A class property `onActiveViewChange` for the widget is assigned to the function `JimuMapView`.  This function uses

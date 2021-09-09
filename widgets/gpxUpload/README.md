@@ -1,26 +1,9 @@
-# what3words widget
+# GPX Upload Widget
 
-This sample watches for changes on the map view and pushes the center point into the what3words REST API to display the w3w address in the widget.
+This widget provides an upload functionality for GPX files (via "react-dropzone") and converts line features into a Graphic, puts it on the map and adds a buffer, which can then be used for further activities, e.g. a spatial query against a feature layer with data. XMP parsing is done by "@tmcw/togeojson", the GeoJSON is manually transformed into Esri JSON.
 
 ## How to use the sample
-Clone the sample repo and paste the "w3w" folder in the Experience Builder client/your-extensions/widget. Install the npm package "@what3words/api".
-
-Clone the sample repo and paste the folder contents in the client/your-extensions/widgets
-folder of your Experience Builder installation. 
+Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
 
 ## How it works
-A class property `onActiveViewChange` for the widget is assigned to the function `JimuMapView`.  This function uses
-the `jimuMapView.view.watch()` method, which takes two imput parameters, the extent property and a callback function to
-execute each time the extent property changes. The `setState` method is called to re-render the widget with the updated state.  
-
-  ```javascript
-  onActiveViewChange = (jimuMapView: JimuMapView) => {
-    if(!this.extentWatch){
-      this.extentWatch = jimuMapView.view.watch('extent', extent => { 
-        this.setState({
-          extent
-        })
-      });
-    }
-  }
-```
+Look at the code :)
