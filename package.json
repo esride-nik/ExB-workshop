@@ -9,8 +9,8 @@
     "@tmcw/togeojson": "^4.5.0",
     "@what3words/api": "^3.3.6",
     "axios": "^0.21.1",
-    "exceljs": "^4.3.0",
-    "react-dropzone": "^11.3.4"
+    "react-dropzone": "^11.3.4",
+    "xlsx": "^0.17.1"
   },
   "devDependencies": {}
 }
