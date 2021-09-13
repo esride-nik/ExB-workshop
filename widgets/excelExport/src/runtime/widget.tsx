@@ -25,7 +25,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>>
         const features: Graphic[] = this.props?.mutableStateProps?.results?.features;
         console.log('Excel Export render', this.props?.mutableStateProps?.results?.label, ' | ', features);
 
-        // TODO: Automatic export writes 2 files most of the times.. maybe because 2 props are set and reder() es executed 2 times?
         if (features?.length > 0) {
             const layer = features[0].layer as FeatureLayer;
             const label =
