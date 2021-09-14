@@ -1,31 +1,13 @@
-# Show record id
+# Excel Export
 
-This sample demonstrates how to provide data action in a widget.
+This widget exports selected records from an attribute table to an Excel file and also queries related tables from the layer. 
+Derived from the Esri ["Show Record ID"](https://github.com/Esri/arcgis-experience-builder-sdk-resources/tree/master/widgets/show-record-id) sample widget.
 
-## How to use the sample
-Clone the [sample repo](https://github.com/esri/arcgis-experience-builder-sdk-resources) and copy this widget's folder (within `widgets`) to the `client/your-extensions/widgets` folder of your Experience Builder installation.
+### How to use the sample
+Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
 
-## How it works
-Define the data action in the folder of `src/data-actions`. Then extend the base class `AbstractDataAction` and implement its methods: `isSupported` and `onExecute`.
+### How it works
+The widget defines a data action that needs to be enabled on a table widget, configured in your app. This data action transmits data from the table into the Excel Export widget for further processing.
 
-Register the data action in manifest.
-
-```json
-  "dataActions": [
-    {
-      "name": "showId",
-      "label": "show id",
-      "uri": "data-actions/show-id"
-    }
-  ],
-
-```
-Add nls labels in `src/runtime/translations/default.ts` for the data action if necessary. The name of the nls property should follow the pattern `_action_${dataActionName}_label`. In this case, it is `_action_showId_label`.
-
-```javascript
-export default {
-  _widgetLabel: 'ShowId',
-  _action_showId_label: 'Show id',
-}
-
-```
+#### Author
+Niklas Köhn, Esri Deutschland GmbH
