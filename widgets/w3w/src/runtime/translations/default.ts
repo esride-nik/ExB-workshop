@@ -24,6 +24,6 @@ export default {
     widgetName: 'widget name:',
     widgetProps: 'widget props:',
     ll: 'Lower Left',
-    center: 'Center',
+    centerLabel: 'Center',
     w3w: 'what3words Center',
 };

@@ -196,7 +196,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                             <td>{this.state.center && this.state.center.y}</td>
                         </tr>
                         <tr>
-                            <th scope="row">{defaultMessages.center}</th>
+                            <th scope="row">
+                                <FormattedMessage id="centerLabel" />
+                            </th>
                             <td>{this.state.w3wAddress && this.state.w3wAddress.words}</td>
                         </tr>
                     </tbody>

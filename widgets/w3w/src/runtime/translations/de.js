@@ -5,6 +5,6 @@ define({
     widgetName: 'Widget Name:',
     widgetProps: 'Widget Eigs:',
     ll: 'Links unten',
-    center: 'Mittelpunkt',
+    centerLabel: 'Mittelpunkt',
     w3w: 'what3words Mittelpunkt',
 });
