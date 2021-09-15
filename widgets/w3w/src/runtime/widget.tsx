@@ -63,7 +63,18 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         }
     }
 
+    handleMapClick = (mapClick: any) => {
+        console.log('mapClick', mapClick);
+
+        const pointGraphic = new Graphic({
+            geometry: mapClick.mapPoint as Point,
+        });
+        console.log('pointGraphic', pointGraphic);
+    };
+
     async stationaryWatchHandler(stationary: boolean, jimuMapView: JimuMapView) {
+        jimuMapView.view.on('click', this.handleMapClick);
+
         if (stationary && this.state.center) {
             let geoPoint = webMercatorToGeographic(this.state.center) as Point;
             if (geoPoint) {
