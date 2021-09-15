@@ -1,5 +1,5 @@
 define({
     _widgetLabel: 'Excel Export',
-    recordsExported: "Einträge exportiert.",
+    recordsReceived: "Einträge empfangen.",
     noRecords: 'Nix zum Anzeigen.',
 });

@@ -1,5 +1,5 @@
 export default {
     _widgetLabel: 'Excel Export',
-    recordsExported: 'records exported.',
+    recordsReceived: 'records received.',
     noRecords: 'No records to display.',
 };
