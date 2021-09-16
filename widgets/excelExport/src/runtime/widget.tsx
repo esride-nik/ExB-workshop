@@ -11,12 +11,20 @@ interface WorksheetObject {
     wsName: string;
 }
 
-export default class Widget extends React.PureComponent<AllWidgetProps<unknown>> {
+interface State {
+    exportButtonDisabled: boolean;
+}
+
+export default class Widget extends React.PureComponent<AllWidgetProps<unknown>, State> {
     wss: WorksheetObject[];
     features: Graphic[];
     layer: FeatureLayer;
     label: string;
     filename: string;
+
+    state: State = {
+        exportButtonDisabled: true,
+    };
 
     async queryRelatedRecords(layer: FeatureLayer, objectIds: number[]): Promise<Graphic[]> {
         return layer.queryRelatedFeatures({
@@ -83,7 +91,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>>
     render() {
         this.wss = [];
         this.features = this.props?.mutableStateProps?.results?.features;
-        console.log('Excel Export render', this.props?.mutableStateProps?.results?.label, ' | ', this.features);
 
         if (this.features?.length > 0) {
             this.layer = this.features[0].layer as FeatureLayer;
@@ -93,8 +100,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>>
                     : defaultMessages._widgetLabel;
             this.filename = this.label.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-            // Relationships and Excel Export
-            // this.excelProcessing(features, layer, wsObject, sheetname, filename);
+            this.setState({
+                exportButtonDisabled: false,
+            });
+        } else {
+            this.setState({
+                exportButtonDisabled: true,
+            });
         }
 
         const fieldNames = this.features?.length > 0 ? Object.keys(this.features[0].attributes) : undefined;
@@ -105,8 +117,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>>
                 {this.features
                     ? `${this.features.length} ${defaultMessages.recordsReceived}. ${fieldNames.join(', ')}`
                     : defaultMessages.noRecords}
-
-                <Button onClick={this.startExcelProcessing}>Export Excel</Button>
+                <p>
+                    <Button onClick={this.startExcelProcessing} disabled={this.state.exportButtonDisabled}>
+                        Export Excel
+                    </Button>
+                </p>
             </div>
         );
     }
