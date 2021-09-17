@@ -31,14 +31,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         selectedFieldNames: [],
     };
 
-    async queryRelatedRecords(layer: FeatureLayer, relationshipId: number, objectIds: number[]): Promise<Graphic[]> {
-        return layer.queryRelatedFeatures({
-            outFields: ['*'],
-            relationshipId: relationshipId,
-            objectIds: objectIds,
-        });
-    }
-
     private processRelatedRecords(objectIds: number[], relationshipResults: any) {
         let relationshipFeatures: Graphic[] = [];
         objectIds.map((oid: number) =>
@@ -54,14 +46,30 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         return relationshipFeatures;
     }
 
-    private startExcelProcessing = (btnEvt: any) => {
-        console.log('startExcelProcessing', btnEvt);
-        this.excelProcessing(this.features, this.layer, this.filename);
+    private queryRelationships = async () => {
+        if (this.features?.length > 0) {
+            const objectIdField = (this.features[0].layer as FeatureLayer).objectIdField ?? 'OBJECTID';
+            const objectIds = this.features.map((feature: Graphic) => feature.attributes[objectIdField]);
+            let relFeatureAttributes;
+            const relationshipQueries = this.layer.relationships?.map((relationship: Relationship) =>
+                this.layer.queryRelatedFeatures({
+                    outFields: ['*'],
+                    relationshipId: relationship.id,
+                    objectIds: objectIds,
+                })
+            );
+            const relationshipResults = await Promise.all(relationshipQueries);
+            this.layer.relationships?.forEach((relationship: Relationship, index: number) => {
+                relFeatureAttributes = this.processRelatedRecords(objectIds, relationshipResults[index]);
+                let wsObject = this.createWorksheet(relFeatureAttributes, relationship.name.substr(0, 31));
+                this.wss.push(wsObject);
+            });
+        }
     };
 
-    private async excelProcessing(features: Graphic[], layer: FeatureLayer, filename: any) {
-        const sheetname = this.label;
+    private excelExport = () => {
         if (this.features?.length > 0) {
+            const sheetname = this.label;
             const featureAttributes = this.features.map((feature: Graphic) => {
                 return Object.keys(feature.attributes)
                     .filter((key) => this.state.selectedFieldNames.includes(key))
@@ -70,25 +78,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                         return obj;
                     }, {});
             });
+            // create worksheet of main table and add as first array element
             let wsObject = this.createWorksheet(featureAttributes, sheetname);
-            this.wss.push(wsObject);
+            this.wss.unshift(wsObject);
 
-            // Relationships
-            const objectIdField = (features[0].layer as FeatureLayer).objectIdField ?? 'OBJECTID';
-            const objectIds = features.map((feature: Graphic) => feature.attributes[objectIdField]);
-            let relFeatureAttributes;
-            const relationshipQueries = layer.relationships?.map((relationship: Relationship) =>
-                this.queryRelatedRecords(layer, relationship.id, objectIds)
-            );
-            const relationshipResults = await Promise.all(relationshipQueries);
-            layer.relationships?.forEach((relationship: Relationship, index: number) => {
-                relFeatureAttributes = this.processRelatedRecords(objectIds, relationshipResults[index]);
-                wsObject = this.createWorksheet(relFeatureAttributes, relationship.name.substr(0, 31));
-                this.wss.push(wsObject);
-            });
-            this.exportExcelFile(this.wss, filename);
+            this.exportExcelFile(this.wss, this.filename);
         }
-    }
+    };
 
     private exportExcelFile(wss: WorksheetObject[], filename: any) {
         const wb = XLSX.utils.book_new();
@@ -165,18 +161,25 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                 )}
 
                 {!this.state.exportButtonDisabled && (
-                    <MultiSelect
-                        items={Immutable(this.state.fieldNames)}
-                        values={Immutable(this.state.selectedFieldNames)}
-                        onClickItem={this.handleItemClick}></MultiSelect>
+                    <p>
+                        <MultiSelect
+                            items={Immutable(this.state.fieldNames)}
+                            values={Immutable(this.state.selectedFieldNames)}
+                            onClickItem={this.handleItemClick}></MultiSelect>
+                    </p>
                 )}
 
                 <p>
-                    <Button onClick={this.startExcelProcessing} disabled={this.state.exportButtonDisabled}>
-                        <FormattedMessage
-                            defaultMessage={defaultMessages.export2Excel}
-                            id={defaultMessages.export2Excel}
-                        />
+                    {!this.state.exportButtonDisabled &&
+                        this.layer.relationships.length > 0 &&
+                        this.features?.length > 0 && (
+                            <Button onClick={this.queryRelationships}>
+                                <FormattedMessage id={defaultMessages.queryRelationships} />
+                            </Button>
+                        )}
+
+                    <Button onClick={this.excelExport} disabled={this.state.exportButtonDisabled}>
+                        <FormattedMessage id={defaultMessages.export2Excel} />
                     </Button>
                 </p>
             </div>
