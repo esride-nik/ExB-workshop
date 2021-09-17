@@ -1,10 +1,11 @@
-import { React, AllWidgetProps } from 'jimu-core';
+import { React, AllWidgetProps, Immutable, FormattedMessage } from 'jimu-core';
 import defaultMessages from './translations/default';
 
 import XLSX from 'xlsx';
 import * as Graphic from 'esri/Graphic';
 import * as FeatureLayer from 'esri/layers/FeatureLayer';
-import { Button } from 'jimu-ui';
+import { Button, MultiSelect, MultiSelectItem } from 'jimu-ui';
+import * as Relationship from 'esri/layers/support/Relationship';
 
 interface WorksheetObject {
     ws: any;
@@ -13,6 +14,8 @@ interface WorksheetObject {
 
 interface State {
     exportButtonDisabled: boolean;
+    fieldNames: MultiSelectItem[];
+    selectedFieldNames: string[];
 }
 
 export default class Widget extends React.PureComponent<AllWidgetProps<unknown>, State> {
@@ -24,12 +27,14 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
 
     state: State = {
         exportButtonDisabled: true,
+        fieldNames: [],
+        selectedFieldNames: [],
     };
 
-    async queryRelatedRecords(layer: FeatureLayer, objectIds: number[]): Promise<Graphic[]> {
+    async queryRelatedRecords(layer: FeatureLayer, relationshipId: number, objectIds: number[]): Promise<Graphic[]> {
         return layer.queryRelatedFeatures({
             outFields: ['*'],
-            relationshipId: layer.relationships[0].id,
+            relationshipId: relationshipId,
             objectIds: objectIds,
         });
     }
@@ -38,7 +43,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         let relationshipFeatures: Graphic[] = [];
         objectIds.map((oid: number) =>
             relationshipFeatures.push(
-                ...(relationshipResults[oid].features as Graphic[]).map((feature: Graphic) => {
+                ...(relationshipResults[oid]?.features as Graphic[]).map((feature: Graphic) => {
                     const attributes = feature.attributes;
                     attributes['relationObjectId'] = oid;
                     return attributes;
@@ -56,20 +61,33 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
 
     private async excelProcessing(features: Graphic[], layer: FeatureLayer, filename: any) {
         const sheetname = this.label;
-        const featureAttributes = this.features.map((feature: Graphic) => feature.attributes);
-        let wsObject = this.createWorksheet(featureAttributes, sheetname);
-        this.wss.push(wsObject);
+        if (this.features?.length > 0) {
+            const featureAttributes = this.features.map((feature: Graphic) => {
+                return Object.keys(feature.attributes)
+                    .filter((key) => this.state.selectedFieldNames.includes(key))
+                    .reduce((obj, key) => {
+                        obj[key] = feature.attributes[key];
+                        return obj;
+                    }, {});
+            });
+            let wsObject = this.createWorksheet(featureAttributes, sheetname);
+            this.wss.push(wsObject);
 
-        // Relationships
-        const objectIds = features.map((feature: Graphic) => feature.attributes['OBJECTID']);
-        let relFeatureAttributes;
-        if (layer.relationships.length > 0) {
-            const relationshipResults = await this.queryRelatedRecords(layer, objectIds);
-            relFeatureAttributes = this.processRelatedRecords(objectIds, relationshipResults);
+            // Relationships
+            const objectIdField = (features[0].layer as FeatureLayer).objectIdField ?? 'OBJECTID';
+            const objectIds = features.map((feature: Graphic) => feature.attributes[objectIdField]);
+            let relFeatureAttributes;
+            const relationshipQueries = layer.relationships?.map((relationship: Relationship) =>
+                this.queryRelatedRecords(layer, relationship.id, objectIds)
+            );
+            const relationshipResults = await Promise.all(relationshipQueries);
+            layer.relationships?.forEach((relationship: Relationship, index: number) => {
+                relFeatureAttributes = this.processRelatedRecords(objectIds, relationshipResults[index]);
+                wsObject = this.createWorksheet(relFeatureAttributes, relationship.name.substr(0, 31));
+                this.wss.push(wsObject);
+            });
+            this.exportExcelFile(this.wss, filename);
         }
-        wsObject = this.createWorksheet(relFeatureAttributes, ('rel_' + sheetname).substr(0, 31));
-        this.wss.push(wsObject);
-        this.exportExcelFile(this.wss, filename);
     }
 
     private exportExcelFile(wss: WorksheetObject[], filename: any) {
@@ -88,11 +106,26 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         };
     }
 
+    private handleItemClick = (evt, item, selectedValues) => {
+        this.onClickItem(evt, item, selectedValues);
+        this.setValues(selectedValues);
+    };
+
+    private onClickItem = (evt, item, selectedValues) => {
+        console.log('onClickItem', evt, item, selectedValues);
+    };
+
+    private setValues = (selectedValues) => {
+        this.setState({
+            selectedFieldNames: selectedValues,
+        });
+    };
+
     render() {
         this.wss = [];
         this.features = this.props?.mutableStateProps?.results?.features;
 
-        if (this.features?.length > 0) {
+        if (this.features?.length > 0 && this.state.fieldNames.length === 0) {
             this.layer = this.features[0].layer as FeatureLayer;
             this.label =
                 this.props?.mutableStateProps?.results?.label?.length > 0
@@ -100,26 +133,50 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                     : defaultMessages._widgetLabel;
             this.filename = this.label.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
+            const fieldNamesMultiSelectItems = Object.keys(this.features[0].attributes).map((fieldName: string) => {
+                return {
+                    label: fieldName,
+                    value: fieldName,
+                } as MultiSelectItem;
+            });
+
             this.setState({
                 exportButtonDisabled: false,
+                fieldNames: fieldNamesMultiSelectItems,
+                selectedFieldNames: Object.keys(this.features[0].attributes),
             });
-        } else {
+        } else if (this.features?.length === 0 && !this.state.exportButtonDisabled) {
             this.setState({
                 exportButtonDisabled: true,
+                fieldNames: [],
+                selectedFieldNames: [],
             });
         }
 
-        const fieldNames = this.features?.length > 0 ? Object.keys(this.features[0].attributes) : undefined;
-
         return (
             <div>
-                <h3>{defaultMessages._widgetLabel}</h3>
-                {this.features
-                    ? `${this.features.length} ${defaultMessages.recordsReceived}. ${fieldNames.join(', ')}`
-                    : defaultMessages.noRecords}
+                <h3>
+                    <FormattedMessage defaultMessage={defaultMessages._widgetLabel} id={defaultMessages._widgetLabel} />
+                </h3>
+                {this.features ? (
+                    `${this.features.length} ${defaultMessages.recordsReceived}.`
+                ) : (
+                    <FormattedMessage defaultMessage={defaultMessages.noRecords} id={defaultMessages.noRecords} />
+                )}
+
+                {!this.state.exportButtonDisabled && (
+                    <MultiSelect
+                        items={Immutable(this.state.fieldNames)}
+                        values={Immutable(this.state.selectedFieldNames)}
+                        onClickItem={this.handleItemClick}></MultiSelect>
+                )}
+
                 <p>
                     <Button onClick={this.startExcelProcessing} disabled={this.state.exportButtonDisabled}>
-                        Export Excel
+                        <FormattedMessage
+                            defaultMessage={defaultMessages.export2Excel}
+                            id={defaultMessages.export2Excel}
+                        />
                     </Button>
                 </p>
             </div>
