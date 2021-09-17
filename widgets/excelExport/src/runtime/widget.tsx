@@ -12,10 +12,16 @@ interface WorksheetObject {
     wsName: string;
 }
 
+interface RelationshipRecords {
+    relationshipName: string;
+    relationshipRecords: any[];
+}
+
 interface State {
     exportButtonDisabled: boolean;
     fieldNames: MultiSelectItem[];
     selectedFieldNames: string[];
+    relationshipRecordsCount: number;
 }
 
 export default class Widget extends React.PureComponent<AllWidgetProps<unknown>, State> {
@@ -24,11 +30,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
     layer: FeatureLayer;
     label: string;
     filename: string;
+    allRelationshipRecords: RelationshipRecords[];
 
     state: State = {
         exportButtonDisabled: true,
         fieldNames: [],
         selectedFieldNames: [],
+        relationshipRecordsCount: 0,
     };
 
     private processRelatedRecords(objectIds: number[], relationshipResults: any) {
@@ -42,7 +50,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                 })
             )
         );
-        console.log('relationshipResults', relationshipFeatures);
         return relationshipFeatures;
     }
 
@@ -50,7 +57,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         if (this.features?.length > 0) {
             const objectIdField = (this.features[0].layer as FeatureLayer).objectIdField ?? 'OBJECTID';
             const objectIds = this.features.map((feature: Graphic) => feature.attributes[objectIdField]);
-            let relFeatureAttributes;
             const relationshipQueries = this.layer.relationships?.map((relationship: Relationship) =>
                 this.layer.queryRelatedFeatures({
                     outFields: ['*'],
@@ -59,15 +65,21 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                 })
             );
             const relationshipResults = await Promise.all(relationshipQueries);
-            this.layer.relationships?.forEach((relationship: Relationship, index: number) => {
-                relFeatureAttributes = this.processRelatedRecords(objectIds, relationshipResults[index]);
-                let wsObject = this.createWorksheet(relFeatureAttributes, relationship.name.substr(0, 31));
-                this.wss.push(wsObject);
+            this.allRelationshipRecords = this.layer.relationships?.map((relationship: Relationship, index: number) => {
+                return {
+                    relationshipName: relationship.name,
+                    relationshipRecords: this.processRelatedRecords(objectIds, relationshipResults[index]),
+                } as RelationshipRecords;
+            });
+
+            this.setState({
+                relationshipRecordsCount: this.allRelationshipRecords.length,
             });
         }
     };
 
     private excelExport = () => {
+        // selected features
         if (this.features?.length > 0) {
             const sheetname = this.label;
             const featureAttributes = this.features.map((feature: Graphic) => {
@@ -81,9 +93,18 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
             // create worksheet of main table and add as first array element
             let wsObject = this.createWorksheet(featureAttributes, sheetname);
             this.wss.unshift(wsObject);
-
-            this.exportExcelFile(this.wss, this.filename);
         }
+
+        // relationships
+        this.allRelationshipRecords.forEach((relationshipRecords: RelationshipRecords) => {
+            let wsObject = this.createWorksheet(
+                relationshipRecords.relationshipRecords,
+                relationshipRecords.relationshipName.substr(0, 31)
+            );
+            this.wss.push(wsObject);
+        });
+
+        this.exportExcelFile(this.wss, this.filename);
     };
 
     private exportExcelFile(wss: WorksheetObject[], filename: any) {
@@ -146,6 +167,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                 exportButtonDisabled: true,
                 fieldNames: [],
                 selectedFieldNames: [],
+                relationshipRecordsCount: 0,
             });
         }
 
@@ -190,6 +212,16 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                         )}
                     </p>
                 )}
+
+                {/* Relationships field selectors */}
+                {this.state.relationshipRecordsCount > 0 &&
+                    this.allRelationshipRecords?.length > 0 &&
+                    this.allRelationshipRecords.map((relationshipRecords: RelationshipRecords) => (
+                        <MultiSelect
+                            items={Immutable(this.state.fieldNames)}
+                            values={Immutable(this.state.selectedFieldNames)}
+                            onClickItem={this.handleItemClick}></MultiSelect>
+                    ))}
 
                 {/* Export button */}
                 <p>
