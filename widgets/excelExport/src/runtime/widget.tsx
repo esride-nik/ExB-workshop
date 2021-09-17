@@ -152,34 +152,52 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         return (
             <div>
                 <h3>
-                    <FormattedMessage defaultMessage={defaultMessages._widgetLabel} id={defaultMessages._widgetLabel} />
+                    <FormattedMessage id={defaultMessages._widgetLabel} />
                 </h3>
-                {this.features ? (
-                    `${this.features.length} ${defaultMessages.recordsReceived}.`
-                ) : (
-                    <FormattedMessage defaultMessage={defaultMessages.noRecords} id={defaultMessages.noRecords} />
-                )}
 
-                {!this.state.exportButtonDisabled && (
+                {/* Selected records and field selector */}
+                {this.features && !this.state.exportButtonDisabled ? (
                     <p>
+                        {this.features.length}&nbsp;
+                        <FormattedMessage
+                            id={defaultMessages.recordsReceived}
+                            defaultMessage={defaultMessages.recordsReceived}
+                        />
                         <MultiSelect
                             items={Immutable(this.state.fieldNames)}
                             values={Immutable(this.state.selectedFieldNames)}
                             onClickItem={this.handleItemClick}></MultiSelect>
                     </p>
+                ) : (
+                    <FormattedMessage id={defaultMessages.noRecords} defaultMessage={defaultMessages.noRecords} />
                 )}
 
-                <p>
-                    {!this.state.exportButtonDisabled &&
-                        this.layer.relationships.length > 0 &&
-                        this.features?.length > 0 && (
+                {/* Relationships */}
+                {this.layer?.relationships && this.layer.relationships.length > 0 && (
+                    <p>
+                        {this.layer.relationships.length}&nbsp;
+                        <FormattedMessage
+                            id={defaultMessages.relationshipsDetected}
+                            defaultMessage={defaultMessages.relationshipsDetected}
+                        />
+                        {!this.state.exportButtonDisabled && this.features?.length > 0 && (
                             <Button onClick={this.queryRelationships}>
-                                <FormattedMessage id={defaultMessages.queryRelationships} />
+                                <FormattedMessage
+                                    id={defaultMessages.queryRelationships}
+                                    defaultMessage={defaultMessages.queryRelationships}
+                                />
                             </Button>
                         )}
+                    </p>
+                )}
 
+                {/* Export button */}
+                <p>
                     <Button onClick={this.excelExport} disabled={this.state.exportButtonDisabled}>
-                        <FormattedMessage id={defaultMessages.export2Excel} />
+                        <FormattedMessage
+                            id={defaultMessages.export2Excel}
+                            defaultMessage={defaultMessages.export2Excel}
+                        />
                     </Button>
                 </p>
             </div>
