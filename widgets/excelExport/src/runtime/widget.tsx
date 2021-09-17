@@ -210,6 +210,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                 exportButtonDisabled: false,
                 fieldNames: fieldNamesMultiSelectItems,
                 selectedFieldNames: Object.keys(this.features[0].attributes),
+                relationshipRecordsCount: 0,
             });
         } else if (this.features?.length === 0 && !this.state.exportButtonDisabled) {
             this.setState({
