@@ -40,14 +40,16 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         fieldNames: [],
         selectedFieldNames: [],
         relationshipRecordsCount: 0,
+        currentRelationshipRecordsSelectedFieldNames: [],
     };
 
     private processRelatedRecords(objectIds: number[], relationshipResults: any) {
-        let relationshipFeatures: Graphic[] = [];
+        let relationshipFeatures: any[] = [];
         objectIds.map((oid: number) =>
             relationshipFeatures.push(
                 ...(relationshipResults[oid]?.features as Graphic[]).map((feature: Graphic) => {
                     const attributes = feature.attributes;
+                    // add the original objectId as reference in an extra field
                     attributes['relationObjectId'] = oid;
                     return attributes;
                 })
@@ -101,22 +103,20 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         if (this.features?.length > 0) {
             const sheetname = this.label;
             const featureAttributes = this.features.map((feature: Graphic) => {
-                return Object.keys(feature.attributes)
-                    .filter((key) => this.state.selectedFieldNames.includes(key))
-                    .reduce((obj, key) => {
-                        obj[key] = feature.attributes[key];
-                        return obj;
-                    }, {});
+                return this.reduceToSelectedFields(feature.attributes, this.state.selectedFieldNames);
             });
             // create worksheet of main table and add as first array element
-            let wsObject = this.createWorksheet(featureAttributes, sheetname);
+            const wsObject = this.createWorksheet(featureAttributes, sheetname);
             this.wss.unshift(wsObject);
         }
 
         // relationships
         this.allRelationshipRecords.forEach((relationshipRecords: RelationshipRecords) => {
-            let wsObject = this.createWorksheet(
-                relationshipRecords.relationshipRecords,
+            const relationshipAttributes = relationshipRecords.relationshipRecords.map((rel: any) => {
+                return this.reduceToSelectedFields(rel, relationshipRecords.relationshipSelectedFieldNames);
+            });
+            const wsObject = this.createWorksheet(
+                relationshipAttributes,
                 relationshipRecords.relationshipName.substr(0, 31)
             );
             this.wss.push(wsObject);
@@ -124,6 +124,15 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
 
         this.exportExcelFile(this.wss, this.filename);
     };
+
+    private reduceToSelectedFields(attributes: any, selectedFieldNames: string[]): {} {
+        return Object.keys(attributes)
+            .filter((key) => selectedFieldNames.includes(key))
+            .reduce((obj, key) => {
+                obj[key] = attributes[key];
+                return obj;
+            }, {});
+    }
 
     private exportExcelFile(wss: WorksheetObject[], filename: any) {
         const wb = XLSX.utils.book_new();
