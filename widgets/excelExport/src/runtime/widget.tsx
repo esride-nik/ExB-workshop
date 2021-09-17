@@ -6,6 +6,7 @@ import * as Graphic from 'esri/Graphic';
 import * as FeatureLayer from 'esri/layers/FeatureLayer';
 import { Button, MultiSelect, MultiSelectItem } from 'jimu-ui';
 import * as Relationship from 'esri/layers/support/Relationship';
+import { formFeedbackStyles } from 'jimu-ui/lib/styles/components/form-feedback';
 
 interface WorksheetObject {
     ws: any;
@@ -111,16 +112,18 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         }
 
         // relationships
-        this.allRelationshipRecords.forEach((relationshipRecords: RelationshipRecords) => {
-            const relationshipAttributes = relationshipRecords.relationshipRecords.map((rel: any) => {
-                return this.reduceToSelectedFields(rel, relationshipRecords.relationshipSelectedFieldNames);
+        if (this.allRelationshipRecords?.length > 0) {
+            this.allRelationshipRecords.forEach((relationshipRecords: RelationshipRecords) => {
+                const relationshipAttributes = relationshipRecords.relationshipRecords.map((rel: any) => {
+                    return this.reduceToSelectedFields(rel, relationshipRecords.relationshipSelectedFieldNames);
+                });
+                const wsObject = this.createWorksheet(
+                    relationshipAttributes,
+                    relationshipRecords.relationshipName.substr(0, 31)
+                );
+                this.wss.push(wsObject);
             });
-            const wsObject = this.createWorksheet(
-                relationshipAttributes,
-                relationshipRecords.relationshipName.substr(0, 31)
-            );
-            this.wss.push(wsObject);
-        });
+        }
 
         this.exportExcelFile(this.wss, this.filename);
     };
@@ -167,11 +170,28 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         });
     };
 
+    private areArraysDifferent(array1: any[], array2: any[]): boolean {
+        if (array1.length !== array2.length) return true;
+
+        const unequalElements = array1.filter((element: any, index: number) => element !== array2[index]);
+        if (unequalElements.length > 0) return true;
+
+        return false;
+    }
+
     render() {
         this.wss = [];
         this.features = this.props?.mutableStateProps?.results?.features;
 
-        if (this.features?.length > 0 && this.state.fieldNames.length === 0) {
+        // the data action is received here. only evaluate and set the state, if the mutableStateProps field list is different. this indicates that there is probably new incoming data.
+        if (
+            this.features?.length > 0 &&
+            (this.state.fieldNames.length === 0 ||
+                this.areArraysDifferent(
+                    this.state.fieldNames.map((r: MultiSelectItem) => r.value as string),
+                    Object.keys(this.features[0].attributes)
+                ))
+        ) {
             this.layer = this.features[0].layer as FeatureLayer;
             this.label =
                 this.props?.mutableStateProps?.results?.label?.length > 0

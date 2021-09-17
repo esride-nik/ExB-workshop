@@ -10,7 +10,6 @@ export default class ExportJson extends AbstractDataAction {
     async onExecute(dataSource: DataSource, records: DataRecord[]): Promise<boolean> {
         if (records.length > 0) {
             const features = records.map((r) => (r as any).feature as Graphic);
-            console.log('action: excel-export onExecute', records, features);
             MutableStoreManager.getInstance().updateStateValue(this.widgetId, 'results', {
                 features: features,
                 label: records[0].dataSource?.belongToDataSource?.fetchedSchema?.label,
