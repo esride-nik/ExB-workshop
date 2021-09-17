@@ -15,6 +15,8 @@ interface WorksheetObject {
 interface RelationshipRecords {
     relationshipName: string;
     relationshipRecords: any[];
+    relationshipFieldNames: MultiSelectItem[];
+    relationshipSelectedFieldNames: string[];
 }
 
 interface State {
@@ -22,6 +24,7 @@ interface State {
     fieldNames: MultiSelectItem[];
     selectedFieldNames: string[];
     relationshipRecordsCount: number;
+    currentRelationshipRecordsSelectedFieldNames: string[];
 }
 
 export default class Widget extends React.PureComponent<AllWidgetProps<unknown>, State> {
@@ -64,16 +67,31 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
                     objectIds: objectIds,
                 })
             );
+            // fill the results array
             const relationshipResults = await Promise.all(relationshipQueries);
             this.allRelationshipRecords = this.layer.relationships?.map((relationship: Relationship, index: number) => {
                 return {
                     relationshipName: relationship.name,
+                    // get the result from the results array
                     relationshipRecords: this.processRelatedRecords(objectIds, relationshipResults[index]),
+                    relationshipFieldNames: Object.keys(
+                        // get the attributes from the 1st feature from the first set of findings (objectId) from the result from the results array
+                        relationshipResults[index][objectIds[0]].features[0].attributes
+                    ).map((fieldName: string) => {
+                        return {
+                            label: fieldName,
+                            value: fieldName,
+                        } as MultiSelectItem;
+                    }),
+                    relationshipSelectedFieldNames: Object.keys(
+                        relationshipResults[index][objectIds[0]].features[0].attributes
+                    ),
                 } as RelationshipRecords;
             });
-
             this.setState({
                 relationshipRecordsCount: this.allRelationshipRecords.length,
+                currentRelationshipRecordsSelectedFieldNames:
+                    this.allRelationshipRecords[0].relationshipSelectedFieldNames,
             });
         }
     };
@@ -124,12 +142,14 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
     }
 
     private handleItemClick = (evt, item, selectedValues) => {
-        this.onClickItem(evt, item, selectedValues);
         this.setValues(selectedValues);
     };
 
-    private onClickItem = (evt, item, selectedValues) => {
-        console.log('onClickItem', evt, item, selectedValues);
+    private handleRelationshipFieldClick = (evt, item, selectedValues, relationshipRecords: RelationshipRecords) => {
+        relationshipRecords.relationshipSelectedFieldNames = selectedValues;
+        this.setState({
+            currentRelationshipRecordsSelectedFieldNames: selectedValues,
+        });
     };
 
     private setValues = (selectedValues) => {
@@ -215,12 +235,19 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
 
                 {/* Relationships field selectors */}
                 {this.state.relationshipRecordsCount > 0 &&
+                    this.state.currentRelationshipRecordsSelectedFieldNames.length > 0 &&
                     this.allRelationshipRecords?.length > 0 &&
                     this.allRelationshipRecords.map((relationshipRecords: RelationshipRecords) => (
-                        <MultiSelect
-                            items={Immutable(this.state.fieldNames)}
-                            values={Immutable(this.state.selectedFieldNames)}
-                            onClickItem={this.handleItemClick}></MultiSelect>
+                        <div>
+                            {relationshipRecords.relationshipName}
+                            <MultiSelect
+                                items={Immutable(relationshipRecords.relationshipFieldNames)}
+                                values={Immutable(relationshipRecords.relationshipSelectedFieldNames)}
+                                onClickItem={(evt, item, selectedValues) => {
+                                    this.handleRelationshipFieldClick(evt, item, selectedValues, relationshipRecords);
+                                }}
+                            />
+                        </div>
                     ))}
 
                 {/* Export button */}
