@@ -7,7 +7,7 @@ import { IMConfig } from '../config';
 import { webMercatorToGeographic } from 'esri/geometry/support/webMercatorUtils';
 import * as Point from 'esri/geometry/Point';
 import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
-import * as Graphic from 'esri/Graphic';
+import Graphic from 'esri/Graphic';
 import * as PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import * as Polygon from 'esri/geometry/Polygon';
 
