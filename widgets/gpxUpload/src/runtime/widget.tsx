@@ -5,14 +5,15 @@ import { gpx } from '@tmcw/togeojson';
 import defaultMessages from './translations/default';
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 
-import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
-import * as Graphic from 'esri/Graphic';
-import * as geometryEngine from 'esri/geometry/geometryEngine';
-import { Polygon, Polyline } from 'esri/geometry';
-import * as Geometry from 'esri/geometry/Geometry';
-import { geographicToWebMercator } from 'esri/geometry/support/webMercatorUtils';
-import * as Layer from 'esri/layers/Layer';
-import * as FeatureLayer from 'esri/layers/FeatureLayer';
+import GraphicsLayer from 'esri/layers/GraphicsLayer';
+import Graphic from 'esri/Graphic';
+import geometryEngine from 'esri/geometry/geometryEngine';
+import Polygon from 'esri/geometry/Polygon';
+import Polyline from 'esri/geometry/Polyline';
+import Geometry from 'esri/geometry/Geometry';
+import webMercatorUtils from 'esri/geometry/support/webMercatorUtils';
+import Layer from 'esri/layers/Layer';
+import FeatureLayer from 'esri/layers/FeatureLayer';
 
 const { useState, useEffect, useRef, useCallback } = React;
 
@@ -85,7 +86,7 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
         }
 
         // produktiv bitte Array-Inhalt verifizieren
-        createBuffer(esriFeatures.map((graphic: Graphic) => geographicToWebMercator(graphic.geometry)));
+        createBuffer(esriFeatures.map((graphic: Graphic) => webMercatorUtils.geographicToWebMercator(graphic.geometry)));
     };
 
     const createBuffer = async (inputGeometries: Geometry[]) => {
@@ -108,21 +109,23 @@ export default function Widget(props: AllWidgetProps<{ Config }>) {
             gpxLayer.add(bufferGraphic);
 
             const polygonLayer = findPolygonLayer();
-            const polyQuery = polygonLayer.createQuery();
-            polyQuery.geometry = oneBuffer;
-            const featuresUnderBuffer = await polygonLayer.queryFeatures(polyQuery);
-            console.log('featuresUnderBuffer', featuresUnderBuffer);
+            if (polygonLayer) {
+                const polyQuery = polygonLayer.createQuery();
+                polyQuery.geometry = oneBuffer;
+                const featuresUnderBuffer = await polygonLayer.queryFeatures(polyQuery);
+                console.log('featuresUnderBuffer', featuresUnderBuffer);
 
-            console.log(
-                'fieldNames',
-                featuresUnderBuffer.fields.map((f) => f.alias)
-            );
-            // Valider Feldname: 'anzahl_ges'
-            const anzahlGes = featuresUnderBuffer.features.map((f) => f.attributes['anzahl_ges']);
+                console.log(
+                    'fieldNames',
+                    featuresUnderBuffer.fields.map((f) => f.alias)
+                );
+                // Valider Feldname: 'anzahl_ges'
+                const anzahlGes = featuresUnderBuffer.features.map((f) => f.attributes['anzahl_ges']);
 
-            const reducer = (accumulator, currentValue) => accumulator + currentValue;
-            setAnzahlGesSum(anzahlGes.reduce(reducer));
-            console.log('Gesamtanzahl der Coronafälle in durchjoggten Stadtteilen', anzahlGesSum);
+                const reducer = (accumulator, currentValue) => accumulator + currentValue;
+                setAnzahlGesSum(anzahlGes.reduce(reducer));
+                console.log('Gesamtanzahl der Coronafälle in durchjoggten Stadtteilen', anzahlGesSum);
+            }
         }
     };
 

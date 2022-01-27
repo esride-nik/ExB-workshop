@@ -4,7 +4,7 @@
   "type": "widget",
   "dependency": ["jimu-arcgis"],
   "version": "0.1.0",
-  "exbVersion": "1.5.0",
+  "exbVersion": "1.7.0",
   "author": "Niklas Köhn, Esri Deutschland GmbH",
   "description": "Map Click Query",
   "copyright": "Esri Deutschland GmbH, 2021",

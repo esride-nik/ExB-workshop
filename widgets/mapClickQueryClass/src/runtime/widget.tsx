@@ -1,15 +1,10 @@
 /** @jsx jsx */
-import { React, AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core';
+import { AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core';
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
-import defaultMessages from './translations/default';
 import { IMConfig } from '../config';
 
-import { webMercatorToGeographic } from 'esri/geometry/support/webMercatorUtils';
-import * as Point from 'esri/geometry/Point';
-import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
+import Point from 'esri/geometry/Point';
 import Graphic from 'esri/Graphic';
-import * as PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
-import * as Polygon from 'esri/geometry/Polygon';
 
 interface State {
     point: __esri.Point;

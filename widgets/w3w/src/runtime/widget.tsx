@@ -4,12 +4,12 @@ import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 import defaultMessages from './translations/default';
 import { IMConfig } from '../config';
 
-import { webMercatorToGeographic } from 'esri/geometry/support/webMercatorUtils';
-import * as Point from 'esri/geometry/Point';
-import * as GraphicsLayer from 'esri/layers/GraphicsLayer';
-import * as Graphic from 'esri/Graphic';
-import * as PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
-import * as Polygon from 'esri/geometry/Polygon';
+import webMercatorUtils from 'esri/geometry/support/webMercatorUtils';
+import Point from 'esri/geometry/Point';
+import GraphicsLayer from 'esri/layers/GraphicsLayer';
+import Graphic from 'esri/Graphic';
+import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
+import Polygon from 'esri/geometry/Polygon';
 
 const w3wApi = require('@what3words/api');
 
@@ -76,7 +76,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         jimuMapView.view.on('click', this.handleMapClick);
 
         if (stationary && this.state.center) {
-            let geoPoint = webMercatorToGeographic(this.state.center) as Point;
+            let geoPoint = webMercatorUtils.webMercatorToGeographic(this.state.center) as Point;
             if (geoPoint) {
                 const w3wAddress = await w3wApi.convertTo3wa({
                     lat: geoPoint.y,

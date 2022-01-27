@@ -2,7 +2,7 @@
   "name": "excelExport",
   "type": "widget",
   "version": "0.9.0",
-  "exbVersion": "1.5.0",
+  "exbVersion": "1.7.0",
   "author": "Niklas Köhn, Esri Deutschland",
   "description": "This widget exports records from a Data Action to an Excel Sheet.",
   "copyright": "",

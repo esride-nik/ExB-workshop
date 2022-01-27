@@ -2,11 +2,10 @@ import { React, AllWidgetProps, Immutable, FormattedMessage } from 'jimu-core';
 import defaultMessages from './translations/default';
 
 import XLSX from 'xlsx';
-import * as Graphic from 'esri/Graphic';
-import * as FeatureLayer from 'esri/layers/FeatureLayer';
+import Graphic from 'esri/Graphic';
+import FeatureLayer from 'esri/layers/FeatureLayer';
 import { Button, MultiSelect, MultiSelectItem } from 'jimu-ui';
 import * as Relationship from 'esri/layers/support/Relationship';
-import { formFeedbackStyles } from 'jimu-ui/lib/styles/components/form-feedback';
 
 interface WorksheetObject {
     ws: any;
@@ -184,6 +183,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         this.features = this.props?.mutableStateProps?.results?.features;
 
         // the data action is received here. only evaluate and set the state, if the mutableStateProps field list is different. this indicates that there is probably new incoming data.
+        console.log('renderExcel');
         if (
             this.features?.length > 0 &&
             (this.state.fieldNames.length === 0 ||
