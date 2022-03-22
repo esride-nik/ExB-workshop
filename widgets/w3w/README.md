@@ -21,3 +21,14 @@ execute each time the extent property changes. The `setState` method is called t
     }
   }
 ```
+
+## Steps
+* Kartenmittelpunkt abgreifen + auf Widget-UI anzeigen => Widget-State aktualisieren per watch auf 'center' Property der MapView
+* Event-Handler für w3w API auslösen, wenn Karte still steht => per watch auf 'stationary' Property der MapView
+* Position ab w3w API schicken + 3-Wort-Ergebnis empfangen => in Event Handler
+* Ergebnis auf Widget-UI anzeigen => Ergebnis in State eintragen
+* Ergebnis in Kartenmitte anzeigen
+    * mit Logo + Text = 2 Grafiken für Text + Logo
+    * als Quadrat = Polygon-Grafik mit Umrisslinie
+* Settings-Oberfläche darstellen => Setting Sections, Rows, Input-Komponenten
+* config schreiben => Event-Handler zum Schreiben der Config in settings.tsx
