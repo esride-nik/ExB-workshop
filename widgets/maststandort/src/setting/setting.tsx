@@ -66,7 +66,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
         `;
 
         return (
-            <div className="widget-setting-w3w p-2" css={style}>
+            <div className="widget-setting p-2" css={style}>
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
