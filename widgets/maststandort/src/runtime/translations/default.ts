@@ -25,6 +25,7 @@ export default {
     widgetProps: 'widget props:',
     ll: 'Lower Left',
     centerLabel: 'Center',
-    w3w: 'what3words Center',
+    maststandort: 'Maststandort',
+    abstrahlwinkel: 'Abstrahlwinkel',
     selectAMap: 'Bitte Karte wählen',
 };

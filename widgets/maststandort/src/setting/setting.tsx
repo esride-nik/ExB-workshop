@@ -24,7 +24,7 @@ import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advance
 import { ArcGISDataSourceTypes } from 'jimu-arcgis';
 import { IMConfig } from '../config';
 import defaultMessages from './translations/default';
-import { Switch, TextInput } from 'jimu-ui';
+import { NumericInput, Switch, TextInput } from 'jimu-ui';
 
 export default class Setting extends React.PureComponent<AllWidgetSettingProps<IMConfig>, any> {
     supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap]);
@@ -36,24 +36,10 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
         });
     };
 
-    switchW3wOnMap = (evt: React.FormEvent<HTMLInputElement>) => {
+    setRadius = (radius: number) => {
         this.props.onSettingChange({
             id: this.props.id,
-            config: this.props.config.set('w3wOnMap', evt.currentTarget.checked),
-        });
-    };
-
-    switchShowW3wSquare = (evt: React.FormEvent<HTMLInputElement>) => {
-        this.props.onSettingChange({
-            id: this.props.id,
-            config: this.props.config.set('showW3wSquare', evt.currentTarget.checked),
-        });
-    };
-
-    setW3wApiKey = (w3wApiKey: string) => {
-        this.props.onSettingChange({
-            id: this.props.id,
-            config: this.props.config.set('w3wApiKey', w3wApiKey),
+            config: this.props.config.set('radiusKm', radius),
         });
     };
 
@@ -81,47 +67,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                     </SettingRow>
                 </SettingSection>
                 <SettingSection
-                    className="map-selector-section"
+                    className="setting-section"
                     title={this.props.intl.formatMessage({
-                        id: 'mapWidgetLabel',
-                        defaultMessage: defaultMessages.displayOption,
+                        id: 'radius',
+                        defaultMessage: defaultMessages.radius,
                     })}>
                     <SettingRow>
-                        <div className="w-100">
-                            <div className="checkbox-row">
-                                <Switch checked={this.props.config?.w3wOnMap || false} onChange={this.switchW3wOnMap} />
-                                <label>
-                                    <FormattedMessage id="zoomToLayer" defaultMessage={defaultMessages.w3wOnMap} />
-                                </label>
-                            </div>
-                        </div>
-                    </SettingRow>
-                    <SettingRow>
-                        <div className="w-100">
-                            <div className="checkbox-row">
-                                <Switch
-                                    checked={(this.props.config && this.props.config.showW3wSquare) || false}
-                                    onChange={this.switchShowW3wSquare}
-                                />
-                                <label>
-                                    <FormattedMessage id="zoomToLayer" defaultMessage={defaultMessages.showW3wSquare} />
-                                </label>
-                            </div>
-                        </div>
-                    </SettingRow>
-                </SettingSection>
-                <SettingSection
-                    className="map-selector-section"
-                    title={this.props.intl.formatMessage({
-                        id: 'mapWidgetLabel',
-                        defaultMessage: defaultMessages.w3wApiKey,
-                    })}>
-                    <SettingRow>
-                        <TextInput
-                            type="password"
-                            placeholder={defaultMessages.w3wApiKey}
-                            defaultValue={this.props.config.w3wApiKey}
-                            onAcceptValue={this.setW3wApiKey}
+                        <NumericInput
+                            defaultValue={this.props.config.radiusKm}
+                            onAcceptValue={this.setRadius}
                         />
                     </SettingRow>
                 </SettingSection>

@@ -10,28 +10,23 @@ import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import Graphic from 'esri/Graphic';
 import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import Polygon from 'esri/geometry/Polygon';
+import { NumericInput } from 'jimu-ui';
 
 const w3wApi = require('@what3words/api');
 
 interface State {
-    extent: __esri.Extent;
     center: __esri.Point;
-    w3wAddress: any;
-    query: any;
+    angle: number;
 }
 
 export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> {
-    extentWatch: __esri.WatchHandle;
-    centerWatch: __esri.WatchHandle;
-    stationaryWatch: __esri.WatchHandle;
     w3wLayer: GraphicsLayer;
 
     state: State = {
-        extent: null,
         center: null,
-        w3wAddress: null,
-        query: null,
+        angle: null,
     };
+    mapView: __esri.MapView | __esri.SceneView;
 
     constructor(props: any) {
         super(props);
@@ -46,21 +41,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.w3wLayer = new GraphicsLayer({
             listMode: 'hide',
         });
-    }
-
-    componentWillUnmount() {
-        if (this.extentWatch) {
-            this.extentWatch.remove();
-            this.extentWatch = null;
-        }
-        if (this.centerWatch) {
-            this.centerWatch.remove();
-            this.centerWatch = null;
-        }
-        if (this.stationaryWatch) {
-            this.stationaryWatch.remove();
-            this.stationaryWatch = null;
-        }
     }
 
     handleMapClick = (mapClick: any) => {
@@ -155,27 +135,26 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
     onActiveViewChange = (jimuMapView: JimuMapView) => {
         if (!jimuMapView) return;
-
-        if (!this.stationaryWatch) {
-            this.stationaryWatch = jimuMapView.view.watch('stationary', (stationary) =>
-                this.stationaryWatchHandler(stationary, jimuMapView)
-            );
-        }
-        if (!this.extentWatch) {
-            this.extentWatch = jimuMapView.view.watch('extent', (extent) => {
-                this.setState({
-                    extent,
-                });
-            });
-        }
-        if (!this.centerWatch) {
-            this.centerWatch = jimuMapView.view.watch('center', (center) => {
-                this.setState({
-                    center,
-                });
-            });
-        }
+        this.mapView = jimuMapView.view;
     };
+
+    setX = (x: number) => this.setState({
+        center: new Point({
+            x: x,
+            y: this.state.center?.y
+        })
+    })
+
+    setY = (y: number) => this.setState({
+        center: new Point({
+            x: this.state.center?.x,
+            y: y
+        })
+    })
+
+    setAngle = (angle: number) => this.setState({
+        angle
+    })
 
     render() {
         if (!this.isConfigured()) {
@@ -185,12 +164,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         return (
             <div className="custom-widget p-3 m-4 surface-1">
                 <h3>
-                    <FormattedMessage id="w3w" defaultMessage={defaultMessages.w3w} />
+                    <FormattedMessage id="maststandort" defaultMessage={defaultMessages.maststandort} />
                 </h3>
 
                 {this.props.hasOwnProperty('useMapWidgetIds') &&
-                    this.props.useMapWidgetIds &&
-                    this.props.useMapWidgetIds.length === 1 && (
+                    this.props.useMapWidgetIds?.length === 1 && (
                         <JimuMapViewComponent
                             useMapWidgetId={this.props.useMapWidgetIds?.[0]}
                             onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
@@ -200,17 +178,24 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                     <tbody>
                         <tr>
                             <td scope="row">X</td>
-                            <td>{this.state.center && this.state.center.x}</td>
+                            <td><NumericInput
+                                defaultValue={this.state.center?.x}
+                                onChange={this.setX}
+                            /></td>
                         </tr>
                         <tr>
                             <td scope="row">Y</td>
-                            <td>{this.state.center && this.state.center.y}</td>
+                            <td><NumericInput
+                                defaultValue={this.state.center?.y}
+                                onChange={this.setY}
+                            /></td>
                         </tr>
                         <tr>
-                            <th scope="row">
-                                <FormattedMessage id="centerLabel" />
-                            </th>
-                            <td>{this.state.w3wAddress && this.state.w3wAddress.words}</td>
+                            <td scope="row"><FormattedMessage id="abstrahlwinkel" defaultMessage={defaultMessages.abstrahlwinkel} /></td>
+                            <td><NumericInput
+                                defaultValue={this.state.angle}
+                                onChange={this.setAngle}
+                            /></td>
                         </tr>
                     </tbody>
                 </table>
