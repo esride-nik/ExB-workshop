@@ -4,3 +4,4 @@ jimu*
 types
 webpack
 __mocks__
+package-lock.json
