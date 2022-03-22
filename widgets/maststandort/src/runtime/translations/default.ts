@@ -26,4 +26,5 @@ export default {
     ll: 'Lower Left',
     centerLabel: 'Center',
     w3w: 'what3words Center',
+    selectAMap: 'Bitte Karte wählen',
 };

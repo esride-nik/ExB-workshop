@@ -1,17 +1,17 @@
 {
   "name": "maststandort",
-  "label": "Maststandort + Abstrahlwinkel",
+  "label": "Maststandort",
   "type": "widget",
   "dependency": ["jimu-arcgis"],
   "version": "1.1.0",
   "exbVersion": "1.7.0",
   "author": "Niklas Köhn, Esri Deutschland GmbH",
-  "description": "",
+  "description": "Maststandort + Abstrahlwinkel",
   "copyright": "",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "defaultSize": {
     "width": 300,
     "height": 300
   },
-  "translatedLocales": ["en", "de"]
+  "translatedLocales": ["en"]
 }

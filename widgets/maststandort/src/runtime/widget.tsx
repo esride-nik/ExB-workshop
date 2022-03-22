@@ -179,7 +179,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
     render() {
         if (!this.isConfigured()) {
-            return 'Select a map';
+            return <FormattedMessage id="selectAMap" defaultMessage={defaultMessages.selectAMap} />;
         }
 
         return (
