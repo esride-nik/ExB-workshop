@@ -16,6 +16,8 @@ import SpatialReference from 'esri/geometry/SpatialReference';
 import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol';
 import Color from 'esri/Color';
 import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
+import FeatureLayer from 'esri/layers/FeatureLayer';
+import UniqueValueRenderer from 'esri/renderers/UniqueValueRenderer';
 interface State {
     x: number;
     y: number;
@@ -26,6 +28,8 @@ interface State {
 
 export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> {
     mastStandortLayer: GraphicsLayer;
+    mapView: __esri.MapView | __esri.SceneView;
+    hslPolyFeatureLayer: FeatureLayer;
 
     state: State = {
         x: null,
@@ -34,7 +38,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         color: '#fff',
         inputValid: false
     };
-    mapView: __esri.MapView | __esri.SceneView;
 
     constructor(props: any) {
         super(props);
@@ -48,6 +51,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.mastStandortLayer = new GraphicsLayer({
             listMode: 'show',
         });
+        this.hslPolyFeatureLayer = new FeatureLayer({
+            source: [],
+            objectIdField: "ObjectID",
+            title: defaultMessages.abstrahlwinkel,
+        })
 
         this.setState({
             x: 6,
@@ -93,8 +101,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         } as unknown as SimpleMarkerSymbol;
     }
 
-    getPolySym() {
-        const fillColor = new Color(this.state.color);
+    getPolySym(color: string) {
+        const fillColor = new Color(color);
         return {
             type: "simple-fill",
             color: [fillColor.r, fillColor.g, fillColor.b, 0.3],
@@ -154,17 +162,16 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             spatialReference: wmCenter.spatialReference
         })
 
-
-
         const anglePolygonRotated = geometryEngine.rotate(anglePolygon, -this.state.angle, wmCenter);
-
         const sampleGraphics = this.getSamplePoints()
 
+        this.fillHslFeatureLayer(anglePolygonRotated);
+
         this.mastStandortLayer.graphics.addMany([
-            new Graphic({
-                geometry: anglePolygonRotated,
-                symbol: this.getPolySym()
-            }),
+            // new Graphic({
+            //     geometry: anglePolygonRotated,
+            //     symbol: this.getPolySym()
+            // }),
             ...sampleGraphics,
             new Graphic({
                 geometry: wmCenter,
@@ -173,6 +180,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         ])
 
         this.mapView.goTo(anglePolygonRotated);
+        this.mapView.map.add(this.hslPolyFeatureLayer);
         this.mapView.map.add(this.mastStandortLayer);
     }
 
@@ -213,6 +221,27 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.setState({
             color: colorPicker?.target?.value
         }, this.checkInputValidity);
+    }
+
+    private fillHslFeatureLayer(anglePolygonRotated: __esri.Geometry) {
+        this.hslPolyFeatureLayer.source.add(new Graphic({
+            geometry: anglePolygonRotated,
+            attributes: {
+                name: 'feature1',
+                ObjectID: 0
+            }
+        }) as unknown as Graphic);
+
+        let renderer = {
+            type: "unique-value",
+            field: "name",
+            defaultSymbol: this.getPolySym('#f00'),
+            uniqueValueInfos: [{
+                value: "feature1",
+                symbol: this.getPolySym(this.state.color)
+            }]
+        } as unknown as UniqueValueRenderer;
+        this.hslPolyFeatureLayer.renderer = renderer;
     }
 
     private getSamplePoints() {
