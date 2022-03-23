@@ -15,6 +15,7 @@ import LineSymbolMarker from 'esri/symbols/LineSymbolMarker';
 import { Polyline } from 'esri/geometry';
 import geometryEngine from 'esri/geometry/geometryEngine';
 import SpatialReference from 'esri/geometry/SpatialReference';
+import geometryEngineAsync from 'esri/geometry/geometryEngineAsync';
 interface State {
     center: __esri.Point;
     angle: number;
@@ -99,41 +100,64 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         };
     }
 
-    drawMast = () => {
+    drawMast = async () => {
         if (!this.state.angle || !this.state.center) return;
         // jimuMapView.view.on('click', this.handleMapClick);
 
-        const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center);
+        const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center) as Point;
         // const offsetWmCenter = geometryEngine.offset(wmCenter, this.props.config.radiusKm, 'kilometers');
 
         const wmDistBufferRadius = geometryEngine.geodesicBuffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
-        console.log('l bef', wmDistBufferRadius.rings[0].length)
-        const lastEl = wmDistBufferRadius.rings[0].pop();
-        console.log('l aft', wmDistBufferRadius.rings[0].length)
+        const wmDistBufferRadiusRotated = geometryEngine.rotate(wmDistBufferRadius, 10) as Polygon;
+        console.log('l bef', wmDistBufferRadiusRotated.rings[0].length)
+        const lastEl = wmDistBufferRadiusRotated.rings[0].pop();
+        console.log('l aft', wmDistBufferRadiusRotated.rings[0].length)
         const wmDistBufferLine = {
             type: "polyline", // autocasts as new Polyline()
-            paths: wmDistBufferRadius.rings,
-            spatialReference: wmDistBufferRadius.spatialReference
+            paths: wmDistBufferRadiusRotated.rings,
+            spatialReference: wmDistBufferRadiusRotated.spatialReference
         } as unknown as Polyline;
-
 
         // const distBufferRadius = geometryEngine.buffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
         // const distPointRadius = geometryEngine.offset(this.state.center, this.props.config.radiusKm) as Point;
-        const offsetBufferRadius = geometryEngine.offset(wmDistBufferRadius, this.props.config.radiusKm, 'kilometers') as Polygon;
+        // const offsetBufferRadius = geometryEngine.offset(wmDistBufferRadius, this.props.config.radiusKm, 'kilometers') as Polygon;
 
         // First create a line geometry (this is the Keystone pipeline)
         const cutline = {
             type: "polyline", // autocasts as new Polyline()
-            paths: [
-                [this.state.center.x, this.state.center.y],
-                [this.state.center.x, this.state.center.y+10],
-            ],
-            spatialReference: SpatialReference.WGS84
+            paths: [[
+                [wmCenter.x, wmCenter.y],
+                [wmCenter.x, wmCenter.y+10000],
+            ]],
+            spatialReference: wmCenter.spatialReference
         } as unknown as Polyline;
+        // const cutline = {
+        //     type: "polyline", // autocasts as new Polyline()
+        //     paths: [
+        //         [this.state.center.x, this.state.center.y],
+        //         [this.state.center.x, this.state.center.y+10],
+        //     ],
+        //     spatialReference: SpatialReference.WGS84
+        // } as unknown as Polyline;
 
-        const wmCutline = webMercatorUtils.geographicToWebMercator(cutline);
-        console.log('wmCutline length', geometryEngine.geodesicLength(wmCutline, 'kilometers'))
-        const outerPoint = geometryEngine.intersect(wmDistBufferRadius, wmCutline) as Point;
+        // const wmCutline = webMercatorUtils.geographicToWebMercator(cutline);
+        console.log('cutline length', cutline, geometryEngine.geodesicLength(cutline))
+        console.log('wmDistBufferLine length', wmDistBufferLine, geometryEngine.geodesicLength(wmDistBufferLine))
+        console.log('crosses', geometryEngine.crosses(cutline, wmDistBufferLine));
+        const cutLines = geometryEngine.cut(cutline, wmDistBufferLine);
+        console.log('cut', cutLines);
+        console.log('cutLines[1] length', cutLines[1], geometryEngine.geodesicLength(cutLines[1]))
+
+        // const angleRing = 
+        
+        const innerLineRotated = geometryEngine.rotate(cutLines[1], -10, wmCenter) as Polyline;
+        const outerPoint = new Point({
+            x: innerLineRotated.paths[0][1][0],
+            y: innerLineRotated.paths[0][1][1],
+            spatialReference: innerLineRotated.spatialReference
+        })
+
+
 
         this.helperLayer.graphics.addMany([
             new Graphic({
@@ -141,20 +165,20 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 symbol: this.getPointSym()
             }),
             new Graphic({
-                geometry: offsetBufferRadius,
-                symbol: this.getFillSym()
-            }),
-            new Graphic({
-                geometry: cutline,
-                symbol: this.getArrowSym()
+                geometry: outerPoint,
+                symbol: this.getPointSym()
             }),
             new Graphic({
                 geometry: wmDistBufferLine,
                 symbol: this.getArrowSym()
             }),
             new Graphic({
-                geometry: wmDistBufferRadius,
-                symbol: this.getFillSym()
+                geometry: cutLines[1],
+                symbol: this.getArrowSym()
+            }),
+            new Graphic({
+                geometry: innerLineRotated,
+                symbol: this.getArrowSym()
             }),
         ])
         
