@@ -15,7 +15,7 @@ import LineSymbolMarker from 'esri/symbols/LineSymbolMarker';
 import { Polyline } from 'esri/geometry';
 import geometryEngine from 'esri/geometry/geometryEngine';
 import SpatialReference from 'esri/geometry/SpatialReference';
-import geometryEngineAsync from 'esri/geometry/geometryEngineAsync';
+import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol';
 interface State {
     center: __esri.Point;
     angle: number;
@@ -68,20 +68,31 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
 
     getArrowSym() {
-        return new LineSymbolMarker({
+        return new SimpleLineSymbol({
+            color: "gray",
+            width: 1.5,
+            marker: {
+               style: "arrow",
+               color: "blue",
+               placement: "begin"
+            }
+         });
+    }
+
+    getLineSym() {
+        return new SimpleLineSymbol({
             color: "blue",
-            placement: "begin-end",
-            style: "arrow"
-        });
+            width: 1.5
+         });
     }
 
     getPointSym() {
         return {
-            type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+            type: "simple-marker",
             style: "square",
             color: "blue",
             size: "8px",  // pixels
-            outline: {  // autocasts as new SimpleLineSymbol()
+            outline: {
                 color: [255, 255, 0],
                 width: 3  // points
             }
@@ -153,7 +164,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             }),
             new Graphic({
                 geometry: angleRingLine,
-                symbol: this.getArrowSym()
+                symbol: this.getLineSym()
             }),
             // new Graphic({
             //     geometry: cutLines[1],
