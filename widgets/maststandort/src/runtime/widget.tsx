@@ -14,6 +14,7 @@ import { Polyline } from 'esri/geometry';
 import geometryEngine from 'esri/geometry/geometryEngine';
 import SpatialReference from 'esri/geometry/SpatialReference';
 import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol';
+import Color from 'esri/Color';
 interface State {
     x: number;
     y: number;
@@ -47,15 +48,12 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             listMode: 'show',
         });
 
-        // this.setState({
-        //     center: new Point({
-        //         x: 8.6,
-        //         y: 52.4,
-        //         spatialReference: SpatialReference.WGS84
-        //     }),
-        //     angle: 20
-        // });
-        // this.checkInputValidity();
+        this.setState({
+            x: 6,
+            y: 48,
+            angle: 50,
+            color: '#fff'
+        }, this.checkInputValidity);
     }
 
     // handleMapClick = (mapClick: any) => {
@@ -71,7 +69,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         return {
             type: "simple-marker",
             path: "M 50,0 100,150 0,150 50,0 50,150 55,150 55,300 45,300 45,150 50,150 50,600 z",
-            color: [0, 0, 255, 1.0],
+            color: this.state.color,
             outline: {
                 color: [0, 0, 255, 1.0],
                 width: 0.1
@@ -81,23 +79,24 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         }
     }
 
-    getPointSym() {
-        return {
-            type: "simple-marker",
-            style: "square",
-            color: "blue",
-            size: "8px",  // pixels
-            outline: {
-                color: [255, 255, 0],
-                width: 3  // points
-            }
-        }
-    }
+    // getPointSym() {
+    //     return {
+    //         type: "simple-marker",
+    //         style: "square",
+    //         color: "blue",
+    //         size: "8px",  // pixels
+    //         outline: {
+    //             color: [255, 255, 0],
+    //             width: 3  // points
+    //         }
+    //     }
+    // }
 
     getPolySym() {
+        const fillColor = new Color(this.state.color);
         return {
-            type: "simple-fill",  // autocasts as new SimpleFillSymbol()
-            color: [0, 0, 255, 0.3],
+            type: "simple-fill",
+            color: [fillColor.r, fillColor.g, fillColor.b, 0.3],
             style: "solid",
             outline: this.getLineSym()
         };
@@ -105,7 +104,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
     getLineSym() {
         return new SimpleLineSymbol({
-            color: [0, 0, 255, 1.0],
+            color: this.state.color,
             width: 1.5
         });
     }
