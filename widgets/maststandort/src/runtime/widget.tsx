@@ -16,6 +16,8 @@ import { Polyline } from 'esri/geometry';
 import geometryEngine from 'esri/geometry/geometryEngine';
 import SpatialReference from 'esri/geometry/SpatialReference';
 import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol';
+import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
+import SimpleRenderer from 'esri/renderers/SimpleRenderer';
 interface State {
     center: __esri.Point;
     angle: number;
@@ -67,16 +69,18 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     // };
 
 
-    getArrowSym() {
-        return new SimpleLineSymbol({
-            color: "gray",
-            width: 1.5,
-            marker: {
-               style: "arrow",
-               color: "blue",
-               placement: "begin"
-            }
-         });
+    getArrowMarkerSym() {
+        return {
+            type: "simple-marker",
+            path: "M 50,0 100,150 0,150 50,0 50,150 55,150 55,300 45,300 45,150 50,150 50,600 z",
+            color: [0, 0, 255, 1.0],
+            outline: {
+              color: [0, 0, 0, 0.7],
+              width: 0.5
+            },
+            angle: 180,
+            size: 15
+          }
     }
 
     getPointSym() {
@@ -105,7 +109,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         return new SimpleLineSymbol({
             color: [0, 0, 255, 1.0],
             width: 1.5
-         });
+        });
     }
 
     drawMast = async () => {
@@ -146,11 +150,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             angleRing.push([innerLineRotated.paths[0][1][0], innerLineRotated.paths[0][1][1]]);
         }
         angleRing.push([wmCenter.x, wmCenter.y]);
-        const angleRingLine = {
-            type: "polyline",
-            paths: angleRing,
-            spatialReference: wmCenter.spatialReference
-        } as unknown as Polyline;
+        // const angleRingLine = {
+        //     type: "polyline",
+        //     paths: angleRing,
+        //     spatialReference: wmCenter.spatialReference
+        // } as unknown as Polyline;
 
         const anglePolygon = new Polygon({
             rings: [angleRing],
@@ -170,6 +174,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 geometry: anglePolygonRotated,
                 symbol: this.getPolySym()
             }),
+            new Graphic({
+                geometry: this.state.center,
+                symbol: this.getArrowMarkerSym()
+            })
         ])
 
         this.mapView.goTo(anglePolygonRotated);
