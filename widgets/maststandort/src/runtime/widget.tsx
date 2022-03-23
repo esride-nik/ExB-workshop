@@ -79,13 +79,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
          });
     }
 
-    getLineSym() {
-        return new SimpleLineSymbol({
-            color: "blue",
-            width: 1.5
-         });
-    }
-
     getPointSym() {
         return {
             type: "simple-marker",
@@ -99,16 +92,20 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         }
     }
 
-    getFillSym() {
+    getPolySym() {
         return {
             type: "simple-fill",  // autocasts as new SimpleFillSymbol()
-            color: [51, 51, 204, 0.9],
+            color: [0, 0, 255, 0.7],
             style: "solid",
-            outline: {  // autocasts as new SimpleLineSymbol()
-                color: "white",
-                width: 1
-            }
+            outline: this.getLineSym()
         };
+    }
+
+    getLineSym() {
+        return new SimpleLineSymbol({
+            color: [0, 0, 255, 1.0],
+            width: 1.5
+         });
     }
 
     drawMast = async () => {
@@ -155,26 +152,28 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             spatialReference: wmCenter.spatialReference
         } as unknown as Polyline;
 
+        const anglePolygon = new Polygon({
+            rings: [angleRing],
+            spatialReference: wmCenter.spatialReference
+        })
+
         // this.state.angle
 
         this.helperLayer.graphics.addMany([
             new Graphic({
                 geometry: this.state.center,
                 symbol: this.getPointSym()
-            }),
+            })
+        ])
+        this.mastStandortLayer.graphics.addMany([
             new Graphic({
-                geometry: angleRingLine,
-                symbol: this.getLineSym()
+                geometry: anglePolygon,
+                symbol: this.getPolySym()
             }),
-            // new Graphic({
-            //     geometry: cutLines[1],
-            //     symbol: this.getArrowSym()
-            // }),
         ])
 
-        this.mapView.goTo(wmDistBufferRadius);
+        this.mapView.goTo(anglePolygon);
 
-        this.mapView.map.add(this.helperLayer);
 
 
         // const hslPointArrow = new Graphic({
@@ -183,8 +182,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         // });
         // console.log('arrowSym', hslPointArrow);
         // this.mastStandortLayer.graphics.add(hslPointArrow);
-        // this.mapView.map.add(this.mastStandortLayer);
 
+        this.mapView.map.add(this.helperLayer);
+        this.mapView.map.add(this.mastStandortLayer);
     }
 
     onActiveViewChange = (jimuMapView: JimuMapView) => {
