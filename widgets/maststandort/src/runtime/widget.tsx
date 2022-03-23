@@ -106,21 +106,34 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center);
         // const offsetWmCenter = geometryEngine.offset(wmCenter, this.props.config.radiusKm, 'kilometers');
 
-        const distBufferRadius = geometryEngine.geodesicBuffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
+        const wmDistBufferRadius = geometryEngine.geodesicBuffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
+        console.log('l bef', wmDistBufferRadius.rings[0].length)
+        const lastEl = wmDistBufferRadius.rings[0].pop();
+        console.log('l aft', wmDistBufferRadius.rings[0].length)
+        const wmDistBufferLine = {
+            type: "polyline", // autocasts as new Polyline()
+            paths: wmDistBufferRadius.rings,
+            spatialReference: wmDistBufferRadius.spatialReference
+        } as unknown as Polyline;
+
+
         // const distBufferRadius = geometryEngine.buffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
         // const distPointRadius = geometryEngine.offset(this.state.center, this.props.config.radiusKm) as Point;
-        const offsetWmCenter = geometryEngine.offset(distBufferRadius, this.props.config.radiusKm, 'kilometers');
+        const offsetBufferRadius = geometryEngine.offset(wmDistBufferRadius, this.props.config.radiusKm, 'kilometers') as Polygon;
 
         // First create a line geometry (this is the Keystone pipeline)
         const cutline = {
             type: "polyline", // autocasts as new Polyline()
             paths: [
                 [this.state.center.x, this.state.center.y],
-                [this.state.center.x, 90],
+                [this.state.center.x, this.state.center.y+10],
             ],
             spatialReference: SpatialReference.WGS84
         } as unknown as Polyline;
-        const outerPoint = geometryEngine.intersect(distBufferRadius, cutline) as Point;
+
+        const wmCutline = webMercatorUtils.geographicToWebMercator(cutline);
+        console.log('wmCutline length', geometryEngine.geodesicLength(wmCutline, 'kilometers'))
+        const outerPoint = geometryEngine.intersect(wmDistBufferRadius, wmCutline) as Point;
 
         this.helperLayer.graphics.addMany([
             new Graphic({
@@ -128,20 +141,24 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 symbol: this.getPointSym()
             }),
             new Graphic({
-                geometry: offsetWmCenter,
-                symbol: this.getPointSym()
+                geometry: offsetBufferRadius,
+                symbol: this.getFillSym()
             }),
             new Graphic({
                 geometry: cutline,
                 symbol: this.getArrowSym()
             }),
             new Graphic({
-                geometry: distBufferRadius,
+                geometry: wmDistBufferLine,
+                symbol: this.getArrowSym()
+            }),
+            new Graphic({
+                geometry: wmDistBufferRadius,
                 symbol: this.getFillSym()
             }),
         ])
         
-        this.mapView.goTo(distBufferRadius);
+        this.mapView.goTo(wmDistBufferRadius);
 
         // // First create a line geometry (this is the Keystone pipeline)
         // const polyline = {
