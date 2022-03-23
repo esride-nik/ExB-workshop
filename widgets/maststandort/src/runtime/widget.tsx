@@ -75,11 +75,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             path: "M 50,0 100,150 0,150 50,0 50,150 55,150 55,300 45,300 45,150 50,150 50,600 z",
             color: [0, 0, 255, 1.0],
             outline: {
-              color: [0, 0, 0, 0.7],
-              width: 0.5
+              color: [0, 0, 255, 1.0],
+              width: 0.1
             },
-            angle: 180,
-            size: 15
+            size: 150,
+            angle: this.state.angle
           }
     }
 
@@ -99,7 +99,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     getPolySym() {
         return {
             type: "simple-fill",  // autocasts as new SimpleFillSymbol()
-            color: [0, 0, 255, 0.7],
+            color: [0, 0, 255, 0.3],
             style: "solid",
             outline: this.getLineSym()
         };
