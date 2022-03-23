@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { React, AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core';
+import { AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core';
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis';
 import defaultMessages from './translations/default';
 import { IMConfig } from '../config';
@@ -8,20 +8,17 @@ import webMercatorUtils from 'esri/geometry/support/webMercatorUtils';
 import Point from 'esri/geometry/Point';
 import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import Graphic from 'esri/Graphic';
-import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import Polygon from 'esri/geometry/Polygon';
 import { Button, NumericInput } from 'jimu-ui';
-import LineSymbolMarker from 'esri/symbols/LineSymbolMarker';
 import { Polyline } from 'esri/geometry';
 import geometryEngine from 'esri/geometry/geometryEngine';
 import SpatialReference from 'esri/geometry/SpatialReference';
 import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol';
-import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
-import SimpleRenderer from 'esri/renderers/SimpleRenderer';
 interface State {
     x: number;
     y: number;
     angle: number;
+    color: string;
     inputValid: boolean;
 }
 
@@ -29,9 +26,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     mastStandortLayer: GraphicsLayer;
 
     state: State = {
-        x: 0,
-        y: 0,
+        x: null,
+        y: null,
         angle: null,
+        color: '#fff',
         inputValid: false
     };
     mapView: __esri.MapView | __esri.SceneView;
@@ -179,9 +177,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     };
 
     checkInputValidity = () => {
-        const valid = this.state.x !== undefined
-            && this.state.y !== undefined
-            && this.state.angle !== undefined;
+        const valid = this.state.x !== null
+            && this.state.y !== null
+            && this.state.color?.length > 0
+            && this.state.angle !== null;
         this.setState({
             inputValid: valid
         })
@@ -190,22 +189,25 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     setX = (x: number) => {
         this.setState({
             x
-        })
-        this.checkInputValidity();
+        }, this.checkInputValidity);
     }
 
     setY = (y: number) => {
         this.setState({
             y
-        })
-        this.checkInputValidity();
+        }, this.checkInputValidity);
     }
 
     setAngle = (angle: number) => {
         this.setState({
             angle
-        })
-        this.checkInputValidity();
+        }, this.checkInputValidity);
+    }
+
+    setColor = (colorPicker: any) => {
+        this.setState({
+            color: colorPicker?.target?.value
+        }, this.checkInputValidity);
     }
 
     render() {
@@ -252,12 +254,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                     </tbody>
                 </table>
 
+                <input type="color" id="favcolor" name="favcolor" value="#ff0000" onChange={this.setColor}></input>
+
                 <Button onClick={this.drawMast} disabled={!this.state.inputValid}>
                     <FormattedMessage
                         id={defaultMessages.drawMast}
                         defaultMessage={defaultMessages.drawMast}
                     />
                 </Button>
+
             </div>
         );
     }
