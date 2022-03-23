@@ -40,7 +40,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     //     angle: null,
     // };
     mapView: __esri.MapView | __esri.SceneView;
-    helperLayer: GraphicsLayer;
 
     constructor(props: any) {
         super(props);
@@ -52,10 +51,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
     componentDidMount() {
         this.mastStandortLayer = new GraphicsLayer({
-            listMode: 'hide',
-        });
-        this.helperLayer = new GraphicsLayer({
-            listMode: 'hide',
+            listMode: 'show',
         });
     }
 
@@ -67,7 +63,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     //     });
     //     console.log('pointGraphic', pointGraphic);
     // };
-
 
     getArrowMarkerSym() {
         return {
@@ -118,8 +113,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
         this.mastStandortLayer.graphics.removeAll();
         this.mapView.map.remove(this.mastStandortLayer);
-        this.helperLayer.graphics.removeAll();
-        this.mapView.map.remove(this.helperLayer);
 
         const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center) as Point;
         const wmDistBufferRadius = geometryEngine.geodesicBuffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
@@ -128,7 +121,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             paths: wmDistBufferRadius.rings,
             spatialReference: wmDistBufferRadius.spatialReference
         } as unknown as Polyline;
-        const cutline = {
+        const wmCutline = {
             type: "polyline",
             paths: [[
                 [wmCenter.x, wmCenter.y],
@@ -137,10 +130,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             spatialReference: wmCenter.spatialReference
         } as unknown as Polyline;
 
-        // console.log('cutline length', cutline, geometryEngine.geodesicLength(cutline))
-        // console.log('wmDistBufferLine length', wmDistBufferLine, geometryEngine.geodesicLength(wmDistBufferLine))
-        // console.log('crosses', geometryEngine.crosses(cutline, wmDistBufferLine));
-        const cutLines = geometryEngine.cut(cutline, wmDistBufferLine);
+        const cutLines = geometryEngine.cut(wmCutline, wmDistBufferLine);
         const innerLine = cutLines[1] as Polyline;
         let angleRing = [[wmCenter.x, wmCenter.y]];
 
@@ -150,11 +140,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             angleRing.push([innerLineRotated.paths[0][1][0], innerLineRotated.paths[0][1][1]]);
         }
         angleRing.push([wmCenter.x, wmCenter.y]);
-        // const angleRingLine = {
-        //     type: "polyline",
-        //     paths: angleRing,
-        //     spatialReference: wmCenter.spatialReference
-        // } as unknown as Polyline;
 
         const anglePolygon = new Polygon({
             rings: [angleRing],
@@ -163,12 +148,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
         const anglePolygonRotated = geometryEngine.rotate(anglePolygon, -this.state.angle, wmCenter);
 
-        this.helperLayer.graphics.addMany([
-            new Graphic({
-                geometry: this.state.center,
-                symbol: this.getPointSym()
-            })
-        ])
         this.mastStandortLayer.graphics.addMany([
             new Graphic({
                 geometry: anglePolygonRotated,
@@ -181,17 +160,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         ])
 
         this.mapView.goTo(anglePolygonRotated);
-
-
-
-        // const hslPointArrow = new Graphic({
-        //     geometry: polyline,
-        //     symbol: this.getArrowSym() //logoSym,
-        // });
-        // console.log('arrowSym', hslPointArrow);
-        // this.mastStandortLayer.graphics.add(hslPointArrow);
-
-        this.mapView.map.add(this.helperLayer);
         this.mapView.map.add(this.mastStandortLayer);
     }
 
