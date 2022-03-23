@@ -19,7 +19,8 @@ import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol';
 import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
 import SimpleRenderer from 'esri/renderers/SimpleRenderer';
 interface State {
-    center: __esri.Point;
+    x: number;
+    y: number;
     angle: number;
     inputValid: boolean;
 }
@@ -28,7 +29,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     mastStandortLayer: GraphicsLayer;
 
     state: State = {
-        center: null,
+        x: 0,
+        y: 0,
         angle: null,
         inputValid: false
     };
@@ -111,13 +113,18 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
 
     drawMast = async () => {
-        if (!this.state.angle || !this.state.center) return;
+        if (!this.state.inputValid) return;
         // jimuMapView.view.on('click', this.handleMapClick);
 
         this.mastStandortLayer.graphics.removeAll();
         this.mapView.map.remove(this.mastStandortLayer);
 
-        const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center) as Point;
+        const center = new Point({
+            x: this.state.x,
+            y: this.state.y,
+            spatialReference: SpatialReference.WGS84
+        })
+        const wmCenter = webMercatorUtils.geographicToWebMercator(center) as Point;
         const wmDistBufferRadius = geometryEngine.geodesicBuffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
         const wmDistBufferLine = {
             type: "polyline",
@@ -157,7 +164,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 symbol: this.getPolySym()
             }),
             new Graphic({
-                geometry: this.state.center,
+                geometry: wmCenter,
                 symbol: this.getArrowMarkerSym()
             })
         ])
@@ -172,8 +179,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     };
 
     checkInputValidity = () => {
-        const valid = this.state.center?.x !== undefined
-            && this.state.center?.y !== undefined
+        const valid = this.state.x !== undefined
+            && this.state.y !== undefined
             && this.state.angle !== undefined;
         this.setState({
             inputValid: valid
@@ -182,20 +189,14 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
     setX = (x: number) => {
         this.setState({
-            center: new Point({
-                x: x,
-                y: this.state.center?.y
-            })
+            x
         })
         this.checkInputValidity();
     }
 
     setY = (y: number) => {
         this.setState({
-            center: new Point({
-                x: this.state.center?.x,
-                y: y
-            })
+            y
         })
         this.checkInputValidity();
     }
@@ -230,14 +231,14 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                         <tr>
                             <td scope="row">X</td>
                             <td><NumericInput
-                                defaultValue={this.state.center?.x}
+                                defaultValue={this.state.x}
                                 onChange={this.setX}
                             /></td>
                         </tr>
                         <tr>
                             <td scope="row">Y</td>
                             <td><NumericInput
-                                defaultValue={this.state.center?.y}
+                                defaultValue={this.state.y}
                                 onChange={this.setY}
                             /></td>
                         </tr>
