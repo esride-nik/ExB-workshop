@@ -157,7 +157,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             spatialReference: wmCenter.spatialReference
         })
 
-        // this.state.angle
+        const anglePolygonRotated = geometryEngine.rotate(anglePolygon, -this.state.angle, wmCenter);
 
         this.helperLayer.graphics.addMany([
             new Graphic({
@@ -167,12 +167,12 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         ])
         this.mastStandortLayer.graphics.addMany([
             new Graphic({
-                geometry: anglePolygon,
+                geometry: anglePolygonRotated,
                 symbol: this.getPolySym()
             }),
         ])
 
-        this.mapView.goTo(anglePolygon);
+        this.mapView.goTo(anglePolygonRotated);
 
 
 
