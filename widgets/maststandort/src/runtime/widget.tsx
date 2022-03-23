@@ -112,11 +112,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
         const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center) as Point;
         const wmDistBufferRadius = geometryEngine.geodesicBuffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
-        const wmDistBufferRadiusRotated = geometryEngine.rotate(wmDistBufferRadius, 10) as Polygon;
         const wmDistBufferLine = {
-            type: "polyline", // autocasts as new Polyline()
-            paths: wmDistBufferRadiusRotated.rings,
-            spatialReference: wmDistBufferRadiusRotated.spatialReference
+            type: "polyline",
+            paths: wmDistBufferRadius.rings,
+            spatialReference: wmDistBufferRadius.spatialReference
         } as unknown as Polyline;
 
         const cutline = {
