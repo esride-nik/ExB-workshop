@@ -148,14 +148,25 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         console.log('cut', cutLines);
         console.log('cutLines[1] length', cutLines[1], geometryEngine.geodesicLength(cutLines[1]))
 
-        // const angleRing = 
+        const innerLine = cutLines[1] as Polyline;
+        let angleRing = [[innerLine.paths[0][1][0], innerLine.paths[0][1][1]]];
+        for (let a=0; a<=this.state.angle; a+=0.1) {
+            const innerLineRotated = geometryEngine.rotate(innerLine, -a, wmCenter) as Polyline;
+            angleRing.push([innerLineRotated.paths[0][1][0], innerLineRotated.paths[0][1][1]]);
+        }
+        const angleRingLine = {
+            type: "polyline", // autocasts as new Polyline()
+            paths: angleRing,
+            spatialReference: wmCenter.spatialReference
+        } as unknown as Polyline;
         
-        const innerLineRotated = geometryEngine.rotate(cutLines[1], -10, wmCenter) as Polyline;
+        const innerLineRotated = geometryEngine.rotate(innerLine, -10, wmCenter) as Polyline;
         const outerPoint = new Point({
             x: innerLineRotated.paths[0][1][0],
             y: innerLineRotated.paths[0][1][1],
             spatialReference: innerLineRotated.spatialReference
         })
+
 
 
 
@@ -169,7 +180,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 symbol: this.getPointSym()
             }),
             new Graphic({
-                geometry: wmDistBufferLine,
+                geometry: angleRingLine,
                 symbol: this.getArrowSym()
             }),
             new Graphic({
