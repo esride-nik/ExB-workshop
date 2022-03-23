@@ -104,79 +104,49 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         if (!this.state.angle || !this.state.center) return;
         // jimuMapView.view.on('click', this.handleMapClick);
 
-        const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center) as Point;
-        // const offsetWmCenter = geometryEngine.offset(wmCenter, this.props.config.radiusKm, 'kilometers');
+        this.mastStandortLayer.graphics.removeAll();
+        this.mapView.map.remove(this.mastStandortLayer);
 
+        this.helperLayer.graphics.removeAll();
+        this.mapView.map.remove(this.helperLayer);
+
+        const wmCenter = webMercatorUtils.geographicToWebMercator(this.state.center) as Point;
         const wmDistBufferRadius = geometryEngine.geodesicBuffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
         const wmDistBufferRadiusRotated = geometryEngine.rotate(wmDistBufferRadius, 10) as Polygon;
-        console.log('l bef', wmDistBufferRadiusRotated.rings[0].length)
-        const lastEl = wmDistBufferRadiusRotated.rings[0].pop();
-        console.log('l aft', wmDistBufferRadiusRotated.rings[0].length)
         const wmDistBufferLine = {
             type: "polyline", // autocasts as new Polyline()
             paths: wmDistBufferRadiusRotated.rings,
             spatialReference: wmDistBufferRadiusRotated.spatialReference
         } as unknown as Polyline;
 
-        // const distBufferRadius = geometryEngine.buffer(wmCenter, this.props.config.radiusKm, 'kilometers') as Polygon;
-        // const distPointRadius = geometryEngine.offset(this.state.center, this.props.config.radiusKm) as Point;
-        // const offsetBufferRadius = geometryEngine.offset(wmDistBufferRadius, this.props.config.radiusKm, 'kilometers') as Polygon;
-
-        // First create a line geometry (this is the Keystone pipeline)
         const cutline = {
-            type: "polyline", // autocasts as new Polyline()
+            type: "polyline",
             paths: [[
                 [wmCenter.x, wmCenter.y],
-                [wmCenter.x, wmCenter.y+10000],
+                [wmCenter.x, wmCenter.y + 10000],
             ]],
             spatialReference: wmCenter.spatialReference
         } as unknown as Polyline;
-        // const cutline = {
-        //     type: "polyline", // autocasts as new Polyline()
-        //     paths: [
-        //         [this.state.center.x, this.state.center.y],
-        //         [this.state.center.x, this.state.center.y+10],
-        //     ],
-        //     spatialReference: SpatialReference.WGS84
-        // } as unknown as Polyline;
 
-        // const wmCutline = webMercatorUtils.geographicToWebMercator(cutline);
-        console.log('cutline length', cutline, geometryEngine.geodesicLength(cutline))
-        console.log('wmDistBufferLine length', wmDistBufferLine, geometryEngine.geodesicLength(wmDistBufferLine))
-        console.log('crosses', geometryEngine.crosses(cutline, wmDistBufferLine));
+        // console.log('cutline length', cutline, geometryEngine.geodesicLength(cutline))
+        // console.log('wmDistBufferLine length', wmDistBufferLine, geometryEngine.geodesicLength(wmDistBufferLine))
+        // console.log('crosses', geometryEngine.crosses(cutline, wmDistBufferLine));
         const cutLines = geometryEngine.cut(cutline, wmDistBufferLine);
-        console.log('cut', cutLines);
-        console.log('cutLines[1] length', cutLines[1], geometryEngine.geodesicLength(cutLines[1]))
-
         const innerLine = cutLines[1] as Polyline;
         let angleRing = [[innerLine.paths[0][1][0], innerLine.paths[0][1][1]]];
-        for (let a=0; a<=this.state.angle; a+=0.1) {
+        for (let a = 0; a <= this.state.angle; a += 0.1) {
             const innerLineRotated = geometryEngine.rotate(innerLine, -a, wmCenter) as Polyline;
             angleRing.push([innerLineRotated.paths[0][1][0], innerLineRotated.paths[0][1][1]]);
         }
         const angleRingLine = {
-            type: "polyline", // autocasts as new Polyline()
+            type: "polyline",
             paths: angleRing,
             spatialReference: wmCenter.spatialReference
         } as unknown as Polyline;
-        
-        const innerLineRotated = geometryEngine.rotate(innerLine, -10, wmCenter) as Polyline;
-        const outerPoint = new Point({
-            x: innerLineRotated.paths[0][1][0],
-            y: innerLineRotated.paths[0][1][1],
-            spatialReference: innerLineRotated.spatialReference
-        })
-
-
-
 
         this.helperLayer.graphics.addMany([
             new Graphic({
                 geometry: this.state.center,
-                symbol: this.getPointSym()
-            }),
-            new Graphic({
-                geometry: outerPoint,
                 symbol: this.getPointSym()
             }),
             new Graphic({
@@ -187,34 +157,13 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 geometry: cutLines[1],
                 symbol: this.getArrowSym()
             }),
-            new Graphic({
-                geometry: innerLineRotated,
-                symbol: this.getArrowSym()
-            }),
         ])
-        
+
         this.mapView.goTo(wmDistBufferRadius);
 
-        // // First create a line geometry (this is the Keystone pipeline)
-        // const polyline = {
-        //     type: "polyline", // autocasts as new Polyline()
-        //     paths: [
-        //         [this.state.center.x, this.state.center.y],
-        //         [outerPoint.x, outerPoint.y],
-        //     ],
-        //     spatialReference: SpatialReference.WGS84
-        // } as unknown as Polyline;
+        this.mapView.map.add(this.helperLayer);
 
 
-        // // const logoSym = {
-        // //     type: 'picture-marker',
-        // //     url:
-        // //         'data:image/svg+xml;base64,' +
-        // //         'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNDYuMjcyNSAxNDYuMjcyNSI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNlMTFmMjY7fS5jbHMtMntmaWxsOiNmZmY7fS5jbHMtM3tmaWxsOm5vbmU7fTwvc3R5bGU+PC9kZWZzPjxnIGlkPSJMYXllcl8yIiBkYXRhLW5hbWU9IkxheWVyIDIiPjxnIGlkPSJhcnR3b3JrIj48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMTcuMDIwNiwyOS4yNTIySDI5LjI1NDl2ODcuNzY1Nmg4Ny43NjU3VjI5LjI1MjJaIi8+PHBhdGggY2xhc3M9ImNscy0yIiBkPSJNNjcuNjUyNSw5Mi4zMzQ2YTIuNzQ1NSwyLjc0NTUsMCwwLDEtMi42MDItMy42MUw3Ni4wMjEyLDU1LjgxMmEyLjc0MjksMi43NDI5LDAsMCwxLDUuMjA0MSwxLjczNTZMNzAuMjU0Niw5MC40NkEyLjc0MjksMi43NDI5LDAsMCwxLDY3LjY1MjUsOTIuMzM0NloiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik01MS4xOTY1LDkyLjMzNDZhMi43NDU2LDIuNzQ1NiwwLDAsMS0yLjYwMjEtMy42MUw1OS41NjUxLDU1LjgxMmEyLjc0MywyLjc0MywwLDAsMSw1LjIwNDIsMS43MzU2TDUzLjc5ODUsOTAuNDZBMi43NDI5LDIuNzQyOSwwLDAsMSw1MS4xOTY1LDkyLjMzNDZaIi8+PHBhdGggY2xhc3M9ImNscy0yIiBkPSJNODQuMTA4Niw5Mi4zMzQ2YTIuNzQ1NiwyLjc0NTYsMCwwLDEtMi42MDIxLTMuNjFMOTIuNDc3Miw1NS44MTJhMi43NDMsMi43NDMsMCwwLDEsNS4yMDQyLDEuNzM1Nkw4Ni43MTA3LDkwLjQ2QTIuNzQzLDIuNzQzLDAsMCwxLDg0LjEwODYsOTIuMzM0NloiLz48cmVjdCBjbGFzcz0iY2xzLTMiIHdpZHRoPSIxNDYuMjcyNSIgaGVpZ2h0PSIxNDYuMjcyNSIvPjwvZz48L2c+PC9zdmc+',
-        // //     contentType: 'image/svg',
-        // //     width: 25,
-        // //     height: 25,
-        // // } as unknown as PictureMarkerSymbol;
         // const hslPointArrow = new Graphic({
         //     geometry: polyline,
         //     symbol: this.getArrowSym() //logoSym,
@@ -223,18 +172,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         // this.mastStandortLayer.graphics.add(hslPointArrow);
         // this.mapView.map.add(this.mastStandortLayer);
 
-
-
-
-
-
-        this.mapView.map.add(this.helperLayer);
-
-
-        // } else {
-        //     this.mastStandortLayer.graphics.removeAll();
-        //     this.mapView.map.remove(this.mastStandortLayer);
-        // }
     }
 
     onActiveViewChange = (jimuMapView: JimuMapView) => {
