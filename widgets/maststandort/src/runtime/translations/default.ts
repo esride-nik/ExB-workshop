@@ -28,4 +28,5 @@ export default {
     maststandort: 'Maststandort',
     abstrahlwinkel: 'Abstrahlwinkel',
     selectAMap: 'Bitte Karte wählen',
+    drawMast: 'Maststandort zeichnen',
 };

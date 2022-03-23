@@ -10,7 +10,7 @@ import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import Graphic from 'esri/Graphic';
 import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import Polygon from 'esri/geometry/Polygon';
-import { NumericInput } from 'jimu-ui';
+import { Button, NumericInput } from 'jimu-ui';
 import LineSymbolMarker from 'esri/symbols/LineSymbolMarker';
 import { Polyline } from 'esri/geometry';
 import geometryEngine from 'esri/geometry/geometryEngine';
@@ -21,24 +21,17 @@ import SimpleRenderer from 'esri/renderers/SimpleRenderer';
 interface State {
     center: __esri.Point;
     angle: number;
+    inputValid: boolean;
 }
 
 export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> {
     mastStandortLayer: GraphicsLayer;
 
     state: State = {
-        center: new Point({
-            x: 8.6,
-            y: 52.4,
-            spatialReference: SpatialReference.WGS84
-        }),
-        angle: 20,
+        center: null,
+        angle: null,
+        inputValid: false
     };
-
-    // state: State = {
-    //     center: null,
-    //     angle: null,
-    // };
     mapView: __esri.MapView | __esri.SceneView;
 
     constructor(props: any) {
@@ -53,6 +46,16 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.mastStandortLayer = new GraphicsLayer({
             listMode: 'show',
         });
+
+        // this.setState({
+        //     center: new Point({
+        //         x: 8.6,
+        //         y: 52.4,
+        //         spatialReference: SpatialReference.WGS84
+        //     }),
+        //     angle: 20
+        // });
+        // this.checkInputValidity();
     }
 
     // handleMapClick = (mapClick: any) => {
@@ -70,12 +73,12 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             path: "M 50,0 100,150 0,150 50,0 50,150 55,150 55,300 45,300 45,150 50,150 50,600 z",
             color: [0, 0, 255, 1.0],
             outline: {
-              color: [0, 0, 255, 1.0],
-              width: 0.1
+                color: [0, 0, 255, 1.0],
+                width: 0.1
             },
             size: 150,
             angle: this.state.angle
-          }
+        }
     }
 
     getPointSym() {
@@ -168,23 +171,41 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.mapView = jimuMapView.view;
     };
 
-    setX = (x: number) => this.setState({
-        center: new Point({
-            x: x,
-            y: this.state.center?.y
+    checkInputValidity = () => {
+        const valid = this.state.center?.x !== undefined
+            && this.state.center?.y !== undefined
+            && this.state.angle !== undefined;
+        this.setState({
+            inputValid: valid
         })
-    })
+    }
 
-    setY = (y: number) => this.setState({
-        center: new Point({
-            x: this.state.center?.x,
-            y: y
+    setX = (x: number) => {
+        this.setState({
+            center: new Point({
+                x: x,
+                y: this.state.center?.y
+            })
         })
-    })
+        this.checkInputValidity();
+    }
 
-    setAngle = (angle: number) => this.setState({
-        angle
-    })
+    setY = (y: number) => {
+        this.setState({
+            center: new Point({
+                x: this.state.center?.x,
+                y: y
+            })
+        })
+        this.checkInputValidity();
+    }
+
+    setAngle = (angle: number) => {
+        this.setState({
+            angle
+        })
+        this.checkInputValidity();
+    }
 
     render() {
         if (!this.isConfigured()) {
@@ -211,7 +232,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                             <td><NumericInput
                                 defaultValue={this.state.center?.x}
                                 onChange={this.setX}
-                                onAcceptValue={this.drawMast}
                             /></td>
                         </tr>
                         <tr>
@@ -219,7 +239,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                             <td><NumericInput
                                 defaultValue={this.state.center?.y}
                                 onChange={this.setY}
-                                onAcceptValue={this.drawMast}
                             /></td>
                         </tr>
                         <tr>
@@ -227,11 +246,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                             <td><NumericInput
                                 defaultValue={this.state.angle}
                                 onChange={this.setAngle}
-                                onAcceptValue={this.drawMast}
                             /></td>
                         </tr>
                     </tbody>
                 </table>
+
+                <Button onClick={this.drawMast} disabled={!this.state.inputValid}>
+                    <FormattedMessage
+                        id={defaultMessages.drawMast}
+                        defaultMessage={defaultMessages.drawMast}
+                    />
+                </Button>
             </div>
         );
     }
