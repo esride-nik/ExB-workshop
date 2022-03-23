@@ -106,7 +106,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
         this.mastStandortLayer.graphics.removeAll();
         this.mapView.map.remove(this.mastStandortLayer);
-
         this.helperLayer.graphics.removeAll();
         this.mapView.map.remove(this.helperLayer);
 
@@ -117,12 +116,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             paths: wmDistBufferRadius.rings,
             spatialReference: wmDistBufferRadius.spatialReference
         } as unknown as Polyline;
-
         const cutline = {
             type: "polyline",
             paths: [[
                 [wmCenter.x, wmCenter.y],
-                [wmCenter.x, wmCenter.y + 10000],
+                [wmCenter.x, wmCenter.y + 1000000],
             ]],
             spatialReference: wmCenter.spatialReference
         } as unknown as Polyline;
@@ -132,16 +130,21 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         // console.log('crosses', geometryEngine.crosses(cutline, wmDistBufferLine));
         const cutLines = geometryEngine.cut(cutline, wmDistBufferLine);
         const innerLine = cutLines[1] as Polyline;
-        let angleRing = [[innerLine.paths[0][1][0], innerLine.paths[0][1][1]]];
-        for (let a = 0; a <= this.state.angle; a += 0.1) {
+        let angleRing = [[wmCenter.x, wmCenter.y]];
+
+        // fixer Öffnungswinkel 120°
+        for (let a = -60; a <= 60; a += 0.1) {
             const innerLineRotated = geometryEngine.rotate(innerLine, -a, wmCenter) as Polyline;
             angleRing.push([innerLineRotated.paths[0][1][0], innerLineRotated.paths[0][1][1]]);
         }
+        angleRing.push([wmCenter.x, wmCenter.y]);
         const angleRingLine = {
             type: "polyline",
             paths: angleRing,
             spatialReference: wmCenter.spatialReference
         } as unknown as Polyline;
+
+        // this.state.angle
 
         this.helperLayer.graphics.addMany([
             new Graphic({
@@ -152,10 +155,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 geometry: angleRingLine,
                 symbol: this.getArrowSym()
             }),
-            new Graphic({
-                geometry: cutLines[1],
-                symbol: this.getArrowSym()
-            }),
+            // new Graphic({
+            //     geometry: cutLines[1],
+            //     symbol: this.getArrowSym()
+            // }),
         ])
 
         this.mapView.goTo(wmDistBufferRadius);
