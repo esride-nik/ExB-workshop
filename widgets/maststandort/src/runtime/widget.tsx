@@ -65,22 +65,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         }, this.checkInputValidity);
     }
 
-    // handleMapClick = (mapClick: any) => {
-    //     console.log('mapClick', mapClick);
 
-    //     const pointGraphic = new Graphic({
-    //         geometry: mapClick.mapPoint as Point,
-    //     });
-    //     console.log('pointGraphic', pointGraphic);
-    // };
-
-    getArrowMarkerSym() {
+    getArrowMarkerSym(color: string) {
+        const fillColor = new Color(color);
         return {
             type: "simple-marker",
             path: "M 50,0 100,150 0,150 50,0 50,150 55,150 55,300 45,300 45,150 50,150 50,600 z",
             color: this.state.color,
             outline: {
-                color: [0, 0, 255, 1.0],
+                color: [fillColor.r, fillColor.g, fillColor.b, 1.0],
                 width: 0.1
             },
             size: 150,
@@ -168,14 +161,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.fillHslFeatureLayer(anglePolygonRotated);
 
         this.mastStandortLayer.graphics.addMany([
-            // new Graphic({
-            //     geometry: anglePolygonRotated,
-            //     symbol: this.getPolySym()
-            // }),
             ...sampleGraphics,
             new Graphic({
                 geometry: wmCenter,
-                symbol: this.getArrowMarkerSym()
+                symbol: this.getArrowMarkerSym(this.state.color)
             })
         ])
 
@@ -235,7 +224,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         let renderer = {
             type: "unique-value",
             field: "name",
-            defaultSymbol: this.getPolySym('#f00'),
+            defaultSymbol: this.getPolySym(this.state.color),
             uniqueValueInfos: [{
                 value: "feature1",
                 symbol: this.getPolySym(this.state.color)
@@ -294,10 +283,12 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                                 onChange={this.setAngle}
                             /></td>
                         </tr>
+                        <tr>
+                            <td scope="row"><FormattedMessage id="favcolor" defaultMessage={defaultMessages.favcolor} /></td>
+                            <td><input type="color" id="favcolor" name="favcolor" value={this.state.color} onChange={this.setColor}></input></td>
+                        </tr>
                     </tbody>
                 </table>
-
-                <input type="color" id="favcolor" name="favcolor" value="#ff0000" onChange={this.setColor}></input>
 
                 <Button onClick={this.drawMast} disabled={!this.state.inputValid}>
                     <FormattedMessage

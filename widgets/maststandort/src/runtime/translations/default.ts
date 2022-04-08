@@ -29,4 +29,5 @@ export default {
     abstrahlwinkel: 'Abstrahlwinkel',
     selectAMap: 'Bitte Karte wählen',
     drawMast: 'Maststandort zeichnen',
+    favcolor: 'Farbe',
 };
