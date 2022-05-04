@@ -18,60 +18,60 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, Immutable, FormattedMessage, css, jsx } from 'jimu-core';
-import { AllWidgetSettingProps } from 'jimu-for-builder';
-import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components';
-import { ArcGISDataSourceTypes } from 'jimu-arcgis';
-import { IMConfig } from '../config';
-import defaultMessages from './translations/default';
-import { Switch, TextInput } from 'jimu-ui';
+import { React, Immutable, FormattedMessage, css, jsx } from 'jimu-core'
+import { AllWidgetSettingProps } from 'jimu-for-builder'
+import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
+import { ArcGISDataSourceTypes } from 'jimu-arcgis'
+import { IMConfig } from '../config'
+import defaultMessages from './translations/default'
+import { Switch, TextInput } from 'jimu-ui'
 
 export default class Setting extends React.PureComponent<AllWidgetSettingProps<IMConfig>, any> {
-    supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap]);
+  supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap])
 
-    onMapSelected = (useMapWidgetIds: string[]) => {
-        this.props.onSettingChange({
-            id: this.props.id,
-            useMapWidgetIds: useMapWidgetIds,
-        });
-    };
+  onMapSelected = (useMapWidgetIds: string[]) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      useMapWidgetIds: useMapWidgetIds
+    })
+  }
 
-    switchW3wOnMap = (evt: React.FormEvent<HTMLInputElement>) => {
-        this.props.onSettingChange({
-            id: this.props.id,
-            config: this.props.config.set('w3wOnMap', evt.currentTarget.checked),
-        });
-    };
+  switchW3wOnMap = (evt: React.FormEvent<HTMLInputElement>) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('w3wOnMap', evt.currentTarget.checked)
+    })
+  }
 
-    switchShowW3wSquare = (evt: React.FormEvent<HTMLInputElement>) => {
-        this.props.onSettingChange({
-            id: this.props.id,
-            config: this.props.config.set('showW3wSquare', evt.currentTarget.checked),
-        });
-    };
+  switchShowW3wSquare = (evt: React.FormEvent<HTMLInputElement>) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('showW3wSquare', evt.currentTarget.checked)
+    })
+  }
 
-    setW3wApiKey = (w3wApiKey: string) => {
-        this.props.onSettingChange({
-            id: this.props.id,
-            config: this.props.config.set('w3wApiKey', w3wApiKey),
-        });
-    };
+  setW3wApiKey = (w3wApiKey: string) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('w3wApiKey', w3wApiKey)
+    })
+  }
 
-    render() {
-        const style = css`
+  render () {
+    const style = css`
             label {
                 display: inline-flex;
                 margin-left: 5px;
             }
-        `;
+        `
 
-        return (
+    return (
             <div className="widget-setting p-2" css={style}>
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                        id: 'mapWidgetLabel',
-                        defaultMessage: defaultMessages.selectMapWidget,
+                      id: 'mapWidgetLabel',
+                      defaultMessage: defaultMessages.selectMapWidget
                     })}>
                     <SettingRow>
                         <JimuMapViewSelector
@@ -83,8 +83,8 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                        id: 'mapWidgetLabel',
-                        defaultMessage: defaultMessages.displayOption,
+                      id: 'mapWidgetLabel',
+                      defaultMessage: defaultMessages.displayOption
                     })}>
                     <SettingRow>
                         <div className="w-100">
@@ -113,8 +113,8 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                        id: 'mapWidgetLabel',
-                        defaultMessage: defaultMessages.w3wApiKey,
+                      id: 'mapWidgetLabel',
+                      defaultMessage: defaultMessages.w3wApiKey
                     })}>
                     <SettingRow>
                         <TextInput
@@ -126,7 +126,6 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                     </SettingRow>
                 </SettingSection>
             </div>
-        );
-    }
+    )
+  }
 }
-

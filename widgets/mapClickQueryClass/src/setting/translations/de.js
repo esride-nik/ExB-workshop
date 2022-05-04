@@ -1,3 +1,3 @@
 define({
-    selectMapWidget: 'Bitte Karte wählen',
+  selectMapWidget: 'Bitte Karte wählen',
 });

@@ -1,7 +1,7 @@
-import { ImmutableObject } from 'jimu-core';
+import { ImmutableObject } from 'jimu-core'
 
 export interface Config {
-    radiusKm: number;
+  radiusKm: number
 }
 
-export type IMConfig = ImmutableObject<Config>;
+export type IMConfig = ImmutableObject<Config>

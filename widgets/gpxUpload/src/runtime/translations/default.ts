@@ -18,6 +18,6 @@
   LICENSE file.
 */
 export default {
-    _widgetLabel: 'GPX Upload',
-    jogTrackResults: 'jog track illnesses',
-};
+  _widgetLabel: 'GPX Upload',
+  jogTrackResults: 'jog track illnesses',
+}

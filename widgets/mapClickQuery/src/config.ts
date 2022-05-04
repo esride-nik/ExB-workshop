@@ -17,12 +17,12 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { ImmutableObject } from 'jimu-core';
+import { ImmutableObject } from 'jimu-core'
 
 export interface Config {
-    w3wApiKey: string;
-    w3wOnMap: boolean;
-    showW3wSquare: boolean;
+  w3wApiKey: string
+  w3wOnMap: boolean
+  showW3wSquare: boolean
 }
 
-export type IMConfig = ImmutableObject<Config>;
+export type IMConfig = ImmutableObject<Config>

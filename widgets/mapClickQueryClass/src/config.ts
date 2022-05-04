@@ -17,10 +17,10 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { ImmutableObject } from 'jimu-core';
+import { ImmutableObject } from 'jimu-core'
 
 export interface Config {
-    someSetting: boolean;
+  someSetting: boolean
 }
 
-export type IMConfig = ImmutableObject<Config>;
+export type IMConfig = ImmutableObject<Config>

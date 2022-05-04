@@ -1,3 +1,3 @@
 export default {
-    _themeLabel: 'Demo',
-};
+  _themeLabel: 'Demo',
+}

@@ -18,8 +18,8 @@
   LICENSE file.
 */
 export default {
-    selectMapWidget: 'Bitte Karte wählen',
-    displayOption: 'Display options',
-    maststandort: 'Maststandort',
-    radius: 'Radius (km)',
-};
+  selectMapWidget: 'Bitte Karte wählen',
+  displayOption: 'Display options',
+  maststandort: 'Maststandort',
+  radius: 'Radius (km)',
+}

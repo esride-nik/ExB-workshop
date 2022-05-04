@@ -18,16 +18,16 @@
   LICENSE file.
 */
 export default {
-    _widgetLabel: 'demo',
-    widgetProperties: 'Widget Properties',
-    widgetFunctions: 'Widget Functions',
-    widgetName: 'widget name:',
-    widgetProps: 'widget props:',
-    ll: 'Lower Left',
-    centerLabel: 'Center',
-    maststandort: 'Maststandort',
-    abstrahlwinkel: 'Abstrahlwinkel',
-    selectAMap: 'Bitte Karte wählen',
-    drawMast: 'Maststandort zeichnen',
-    favcolor: 'Farbe',
-};
+  _widgetLabel: 'demo',
+  widgetProperties: 'Widget Properties',
+  widgetFunctions: 'Widget Functions',
+  widgetName: 'widget name:',
+  widgetProps: 'widget props:',
+  ll: 'Lower Left',
+  centerLabel: 'Center',
+  maststandort: 'Maststandort',
+  abstrahlwinkel: 'Abstrahlwinkel',
+  selectAMap: 'Bitte Karte wählen',
+  drawMast: 'Maststandort zeichnen',
+  favcolor: 'Farbe',
+}

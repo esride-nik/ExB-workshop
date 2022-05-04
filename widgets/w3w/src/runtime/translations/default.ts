@@ -18,12 +18,12 @@
   LICENSE file.
 */
 export default {
-    _widgetLabel: 'demo',
-    widgetProperties: 'Widget Properties',
-    widgetFunctions: 'Widget Functions',
-    widgetName: 'widget name:',
-    widgetProps: 'widget props:',
-    ll: 'Lower Left',
-    centerLabel: 'Center',
-    w3w: 'what3words Center',
-};
+  _widgetLabel: 'demo',
+  widgetProperties: 'Widget Properties',
+  widgetFunctions: 'Widget Functions',
+  widgetName: 'widget name:',
+  widgetProps: 'widget props:',
+  ll: 'Lower Left',
+  centerLabel: 'Center',
+  w3w: 'what3words Center',
+}

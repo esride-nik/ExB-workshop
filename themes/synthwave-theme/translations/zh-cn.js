@@ -1,3 +1,3 @@
 define({
-    _themeLabel: '演示',
+  _themeLabel: '演示',
 });

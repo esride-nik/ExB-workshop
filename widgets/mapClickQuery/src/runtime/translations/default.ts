@@ -18,6 +18,6 @@
   LICENSE file.
 */
 export default {
-    _widgetLabel: 'Map Click Query',
-    jogTrackResults: 'jog track illnesses',
-};
+  _widgetLabel: 'Map Click Query',
+  jogTrackResults: 'jog track illnesses',
+}

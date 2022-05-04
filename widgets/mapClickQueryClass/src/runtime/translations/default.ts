@@ -18,7 +18,7 @@
   LICENSE file.
 */
 export default {
-    _widgetLabel: 'Map Click Query Class',
-    mcq: 'Map Click Query Class',
-    clickPoint: 'Click Point',
-};
+  _widgetLabel: 'Map Click Query Class',
+  mcq: 'Map Click Query Class',
+  clickPoint: 'Click Point',
+}

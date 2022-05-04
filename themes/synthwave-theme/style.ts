@@ -25,10 +25,10 @@
  * 2. Button component style override: font size change for all Button components.
  */
 
-import { css, IMThemeVariables } from 'jimu-core';
+import { css, IMThemeVariables } from 'jimu-core'
 
 const globalStyles = () => {
-    return css`
+  return css`
         // Set default font in "fontFamilyBase" property in variables.json
         @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@600&display=swap');
 
@@ -46,17 +46,17 @@ const globalStyles = () => {
             background-repeat: no-repeat;
             background-position-y: bottom;
         }
-    `;
-};
+    `
+}
 
 const buttonStyles = (props) => {
-    const theme: IMThemeVariables = props.theme;
-    return css`
+  const theme: IMThemeVariables = props.theme
+  return css`
         font-size: ${theme?.typography.sizes.display3};
-    `;
-};
+    `
+}
 
 // global styles
-export { globalStyles as Global };
+export { globalStyles as Global }
 // Button component styles
-export { buttonStyles as Button };
+export { buttonStyles as Button }
