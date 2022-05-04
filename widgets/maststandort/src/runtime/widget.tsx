@@ -248,7 +248,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                     <FormattedMessage id="maststandort" defaultMessage={defaultMessages.maststandort} />
                 </h3>
 
-                {this.props.hasOwnProperty('useMapWidgetIds') &&
+                {{}.hasOwnProperty.call(this.props, 'useMapWidgetIds') &&
                     this.props.useMapWidgetIds?.length === 1 && (
                         <JimuMapViewComponent
                             useMapWidgetId={this.props.useMapWidgetIds?.[0]}

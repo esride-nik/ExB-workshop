@@ -33,10 +33,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     query: null
   }
 
-  constructor (props: any) {
-    super(props)
-  }
-
   isConfigured = () => {
     return this.props.useMapWidgetIds && this.props.useMapWidgetIds.length === 1
   }
@@ -141,7 +137,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
               color: [225, 31, 38, 1],
               width: '2px',
               style: 'short-dot'
-            }
+            } as unknown as __esri.Symbol
           })
           this.w3wLayer.graphics.add(w3wGraphic)
         }
@@ -188,7 +184,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                     <FormattedMessage id="w3w" defaultMessage={defaultMessages.w3w} />
                 </h3>
 
-                {this.props.hasOwnProperty('useMapWidgetIds') &&
+                {{}.hasOwnProperty.call(this.props, 'useMapWidgetIds') &&
                     this.props.useMapWidgetIds &&
                     this.props.useMapWidgetIds.length === 1 && (
                         <JimuMapViewComponent

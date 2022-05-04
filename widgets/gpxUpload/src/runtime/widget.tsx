@@ -49,6 +49,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
 
       reader.readAsText(file)
       reader.onloadend = () => {
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         parseGpx(reader.result.toString())
       }
     })
@@ -59,8 +60,9 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
   const parseGpx = (gpxText: string) => {
     const geoJson = gpx(new DOMParser().parseFromString(gpxText, 'text/xml'))
     console.log('geoJson', geoJson)
-    const esriFeatures: Graphic[] = geoJson?.features.map((feature: any) => {
-      if (feature.geometry.type === 'LineString') {
+    const esriFeatures: Graphic[] = geoJson?.features
+      .filter((feature: any) => feature.geometry.type === 'LineString')
+      .map((feature: any) => {
         return new Graphic({
           geometry: new Polyline({
             hasZ: true,
@@ -70,8 +72,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
           }),
           attributes: feature.properties
         })
-      }
-    })
+      })
     addTrackToMap(esriFeatures)
   }
 
@@ -182,7 +183,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
                 {anzahlGesSum} {defaultMessages.jogTrackResults}
             </h1>
 
-            {props.hasOwnProperty('useMapWidgetIds') && props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
+            {{}.hasOwnProperty.call('useMapWidgetIds') && props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
                 <JimuMapViewComponent
                     useMapWidgetId={props.useMapWidgetIds?.[0]}
                     onActiveViewChange={activeViewChangeHandler}

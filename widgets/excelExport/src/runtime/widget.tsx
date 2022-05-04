@@ -24,7 +24,7 @@ interface State {
   fieldNames: MultiSelectItem[]
   selectedFieldNames: string[]
   relationshipRecordsCount: number
-  currentRelationshipRecordsSelectedFieldNames: string[]; // this number is only used to rerender the view when the current selection is changed
+  currentRelationshipRecordsSelectedFieldNames: string[] // this number is only used to rerender the view when the current selection is changed
 }
 
 export default class Widget extends React.PureComponent<AllWidgetProps<unknown>, State> {
