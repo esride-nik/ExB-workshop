@@ -10,7 +10,6 @@ import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import Graphic from 'esri/Graphic'
 import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol'
 import Polygon from 'esri/geometry/Polygon'
-import { SpatialReference } from 'esri/geometry'
 
 const w3wApi = require('@what3words/api')
 
@@ -44,6 +43,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   centerWatch: __esri.WatchHandle
   stationaryWatch: __esri.WatchHandle
   w3wLayer: GraphicsLayer
+  view: __esri.MapView | __esri.SceneView
 
   state: State = {
     extent: null,
@@ -84,41 +84,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     console.log('pointGraphic', pointGraphic)
   }
 
-  async stationaryWatchHandler (stationary: boolean, jimuMapView: JimuMapView) {
-    jimuMapView.view.on('click', this.handleMapClick)
+  async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
+    view.on('click', this.handleMapClick)
 
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
       const w3wAddress = await this.updateW3wAddress(this.state.center)
 
       if (this.props.config.w3wOnMap) {
-        this.drawW3wOnMap(w3wAddress)
+        this.drawW3wLogoAndText(w3wAddress)
       }
       if (this.props.config.showW3wSquare) {
-        const east = w3wAddress.square.northeast.lng
-        const north = w3wAddress.square.northeast.lat
-        const west = w3wAddress.square.southwest.lng
-        const south = w3wAddress.square.southwest.lat
-        const w3wGraphic = new Graphic({
-          geometry: new Polygon({
-            rings: [
-              [
-                [west, north],
-                [east, north],
-                [east, south],
-                [west, south],
-                [west, north]
-              ]
-            ],
-            spatialReference: SpatialReference.WGS84
-          }),
-          symbol: {
-            type: 'simple-line',
-            color: [225, 31, 38, 1],
-            width: '2px',
-            style: 'short-dot'
-          } as unknown as __esri.Symbol
-        })
-        this.w3wLayer.graphics.add(w3wGraphic)
+        this.drawW3wSquare(w3wAddress)
       }
     } else {
       this.w3wLayer.graphics.removeAll()
@@ -127,26 +103,27 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   onActiveViewChange = (jimuMapView: JimuMapView) => {
     if (!jimuMapView) return
+    this.view = jimuMapView.view
 
     this.w3wLayer = new GraphicsLayer({
       listMode: 'hide'
     })
-    jimuMapView.view.map.add(this.w3wLayer)
+    this.view.map.add(this.w3wLayer)
 
     if (!this.stationaryWatch) {
-      this.stationaryWatch = jimuMapView.view.watch('stationary', (stationary) =>
-        this.stationaryWatchHandler(stationary, jimuMapView)
+      this.stationaryWatch = this.view.watch('stationary', (stationary) =>
+        this.stationaryWatchHandler(stationary, this.view)
       )
     }
     if (!this.extentWatch) {
-      this.extentWatch = jimuMapView.view.watch('extent', (extent) => {
+      this.extentWatch = this.view.watch('extent', (extent) => {
         this.setState({
           extent
         })
       })
     }
     if (!this.centerWatch) {
-      this.centerWatch = jimuMapView.view.watch('center', (center) => {
+      this.centerWatch = this.view.watch('center', (center) => {
         this.setState({
           center
         })
@@ -175,7 +152,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     return w3wAddress
   }
 
-  private readonly drawW3wOnMap = (w3wAddress: W3wAddress) => {
+  private readonly drawW3wLogoAndText = (w3wAddress: W3wAddress) => {
     const textSym = {
       type: 'text',
       text: w3wAddress.words,
@@ -212,6 +189,36 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       symbol: logoSym
     })
     this.w3wLayer.graphics.add(w3wlogo)
+  }
+
+  private readonly drawW3wSquare = (w3wAddress: W3wAddress) => {
+    const east = w3wAddress.square.northeast.lng
+    const north = w3wAddress.square.northeast.lat
+    const west = w3wAddress.square.southwest.lng
+    const south = w3wAddress.square.southwest.lat
+    const w3wGraphic = new Graphic({
+      geometry: new Polygon({
+        rings: [
+          [
+            [west, north],
+            [east, north],
+            [east, south],
+            [west, south],
+            [west, north]
+          ]
+        ],
+        spatialReference: {
+          wkid: 4326
+        }
+      }),
+      symbol: {
+        type: 'simple-line',
+        color: [225, 31, 38, 1],
+        width: '2px',
+        style: 'short-dot'
+      } as unknown as __esri.Symbol
+    })
+    this.w3wLayer.graphics.add(w3wGraphic)
   }
 
   render () {
