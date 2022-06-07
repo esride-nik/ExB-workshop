@@ -10,6 +10,7 @@ import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import Graphic from 'esri/Graphic'
 import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol'
 import Polygon from 'esri/geometry/Polygon'
+import { Button } from 'jimu-ui'
 
 const w3wApi = require('@what3words/api')
 
@@ -142,15 +143,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
           this.w3wLayer.graphics.add(w3wGraphic)
         }
       }
-      jimuMapView.view.map.add(this.w3wLayer)
     } else {
       this.w3wLayer.graphics.removeAll()
-      jimuMapView.view.map.remove(this.w3wLayer)
     }
   }
 
   onActiveViewChange = (jimuMapView: JimuMapView) => {
     if (!jimuMapView) return
+
+    jimuMapView.view.map.add(this.w3wLayer)
 
     if (!this.stationaryWatch) {
       this.stationaryWatch = jimuMapView.view.watch('stationary', (stationary) =>
