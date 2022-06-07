@@ -23,4 +23,5 @@ export default {
   w3wOnMap: 'on map',
   showW3wSquare: 'show square',
   w3wApiKey: 'what3words API Key',
+  useMapMidpoint: 'use map midpoint',
 }

@@ -40,9 +40,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   componentDidMount () {
     w3wApi.setOptions({ key: this.props.config.w3wApiKey })
-    this.w3wLayer = new GraphicsLayer({
-      listMode: 'hide'
-    })
   }
 
   componentWillUnmount () {
@@ -72,7 +69,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   async stationaryWatchHandler (stationary: boolean, jimuMapView: JimuMapView) {
     jimuMapView.view.on('click', this.handleMapClick)
 
-    if (stationary && this.state.center) {
+    if (this.props.config.useMapMidpoint && stationary && this.state.center) {
       const geoPoint = webMercatorUtils.webMercatorToGeographic(this.state.center) as Point
       if (geoPoint) {
         const w3wAddress = await w3wApi.convertTo3wa({
@@ -151,6 +148,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   onActiveViewChange = (jimuMapView: JimuMapView) => {
     if (!jimuMapView) return
 
+    this.w3wLayer = new GraphicsLayer({
+      listMode: 'hide'
+    })
     jimuMapView.view.map.add(this.w3wLayer)
 
     if (!this.stationaryWatch) {

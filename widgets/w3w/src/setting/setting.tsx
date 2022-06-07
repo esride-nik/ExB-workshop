@@ -50,6 +50,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     })
   }
 
+  switchUseMapMidpoint = (evt: React.FormEvent<HTMLInputElement>) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('useMapMidpoint', evt.currentTarget.checked)
+    })
+  }
+
   setW3wApiKey = (w3wApiKey: string) => {
     this.props.onSettingChange({
       id: this.props.id,
@@ -91,7 +98,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                             <div className="checkbox-row">
                                 <Switch checked={this.props.config?.w3wOnMap || false} onChange={this.switchW3wOnMap} />
                                 <label>
-                                    <FormattedMessage id="zoomToLayer" defaultMessage={defaultMessages.w3wOnMap} />
+                                    <FormattedMessage id="w3wOnMap" defaultMessage={defaultMessages.w3wOnMap} />
                                 </label>
                             </div>
                         </div>
@@ -104,7 +111,20 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                                     onChange={this.switchShowW3wSquare}
                                 />
                                 <label>
-                                    <FormattedMessage id="zoomToLayer" defaultMessage={defaultMessages.showW3wSquare} />
+                                    <FormattedMessage id="showW3wSquare" defaultMessage={defaultMessages.showW3wSquare} />
+                                </label>
+                            </div>
+                        </div>
+                    </SettingRow>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <Switch
+                                    checked={(this.props.config && this.props.config.useMapMidpoint) || false}
+                                    onChange={this.switchUseMapMidpoint}
+                                />
+                                <label>
+                                    <FormattedMessage id="useMapMidpoint" defaultMessage={defaultMessages.useMapMidpoint} />
                                 </label>
                             </div>
                         </div>
