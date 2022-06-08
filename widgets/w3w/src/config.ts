@@ -23,6 +23,7 @@ export interface Config {
   w3wApiKey: string
   w3wOnMap: boolean
   showW3wSquare: boolean
+  zoomToW3wSquare: boolean
   useMapMidpoint: boolean
 }
 

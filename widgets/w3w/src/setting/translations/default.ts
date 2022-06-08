@@ -22,6 +22,7 @@ export default {
   displayOption: 'Display options',
   w3wOnMap: 'on map',
   showW3wSquare: 'show square',
+  zoomToW3wSquare: 'zoom to square',
   w3wApiKey: 'what3words API Key',
   useMapMidpoint: 'use map midpoint',
 }

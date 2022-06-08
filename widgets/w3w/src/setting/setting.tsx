@@ -50,6 +50,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     })
   }
 
+  switchZoomToW3wSquare = (evt: React.FormEvent<HTMLInputElement>) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('zoomToW3wSquare', evt.currentTarget.checked)
+    })
+  }
+
   switchUseMapMidpoint = (evt: React.FormEvent<HTMLInputElement>) => {
     this.props.onSettingChange({
       id: this.props.id,
@@ -112,6 +119,19 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                                 />
                                 <label>
                                     <FormattedMessage id="showW3wSquare" defaultMessage={defaultMessages.showW3wSquare} />
+                                </label>
+                            </div>
+                        </div>
+                    </SettingRow>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <Switch
+                                    checked={(this.props.config && this.props.config.zoomToW3wSquare) || false}
+                                    onChange={this.switchZoomToW3wSquare}
+                                />
+                                <label>
+                                    <FormattedMessage id="zoomToW3wSquare" defaultMessage={defaultMessages.zoomToW3wSquare} />
                                 </label>
                             </div>
                         </div>

@@ -10,6 +10,7 @@ import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import Graphic from 'esri/Graphic'
 import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol'
 import Polygon from 'esri/geometry/Polygon'
+import { Button } from 'jimu-ui'
 
 const w3wApi = require('@what3words/api')
 
@@ -90,14 +91,13 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
       const w3wAddress = await this.updateW3wAddress(this.state.center)
 
+      this.w3wLayer.graphics.removeAll()
       if (this.props.config.w3wOnMap) {
         this.drawW3wLogoAndText(w3wAddress)
       }
       if (this.props.config.showW3wSquare) {
         this.drawW3wSquare(w3wAddress)
       }
-    } else {
-      this.w3wLayer.graphics.removeAll()
     }
   }
 
@@ -219,6 +219,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       } as unknown as __esri.Symbol
     })
     this.w3wLayer.graphics.add(w3wGraphic)
+
+    if (this.props.config.zoomToW3wSquare) {
+      this.zoomToW3w()
+    }
+  }
+
+  private readonly zoomToW3w = () => {
+    this.view.goTo({
+      target: this.w3wLayer.graphics.getItemAt(0).geometry,
+      zoom: 20
+    })
   }
 
   render () {
@@ -255,6 +266,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                                 <FormattedMessage id="centerLabel" />
                             </th>
                             <td>{this.state.w3wAddress && this.state.w3wAddress.words}</td>
+                        </tr>
+                        <tr>
+                            <td colSpan={2}><Button onClick={this.zoomToW3w}>Zoom</Button></td>
                         </tr>
                     </tbody>
                 </table>

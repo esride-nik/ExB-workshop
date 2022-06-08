@@ -2,5 +2,6 @@
   "w3wApiKey": "",
   "w3wOnMap": true,
   "showW3wSquare": false,
+  "zoomToW3wSquare": false,
   "useMapMidpoint": false
 }
