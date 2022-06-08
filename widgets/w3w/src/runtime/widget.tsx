@@ -76,13 +76,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  handleMapClick = (mapClick: any) => {
+  handleMapClick = async (mapClick: any) => {
     console.log('mapClick', mapClick)
-
-    const pointGraphic = new Graphic({
-      geometry: mapClick.mapPoint as Point
-    })
-    console.log('pointGraphic', pointGraphic)
+    const w3wAddress = await this.updateW3wAddress(mapClick.mapPoint as Point)
+    this.w3wLayer.graphics.removeAll()
+    this.drawW3wLogoAndText(w3wAddress)
   }
 
   async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
