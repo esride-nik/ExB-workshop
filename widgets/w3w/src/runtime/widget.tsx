@@ -86,8 +86,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
-    view.on('click', this.handleMapClick)
-
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
       const w3wAddress = await this.updateW3wAddress(this.state.center)
 
@@ -110,6 +108,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     })
     this.view.map.add(this.w3wLayer)
 
+    this.view.on('click', this.handleMapClick)
+
     if (!this.stationaryWatch) {
       this.stationaryWatch = this.view.watch('stationary', (stationary) =>
         this.stationaryWatchHandler(stationary, this.view)
@@ -131,7 +131,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  private readonly updateW3wAddress= async (point: Point): Promise<W3wAddress> => {
+  private readonly getW3wAddress= async (point: Point): Promise<W3wAddress> => {
     let geoPoint: Point
     if (point.spatialReference.isWebMercator) {
       geoPoint = webMercatorUtils.webMercatorToGeographic(point) as Point
@@ -141,10 +141,14 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       geoPoint = point
     }
 
-    const w3wAddress = await w3wApi.convertTo3wa({
+    return await w3wApi.convertTo3wa({
       lat: geoPoint.y,
       lng: geoPoint.x
     })
+  }
+
+  private readonly updateW3wAddress= async (point: Point): Promise<W3wAddress> => {
+    const w3wAddress = await this.getW3wAddress(point)
 
     this.setState({
       w3wAddress
