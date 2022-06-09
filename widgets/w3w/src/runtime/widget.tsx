@@ -90,15 +90,23 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  handleMapClick = async (mapClick: any) => {
-    const w3wAddress = await this.updateW3wAddress(mapClick.mapPoint as Point)
+  refreshAndZoom = async (point: Point) => {
+    const w3wAddress = await this.updateW3wAddress(point)
     this.refreshW3wGraphics(w3wAddress)
+    if (this.props.config.zoomToW3wSquare) {
+      this.zoomToW3w()
+    }
+  }
+
+  handleMapClick = async (mapClick: any) => {
+    if (!this.props.config.useMapMidpoint) {
+      await this.refreshAndZoom(mapClick.mapPoint as Point)
+    }
   }
 
   async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
-      const w3wAddress = await this.updateW3wAddress(this.state.center)
-      this.refreshW3wGraphics(w3wAddress)
+      await this.refreshAndZoom(this.state.center)
     }
   }
 
@@ -236,10 +244,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       } as unknown as __esri.Symbol
     })
     this.w3wLayer.graphics.add(w3wGraphic)
-
-    if (this.props.config.zoomToW3wSquare) {
-      this.zoomToW3w()
-    }
   }
 
   private readonly zoomToW3w = () => {
