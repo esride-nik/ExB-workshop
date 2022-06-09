@@ -19,11 +19,13 @@
 */
 export default {
   selectMapWidget: 'Please select map',
-  displayOption: 'Display options',
+  displayOptions: 'Display options',
+  userOptions: 'User options',
   showW3wLogo: 'show logo',
   showW3wSquare: 'show square',
   showW3wText: 'show text',
   zoomToW3w: 'automatic zoom',
   w3wApiKey: 'what3words API Key',
+  useClickpoint: 'use click point',
   useMapMidpoint: 'use map midpoint',
 }

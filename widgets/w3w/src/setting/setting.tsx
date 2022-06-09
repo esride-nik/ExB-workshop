@@ -81,8 +81,19 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   render () {
     const style = css`
             label {
-                display: inline-flex;
-                margin-left: 5px;
+              display: inline-flex;
+              margin-left: 5px;
+            }
+            .switch-select {
+              background-color: #00BFB8;
+              border-color: #00BFB8;
+            }
+            .switch-select .switch-slider {
+              background-color: #000 !important;
+            }
+            .switch-select.checked {
+              background-color: #F9F871;
+              border-color: #F9F871;
             }
         `
 
@@ -91,7 +102,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                      id: 'mapWidgetLabel',
+                      id: 'selectMapWidget',
                       defaultMessage: defaultMessages.selectMapWidget
                     })}>
                     <SettingRow>
@@ -104,8 +115,8 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                      id: 'mapWidgetLabel',
-                      defaultMessage: defaultMessages.displayOption
+                      id: 'displayOption',
+                      defaultMessage: defaultMessages.displayOptions
                     })}>
                     <SettingRow>
                         <div className="w-100">
@@ -143,6 +154,29 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                             </div>
                         </div>
                     </SettingRow>
+                </SettingSection>
+                <SettingSection
+                    className="map-selector-section"
+                    title={this.props.intl.formatMessage({
+                      id: 'userOptions',
+                      defaultMessage: defaultMessages.userOptions
+                    })}>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <Switch
+                                    checked={(this.props.config && this.props.config.useMapMidpoint) || false}
+                                    onChange={this.switchUseMapMidpoint}
+                                    className='switch-select'
+                                />
+                                <label>
+                                  {this.props.config.useMapMidpoint
+                                    ? <FormattedMessage id="useMapMidpoint" defaultMessage={defaultMessages.useMapMidpoint} />
+                                    : <FormattedMessage id="useClickpoint" defaultMessage={defaultMessages.useClickpoint} /> }
+                                </label>
+                            </div>
+                        </div>
+                    </SettingRow>
                     <SettingRow>
                         <div className="w-100">
                             <div className="checkbox-row">
@@ -156,24 +190,11 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                             </div>
                         </div>
                     </SettingRow>
-                    <SettingRow>
-                        <div className="w-100">
-                            <div className="checkbox-row">
-                                <Switch
-                                    checked={(this.props.config && this.props.config.useMapMidpoint) || false}
-                                    onChange={this.switchUseMapMidpoint}
-                                />
-                                <label>
-                                    <FormattedMessage id="useMapMidpoint" defaultMessage={defaultMessages.useMapMidpoint} />
-                                </label>
-                            </div>
-                        </div>
-                    </SettingRow>
                 </SettingSection>
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                      id: 'mapWidgetLabel',
+                      id: 'w3wApiKey',
                       defaultMessage: defaultMessages.w3wApiKey
                     })}>
                     <SettingRow>
