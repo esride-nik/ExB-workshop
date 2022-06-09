@@ -85,15 +85,18 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
               margin-left: 5px;
             }
             .switch-select {
-              background-color: #00BFB8;
-              border-color: #00BFB8;
+              background-color: #01AABB;
+              border-color: #01AABB;
             }
             .switch-select .switch-slider {
               background-color: #000 !important;
             }
             .switch-select.checked {
-              background-color: #F9F871;
-              border-color: #F9F871;
+              background-color: #000;
+              border-color: #01AABB;
+            }
+            .switch-select.checked .switch-slider {
+              background-color: #01AABB !important;
             }
         `
 
