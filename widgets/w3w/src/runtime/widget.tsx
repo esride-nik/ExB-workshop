@@ -11,6 +11,7 @@ import Graphic from 'esri/Graphic'
 import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol'
 import Polygon from 'esri/geometry/Polygon'
 import { Button } from 'jimu-ui'
+import geometryEngine from 'esri/geometry/geometryEngine'
 
 const w3wApi = require('@what3words/api')
 
@@ -242,15 +243,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   private readonly zoomToW3w = () => {
+    const w3wPoint = webMercatorUtils.geographicToWebMercator(new Point({
+      x: this.state.w3wAddress.coordinates.lng,
+      y: this.state.w3wAddress.coordinates.lat,
+      spatialReference: {
+        wkid: 4326
+      }
+    }))
+    const w3wBuffer = geometryEngine.buffer(w3wPoint, 1, 'kilometers')
+
     this.view.goTo({
-      target: new Point({
-        x: this.state.w3wAddress.coordinates.lng,
-        y: this.state.w3wAddress.coordinates.lat,
-        spatialReference: {
-          wkid: 4326
-        }
-      }),
-      zoom: 20
+      target: w3wBuffer
     })
   }
 
