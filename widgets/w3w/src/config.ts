@@ -26,6 +26,7 @@ export interface Config {
   showW3wText: boolean
   zoomToW3wSquare: boolean
   useMapMidpoint: boolean
+  w3wLanguage: string
 }
 
 export type IMConfig = ImmutableObject<Config>

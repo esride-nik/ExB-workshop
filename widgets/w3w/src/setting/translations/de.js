@@ -9,4 +9,5 @@ define({
   w3wApiKey: 'what3words API Key',
   useClickpoint: 'Klickpunkt verwenden',
   useMapMidpoint: 'Kartenmittelpunkt verwenden',
+  w3wLanguage: 'what3words language'
 });

@@ -4,5 +4,6 @@
   "showW3wSquare": false,
   "showW3wText": false,
   "zoomToW3wSquare": false,
-  "useMapMidpoint": false
+  "useMapMidpoint": false,
+  "w3wLanguage": "en"
 }

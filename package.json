@@ -7,10 +7,10 @@
   "author": "",
   "dependencies": {
     "@tmcw/togeojson": "^4.5.0",
-    "@what3words/api": "^3.3.6",
+    "@what3words/api": "^4.0.6",
     "axios": "^0.21.4",
+    "cross-fetch": "^3.1.5",
     "react-dropzone": "^11.3.4",
     "xlsx": "^0.17.1"
-  },
-  "devDependencies": {}
+  }
 }

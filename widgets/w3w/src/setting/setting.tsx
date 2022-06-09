@@ -24,7 +24,7 @@ import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advance
 import { ArcGISDataSourceTypes } from 'jimu-arcgis'
 import { IMConfig } from '../config'
 import defaultMessages from './translations/default'
-import { Switch, TextInput } from 'jimu-ui'
+import { Select, Switch, TextInput, Option } from 'jimu-ui'
 
 export default class Setting extends React.PureComponent<AllWidgetSettingProps<IMConfig>, any> {
   supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap])
@@ -75,6 +75,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     this.props.onSettingChange({
       id: this.props.id,
       config: this.props.config.set('w3wApiKey', w3wApiKey)
+    })
+  }
+
+  setw3wLanguage = (w3wLanguage: string) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('w3wLanguage', w3wLanguage)
     })
   }
 
@@ -153,6 +160,19 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                                 />
                                 <label>
                                     <FormattedMessage id="showW3wText" defaultMessage={defaultMessages.showW3wText} />
+                                </label>
+                            </div>
+                        </div>
+                    </SettingRow>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <Select onChange={this.setw3wLanguage}>
+                                  <Option>en</Option>
+                                  <Option>de</Option>
+                                </Select>
+                                <label>
+                                    <FormattedMessage id="w3wLanguage" defaultMessage={defaultMessages.w3wLanguage} />
                                 </label>
                             </div>
                         </div>

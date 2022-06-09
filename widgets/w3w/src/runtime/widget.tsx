@@ -13,7 +13,8 @@ import Polygon from 'esri/geometry/Polygon'
 import { Button } from 'jimu-ui'
 import geometryEngine from 'esri/geometry/geometryEngine'
 
-const w3wApi = require('@what3words/api')
+// const what3words = require('@what3words/api')
+import what3words, { ApiVersion, What3wordsService, Transport, LocationGeoJsonResponse, LocationJsonResponse } from '@what3words/api'
 
 interface W3wAddress {
   country: string
@@ -46,6 +47,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   stationaryWatch: __esri.WatchHandle
   w3wLayer: GraphicsLayer
   view: __esri.MapView | __esri.SceneView
+  w3wService: What3wordsService
+
+  // hard-coded w3w options
+  format: 'json' | 'geojson' = 'json'
 
   state: State = {
     extent: null,
@@ -59,7 +64,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   componentDidMount () {
-    w3wApi.setOptions({ key: this.props.config.w3wApiKey })
+    // what3words.setOptions({ key: this.props.config.w3wApiKey })
+
+    const config: {
+      host: string
+      apiVersion: ApiVersion
+    } = {
+      host: 'https://api.what3words.com',
+      apiVersion: ApiVersion.Version3
+    }
+    const transport = 'fetch' as unknown as Transport
+    this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: transport })
   }
 
   componentWillUnmount () {
@@ -92,13 +107,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   refreshAndZoom = async (point: Point) => {
     const w3wAddress = await this.updateW3wAddress(point)
-    this.refreshW3wGraphics(w3wAddress)
-    if (this.props.config.zoomToW3wSquare) {
-      this.zoomToW3w()
-    }
+    console.log('refreshAndZoom', w3wAddress)
+    // this.refreshW3wGraphics(w3wAddress)
+    // if (this.props.config.zoomToW3wSquare) {
+    //   this.zoomToW3w()
+    // }
   }
 
   handleMapClick = async (mapClick: any) => {
+    this.getW3wGrid()
     if (!this.props.config.useMapMidpoint) {
       await this.refreshAndZoom(mapClick.mapPoint as Point)
     }
@@ -142,7 +159,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  private readonly getW3wAddress= async (point: Point): Promise<W3wAddress> => {
+  private readonly getW3wAddress = async (point: Point): Promise<LocationGeoJsonResponse | LocationJsonResponse> => {
     let geoPoint: Point
     if (point.spatialReference.isWebMercator) {
       geoPoint = webMercatorUtils.webMercatorToGeographic(point) as Point
@@ -152,18 +169,46 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       geoPoint = point
     }
 
-    return await w3wApi.convertTo3wa({
-      lat: geoPoint.y,
-      lng: geoPoint.x
+    // return await this.w3wService.convertTo3wa({
+    //   lat: geoPoint.y,
+    //   lng: geoPoint.x
+    // })
+    return await this.w3wService.convertTo3wa({
+      coordinates: {
+        lat: geoPoint.y,
+        lng: geoPoint.x
+      },
+      format: this.format,
+      language: this.props.config.w3wLanguage ?? 'en'
     })
   }
 
-  private readonly updateW3wAddress= async (point: Point): Promise<W3wAddress> => {
+  private readonly getW3wGrid = () => {
+    const wgs84Extent = webMercatorUtils.webMercatorToGeographic(this.view.extent)
+    console.log('wgs84Extent', wgs84Extent)
+    // this.w3wService.gridSection({
+    //   boundingBox: {
+    //     northeast: {
+    //       lat: wgs84Extent.ymax,
+    //       lng: this.view.extent.xmin
+    //     },
+    //     southwest: {
+    //       lat: this.view.extent.ymin,
+    //       lng: this.view.extent.xmax
+    //     }
+    //   },
+    //   format: this.format
+    // })
+  }
+
+  private readonly updateW3wAddress= async (point: Point): Promise<LocationGeoJsonResponse | LocationJsonResponse> => {
     const w3wAddress = await this.getW3wAddress(point)
 
-    this.setState({
-      w3wAddress
-    })
+    console.log('w3wAddress', w3wAddress)
+
+    // this.setState({
+    //   w3wAddress
+    // })
     return w3wAddress
   }
 

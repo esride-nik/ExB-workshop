@@ -28,4 +28,5 @@ export default {
   w3wApiKey: 'what3words API Key',
   useClickpoint: 'use click point',
   useMapMidpoint: 'use map midpoint',
+  w3wLanguage: 'what3words language'
 }
