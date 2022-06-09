@@ -35,7 +35,7 @@ interface W3wPoint {
 interface State {
   extent: __esri.Extent
   center: __esri.Point
-  w3wAddress: any
+  w3wAddress: W3wAddress
   query: any
 }
 
@@ -76,24 +76,28 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  handleMapClick = async (mapClick: any) => {
-    console.log('mapClick', mapClick)
-    const w3wAddress = await this.updateW3wAddress(mapClick.mapPoint as Point)
+  refreshW3wGraphics = (w3wAddress: W3wAddress) => {
     this.w3wLayer.graphics.removeAll()
-    this.drawW3wLogoAndText(w3wAddress)
+    if (this.props.config.w3wOnMap) {
+      this.drawW3wLogo(w3wAddress)
+    }
+    if (this.props.config.w3wOnMap) {
+      this.drawW3wText(w3wAddress)
+    }
+    if (this.props.config.showW3wSquare) {
+      this.drawW3wSquare(w3wAddress)
+    }
+  }
+
+  handleMapClick = async (mapClick: any) => {
+    const w3wAddress = await this.updateW3wAddress(mapClick.mapPoint as Point)
+    this.refreshW3wGraphics(w3wAddress)
   }
 
   async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
       const w3wAddress = await this.updateW3wAddress(this.state.center)
-
-      this.w3wLayer.graphics.removeAll()
-      if (this.props.config.w3wOnMap) {
-        this.drawW3wLogoAndText(w3wAddress)
-      }
-      if (this.props.config.showW3wSquare) {
-        this.drawW3wSquare(w3wAddress)
-      }
+      this.refreshW3wGraphics(w3wAddress)
     }
   }
 
@@ -154,7 +158,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     return w3wAddress
   }
 
-  private readonly drawW3wLogoAndText = (w3wAddress: W3wAddress) => {
+  private readonly drawW3wText = (w3wAddress: W3wAddress) => {
     const textSym = {
       type: 'text',
       text: w3wAddress.words,
@@ -178,6 +182,16 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       symbol: textSym
     })
     this.w3wLayer.graphics.add(w3wtext)
+  }
+
+  private readonly drawW3wLogo = (w3wAddress: W3wAddress) => {
+    const w3wGeometry = new Point({
+      x: w3wAddress.coordinates.lng,
+      y: w3wAddress.coordinates.lat,
+      spatialReference: {
+        wkid: 4326
+      }
+    })
     const logoSym = {
       type: 'picture-marker',
       url: 'data:image/svg+xml;base64,' +
@@ -229,7 +243,13 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   private readonly zoomToW3w = () => {
     this.view.goTo({
-      target: this.w3wLayer.graphics.getItemAt(0).geometry,
+      target: new Point({
+        x: this.state.w3wAddress.coordinates.lng,
+        y: this.state.w3wAddress.coordinates.lat,
+        spatialReference: {
+          wkid: 4326
+        }
+      }),
       zoom: 20
     })
   }
