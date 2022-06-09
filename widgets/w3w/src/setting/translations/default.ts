@@ -20,9 +20,10 @@
 export default {
   selectMapWidget: 'Please select map',
   displayOption: 'Display options',
-  w3wOnMap: 'on map',
+  showW3wLogo: 'show logo',
   showW3wSquare: 'show square',
-  zoomToW3wSquare: 'zoom to square',
+  showW3wText: 'show text',
+  zoomToW3w: 'automatic zoom',
   w3wApiKey: 'what3words API Key',
   useMapMidpoint: 'use map midpoint',
 }

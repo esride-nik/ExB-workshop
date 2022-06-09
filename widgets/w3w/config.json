@@ -1,7 +1,8 @@
 {
   "w3wApiKey": "",
-  "w3wOnMap": true,
+  "showW3wLogo": true,
   "showW3wSquare": false,
+  "showW3wText": false,
   "zoomToW3wSquare": false,
   "useMapMidpoint": false
 }

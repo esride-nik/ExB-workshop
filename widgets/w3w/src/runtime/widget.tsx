@@ -79,10 +79,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   refreshW3wGraphics = (w3wAddress: W3wAddress) => {
     this.w3wLayer.graphics.removeAll()
-    if (this.props.config.w3wOnMap) {
+    if (this.props.config.showW3wLogo) {
       this.drawW3wLogo(w3wAddress)
     }
-    if (this.props.config.w3wOnMap) {
+    if (this.props.config.showW3wText) {
       this.drawW3wText(w3wAddress)
     }
     if (this.props.config.showW3wSquare) {

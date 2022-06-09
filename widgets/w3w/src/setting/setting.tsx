@@ -36,10 +36,10 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     })
   }
 
-  switchW3wOnMap = (evt: React.FormEvent<HTMLInputElement>) => {
+  switchShowW3wLogo = (evt: React.FormEvent<HTMLInputElement>) => {
     this.props.onSettingChange({
       id: this.props.id,
-      config: this.props.config.set('w3wOnMap', evt.currentTarget.checked)
+      config: this.props.config.set('showW3wLogo', evt.currentTarget.checked)
     })
   }
 
@@ -47,6 +47,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     this.props.onSettingChange({
       id: this.props.id,
       config: this.props.config.set('showW3wSquare', evt.currentTarget.checked)
+    })
+  }
+
+  switchShowW3wText = (evt: React.FormEvent<HTMLInputElement>) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('showW3wText', evt.currentTarget.checked)
     })
   }
 
@@ -103,9 +110,9 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                     <SettingRow>
                         <div className="w-100">
                             <div className="checkbox-row">
-                                <Switch checked={this.props.config?.w3wOnMap || false} onChange={this.switchW3wOnMap} />
+                                <Switch checked={this.props.config?.showW3wLogo || false} onChange={this.switchShowW3wLogo} />
                                 <label>
-                                    <FormattedMessage id="w3wOnMap" defaultMessage={defaultMessages.w3wOnMap} />
+                                    <FormattedMessage id="showW3wLogo" defaultMessage={defaultMessages.showW3wLogo} />
                                 </label>
                             </div>
                         </div>
@@ -127,11 +134,24 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                         <div className="w-100">
                             <div className="checkbox-row">
                                 <Switch
+                                    checked={(this.props.config && this.props.config.showW3wText) || false}
+                                    onChange={this.switchShowW3wText}
+                                />
+                                <label>
+                                    <FormattedMessage id="showW3wText" defaultMessage={defaultMessages.showW3wText} />
+                                </label>
+                            </div>
+                        </div>
+                    </SettingRow>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <Switch
                                     checked={(this.props.config && this.props.config.zoomToW3wSquare) || false}
                                     onChange={this.switchZoomToW3wSquare}
                                 />
                                 <label>
-                                    <FormattedMessage id="zoomToW3wSquare" defaultMessage={defaultMessages.zoomToW3wSquare} />
+                                    <FormattedMessage id="zoomToW3w" defaultMessage={defaultMessages.zoomToW3w} />
                                 </label>
                             </div>
                         </div>

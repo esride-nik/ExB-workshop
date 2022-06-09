@@ -21,8 +21,9 @@ import { ImmutableObject } from 'jimu-core'
 
 export interface Config {
   w3wApiKey: string
-  w3wOnMap: boolean
+  showW3wLogo: boolean
   showW3wSquare: boolean
+  showW3wText: boolean
   zoomToW3wSquare: boolean
   useMapMidpoint: boolean
 }
