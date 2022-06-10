@@ -151,7 +151,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       geoPoint = point
     }
 
-    return await this.w3wService.convertTo3wa({
+    const w3wAddressCollection = await this.w3wService.convertTo3wa({
       coordinates: {
         lat: geoPoint.y,
         lng: geoPoint.x
@@ -159,6 +159,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       format: this.format,
       language: this.props.config.w3wLanguage ?? 'en'
     }) as LocationGeoJsonResponse
+
+    // The return type is wrong in the definitions. It's a FeatureCollection containing the array "features": LocationGeoJsonResponse[] | LocationJsonResponse[]
+    return (w3wAddressCollection as any).features[0]
   }
 
   private readonly fillW3wGridLayer = async () => {
@@ -200,7 +203,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   private readonly updateW3wAddress= async (point: Point): Promise<LocationGeoJsonResponse> => {
     const w3wAddress = await this.getW3wAddress(point)
-    console.log('w3wAddress', w3wAddress)
+    console.debug('w3wAddress', w3wAddress, point)
 
     this.setState({
       w3wAddress
@@ -335,7 +338,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                             <th scope="row">
                                 <FormattedMessage id="centerLabel" />
                             </th>
-                            <td>{this.state.w3wAddress && this.state.w3wAddress.properties.words}</td>
+                            <td>{this.state.w3wAddress?.properties?.words}</td>
                         </tr>
                         <tr>
                             <td colSpan={2}><Button onClick={this.zoomToW3w}>Zoom</Button></td>
