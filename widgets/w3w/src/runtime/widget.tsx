@@ -94,7 +94,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   refreshAndZoom = async () => {
-    console.log('refreshAndZoom')
     this.refreshW3wGraphics()
     if (this.props.config.zoomToW3wSquare) {
       this.zoomToW3w()
@@ -169,6 +168,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     return (w3wAddressCollection as any).features[0]
   }
 
+  // TODO: call this when exceeding a certain zoom level
   private readonly fillW3wGridLayer = async () => {
     const wgs84Extent = webMercatorUtils.webMercatorToGeographic(this.view.extent) as Extent
     const diagonalDistance = geodesicUtils.geodesicDistance(new Point({
@@ -179,7 +179,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       x: wgs84Extent.xmin
     }), 'kilometers')
 
-    if (diagonalDistance.distance <= 4) {
+    if (diagonalDistance.distance <= 0.5) {
       const w3wGrid = await this.w3wService.gridSection({
         boundingBox: {
           northeast: {
@@ -199,9 +199,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         type: 'application/json'
       })
       const url = URL.createObjectURL(blob)
+      // TODO: refresh graphics instead of creating new layer? take graphics out when zooming out? grey symbology, fading out to the sides?
       this.w3wGridLayer = new GeoJSONLayer({
         url
       })
+      // TODO: add grid layer behind w3w graphics
       this.view.map.add(this.w3wGridLayer)
     }
   }
@@ -288,13 +290,14 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     this.w3wLayer.graphics.add(w3wGraphic)
   }
 
-  private readonly zoomToW3w = () => {
+  private readonly zoomToW3w = async () => {
     const w3wPoint = webMercatorUtils.geographicToWebMercator(this.state.w3wPoint)
     const w3wBuffer = geometryEngine.buffer(w3wPoint, 1, 'kilometers')
 
-    this.view.goTo({
+    await this.view.goTo({
       target: w3wBuffer
     })
+    this.fillW3wGridLayer()
   }
 
   render () {
