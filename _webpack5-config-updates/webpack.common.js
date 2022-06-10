@@ -387,6 +387,18 @@ exports.getCommon = function (commonOptions = {}) {
     'arcgis-charts': path.resolve(__dirname, '../jimu-ui/arcgis-charts'),
     'calcite-components': path.resolve(__dirname, '../jimu-ui/calcite-components'),
   };
+  exports.fallback = {
+    "os": require.resolve("os-browserify/browser"),
+    "stream": require.resolve("stream-browserify"),
+    "http": require.resolve("stream-http"),
+    "zlib": require.resolve("browserify-zlib"),
+    "url": require.resolve("url/"),
+    "querystring": require.resolve("querystring-es3"),
+    "https": require.resolve("https-browserify"),
+    "util": require.resolve("util/"),
+    "assert": require.resolve("assert/"),
+    "buffer": require.resolve("buffer/")
+  }
 
   exports.externalFunction = function({context, request}, callback) {
     if (isRequestExternal(request)) {

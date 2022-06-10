@@ -687,7 +687,8 @@ function getWidgetsWebpackConfig(entries, toBeCopiedFiles, toBeCleanFiles){
     resolve: {
       alias: webpackCommon.moduleAlias,
       extensions: webpackCommon.extensions,
-      mainFields: webpackCommon.resolveMainFields
+      mainFields: webpackCommon.resolveMainFields,
+      fallback: webpackCommon.fallback
     },
     module: {
       rules: webpackCommon.getModuleRules(path.resolve(__dirname, '../tsconfig/tsconfig-widgets.json'))
@@ -725,7 +726,8 @@ function getThemesWebpackConfig(entries, toBeCopiedFiles, toBeCleanFiles){
     resolve: {
       alias: webpackCommon.moduleAlias,
       extensions: webpackCommon.extensions,
-      mainFields: webpackCommon.resolveMainFields
+      mainFields: webpackCommon.resolveMainFields,
+      fallback: webpackCommon.fallback
     },
     module: {
       rules: webpackCommon.getModuleRules(path.resolve(__dirname, '../tsconfig/tsconfig-themes.json'))
@@ -756,7 +758,8 @@ function getTemplatesWebpackConfig(toBeCopiedFiles, toBeCleanFiles){
     resolve: {
       alias: webpackCommon.moduleAlias,
       extensions: webpackCommon.extensions,
-      mainFields: webpackCommon.resolveMainFields
+      mainFields: webpackCommon.resolveMainFields,
+      fallback: webpackCommon.fallback
     },
     module: {
       rules: webpackCommon.getModuleRules(path.resolve(__dirname, '../tsconfig/tsconfig-themes.json'))
