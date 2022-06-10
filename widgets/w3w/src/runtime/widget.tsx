@@ -13,34 +13,15 @@ import Polygon from 'esri/geometry/Polygon'
 import { Button } from 'jimu-ui'
 import geometryEngine from 'esri/geometry/geometryEngine'
 
-// const what3words = require('@what3words/api')
-import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, LocationJsonResponse, axiosTransport } from '@what3words/api'
+import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, axiosTransport } from '@what3words/api'
 import { Extent } from 'esri/geometry'
 import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer'
 
-interface W3wAddress {
-  country: string
-  square: W3wSquare
-  nearestPlace: string
-  coordinates: W3wPoint
-  words: string
-  language: string
-  map: string
-}
-interface W3wSquare {
-  northeast: W3wPoint
-  southwest: W3wPoint
-}
-interface W3wPoint {
-  lng: number
-  lat: number
-}
-
 interface State {
   extent: __esri.Extent
   center: __esri.Point
-  w3wAddress: LocationJsonResponse
+  w3wAddress: LocationGeoJsonResponse
   query: any
 }
 
@@ -93,7 +74,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  refreshW3wGraphics = (w3wAddress: W3wAddress) => {
+  refreshW3wGraphics = (w3wAddress: LocationGeoJsonResponse) => {
     this.w3wLayer.graphics.removeAll()
     if (this.props.config.showW3wLogo) {
       this.drawW3wLogo(w3wAddress)
@@ -109,10 +90,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   refreshAndZoom = async (point: Point) => {
     const w3wAddress = await this.updateW3wAddress(point)
     console.log('refreshAndZoom', w3wAddress)
-    // this.refreshW3wGraphics(w3wAddress)
-    // if (this.props.config.zoomToW3wSquare) {
-    //   this.zoomToW3w()
-    // }
+    this.refreshW3wGraphics(w3wAddress)
+    if (this.props.config.zoomToW3wSquare) {
+      this.zoomToW3w()
+    }
   }
 
   handleMapClick = async (mapClick: any) => {
@@ -160,7 +141,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  private readonly getW3wAddress = async (point: Point): Promise<LocationGeoJsonResponse | LocationJsonResponse> => {
+  private readonly getW3wAddress = async (point: Point): Promise<LocationGeoJsonResponse> => {
     let geoPoint: Point
     if (point.spatialReference.isWebMercator) {
       geoPoint = webMercatorUtils.webMercatorToGeographic(point) as Point
@@ -177,7 +158,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       },
       format: this.format,
       language: this.props.config.w3wLanguage ?? 'en'
-    })
+    }) as LocationGeoJsonResponse
   }
 
   private readonly fillW3wGridLayer = async () => {
@@ -217,9 +198,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  private readonly updateW3wAddress= async (point: Point): Promise<LocationJsonResponse> => {
-    const w3wAddress = await this.getW3wAddress(point) as LocationJsonResponse
-
+  private readonly updateW3wAddress= async (point: Point): Promise<LocationGeoJsonResponse> => {
+    const w3wAddress = await this.getW3wAddress(point)
     console.log('w3wAddress', w3wAddress)
 
     this.setState({
@@ -228,10 +208,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     return w3wAddress
   }
 
-  private readonly drawW3wText = (w3wAddress: W3wAddress) => {
+  private readonly drawW3wText = (w3wAddress: LocationGeoJsonResponse) => {
     const textSym = {
       type: 'text',
-      text: w3wAddress.words,
+      text: w3wAddress.properties.words,
       font: { size: 12 },
       horizontalAlignment: 'left',
       kerning: true,
@@ -241,8 +221,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       yoffset: -4
     }
     const w3wGeometry = new Point({
-      x: w3wAddress.coordinates.lng,
-      y: w3wAddress.coordinates.lat,
+      x: w3wAddress.geometry.coordinates[1],
+      y: w3wAddress.geometry.coordinates[0],
       spatialReference: {
         wkid: 4326
       }
@@ -254,10 +234,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     this.w3wLayer.graphics.add(w3wtext)
   }
 
-  private readonly drawW3wLogo = (w3wAddress: W3wAddress) => {
+  private readonly drawW3wLogo = (w3wAddress: LocationGeoJsonResponse) => {
     const w3wGeometry = new Point({
-      x: w3wAddress.coordinates.lng,
-      y: w3wAddress.coordinates.lat,
+      x: w3wAddress.geometry.coordinates[1],
+      y: w3wAddress.geometry.coordinates[0],
       spatialReference: {
         wkid: 4326
       }
@@ -277,11 +257,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     this.w3wLayer.graphics.add(w3wlogo)
   }
 
-  private readonly drawW3wSquare = (w3wAddress: W3wAddress) => {
-    const east = w3wAddress.square.northeast.lng
-    const north = w3wAddress.square.northeast.lat
-    const west = w3wAddress.square.southwest.lng
-    const south = w3wAddress.square.southwest.lat
+  private readonly drawW3wSquare = (w3wAddress: LocationGeoJsonResponse) => {
+    const north = w3wAddress.bbox[0]
+    const east = w3wAddress.bbox[1]
+    const south = w3wAddress.bbox[2]
+    const west = w3wAddress.bbox[3]
     const w3wGraphic = new Graphic({
       geometry: new Polygon({
         rings: [
@@ -309,8 +289,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   private readonly zoomToW3w = () => {
     const w3wPoint = webMercatorUtils.geographicToWebMercator(new Point({
-      x: this.state.w3wAddress.coordinates.lng,
-      y: this.state.w3wAddress.coordinates.lat,
+      x: this.state.w3wAddress.geometry.coordinates[1],
+      y: this.state.w3wAddress.geometry.coordinates[0],
       spatialReference: {
         wkid: 4326
       }
@@ -355,7 +335,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                             <th scope="row">
                                 <FormattedMessage id="centerLabel" />
                             </th>
-                            <td>{this.state.w3wAddress && this.state.w3wAddress.words}</td>
+                            <td>{this.state.w3wAddress && this.state.w3wAddress.properties.words}</td>
                         </tr>
                         <tr>
                             <td colSpan={2}><Button onClick={this.zoomToW3w}>Zoom</Button></td>
