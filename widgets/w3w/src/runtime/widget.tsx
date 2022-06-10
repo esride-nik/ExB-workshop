@@ -14,7 +14,7 @@ import { Button } from 'jimu-ui'
 import geometryEngine from 'esri/geometry/geometryEngine'
 
 // const what3words = require('@what3words/api')
-import what3words, { ApiVersion, What3wordsService, Transport, LocationGeoJsonResponse, LocationJsonResponse } from '@what3words/api'
+import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, LocationJsonResponse, axiosTransport } from '@what3words/api'
 
 interface W3wAddress {
   country: string
@@ -73,8 +73,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       host: 'https://api.what3words.com',
       apiVersion: ApiVersion.Version3
     }
-    const transport = 'axios' as unknown as Transport
-    this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: transport })
+    // const transport = 'axios' as unknown as Transport
+    // this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: transport })
+
+    // const transport: 'axios' | 'fetch' = 'fetch'
+    this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: axiosTransport() })
   }
 
   componentWillUnmount () {
