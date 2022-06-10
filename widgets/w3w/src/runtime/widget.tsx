@@ -116,7 +116,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   handleMapClick = async (mapClick: any) => {
-    this.getW3wGrid()
+    this.fillW3wGridLayer()
     if (!this.props.config.useMapMidpoint) {
       await this.refreshAndZoom(mapClick.mapPoint as Point)
     }
@@ -180,9 +180,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     })
   }
 
-  private readonly getW3wGrid = async () => {
+  private readonly fillW3wGridLayer = async () => {
     const wgs84Extent = webMercatorUtils.webMercatorToGeographic(this.view.extent) as Extent
-    console.log('wgs84Extent', wgs84Extent)
     const diagonalDistance = geodesicUtils.geodesicDistance(new Point({
       y: wgs84Extent.ymax,
       x: wgs84Extent.xmax
@@ -190,7 +189,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       y: wgs84Extent.ymin,
       x: wgs84Extent.xmin
     }), 'kilometers')
-    console.log('diagonalDistance', diagonalDistance)
 
     if (diagonalDistance.distance <= 4) {
       const w3wGrid = await this.w3wService.gridSection({
@@ -206,20 +204,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         },
         format: this.format
       })
-      console.log('w3wGrid', w3wGrid)
 
       // create a new blob from geojson featurecollection
       const blob = new Blob([JSON.stringify(w3wGrid)], {
         type: 'application/json'
       })
-
-      // URL reference to the blob
       const url = URL.createObjectURL(blob)
-      // create new geojson layer using the blob url
       this.w3wGridLayer = new GeoJSONLayer({
         url
       })
-
       this.view.map.add(this.w3wGridLayer)
     }
   }
