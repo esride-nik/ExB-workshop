@@ -22,6 +22,7 @@ interface State {
   extent: __esri.Extent
   center: __esri.Point
   w3wAddress: LocationGeoJsonResponse
+  w3wPoint: Point
   query: any
 }
 
@@ -41,6 +42,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     extent: null,
     center: null,
     w3wAddress: null,
+    w3wPoint: null,
     query: null
   }
 
@@ -74,23 +76,26 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  refreshW3wGraphics = (w3wAddress: LocationGeoJsonResponse) => {
+  refreshW3wGraphics = () => {
     this.w3wLayer.graphics.removeAll()
     if (this.props.config.showW3wLogo) {
-      this.drawW3wLogo(w3wAddress)
+      this.drawW3wLogo()
     }
     if (this.props.config.showW3wText) {
-      this.drawW3wText(w3wAddress)
+      this.drawW3wText()
     }
     if (this.props.config.showW3wSquare) {
-      this.drawW3wSquare(w3wAddress)
+      this.drawW3wSquare()
     }
   }
 
-  refreshAndZoom = async (point: Point) => {
-    const w3wAddress = await this.updateW3wAddress(point)
-    console.log('refreshAndZoom', w3wAddress)
-    this.refreshW3wGraphics(w3wAddress)
+  updateRefreshAndZoom = async (point: Point) => {
+    await this.updateW3wAddress(point)
+  }
+
+  refreshAndZoom = async () => {
+    console.log('refreshAndZoom')
+    this.refreshW3wGraphics()
     if (this.props.config.zoomToW3wSquare) {
       this.zoomToW3w()
     }
@@ -99,13 +104,13 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   handleMapClick = async (mapClick: any) => {
     this.fillW3wGridLayer()
     if (!this.props.config.useMapMidpoint) {
-      await this.refreshAndZoom(mapClick.mapPoint as Point)
+      await this.updateRefreshAndZoom(mapClick.mapPoint as Point)
     }
   }
 
   async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
-      await this.refreshAndZoom(this.state.center)
+      await this.updateRefreshAndZoom(this.state.center)
     }
   }
 
@@ -201,20 +206,27 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  private readonly updateW3wAddress= async (point: Point): Promise<LocationGeoJsonResponse> => {
+  private readonly updateW3wAddress= async (point: Point): Promise<void> => {
     const w3wAddress = await this.getW3wAddress(point)
-    console.debug('w3wAddress', w3wAddress, point)
-
-    this.setState({
-      w3wAddress
+    const w3wPoint = new Point({
+      x: w3wAddress.geometry.coordinates[0],
+      y: w3wAddress.geometry.coordinates[1],
+      spatialReference: {
+        wkid: 4326
+      }
     })
-    return w3wAddress
+
+    // remember that setState is async!
+    this.setState({
+      w3wAddress,
+      w3wPoint
+    }, this.refreshAndZoom)
   }
 
-  private readonly drawW3wText = (w3wAddress: LocationGeoJsonResponse) => {
+  private readonly drawW3wText = () => {
     const textSym = {
       type: 'text',
-      text: w3wAddress.properties.words,
+      text: this.state.w3wAddress.properties.words,
       font: { size: 12 },
       horizontalAlignment: 'left',
       kerning: true,
@@ -223,28 +235,14 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       xoffset: 10,
       yoffset: -4
     }
-    const w3wGeometry = new Point({
-      x: w3wAddress.geometry.coordinates[1],
-      y: w3wAddress.geometry.coordinates[0],
-      spatialReference: {
-        wkid: 4326
-      }
-    })
     const w3wtext = new Graphic({
-      geometry: w3wGeometry,
+      geometry: this.state.w3wPoint,
       symbol: textSym
     })
     this.w3wLayer.graphics.add(w3wtext)
   }
 
-  private readonly drawW3wLogo = (w3wAddress: LocationGeoJsonResponse) => {
-    const w3wGeometry = new Point({
-      x: w3wAddress.geometry.coordinates[1],
-      y: w3wAddress.geometry.coordinates[0],
-      spatialReference: {
-        wkid: 4326
-      }
-    })
+  private readonly drawW3wLogo = () => {
     const logoSym = {
       type: 'picture-marker',
       url: 'data:image/svg+xml;base64,' +
@@ -254,17 +252,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       height: 25
     } as unknown as PictureMarkerSymbol
     const w3wlogo = new Graphic({
-      geometry: w3wGeometry,
+      geometry: this.state.w3wPoint,
       symbol: logoSym
     })
     this.w3wLayer.graphics.add(w3wlogo)
   }
 
-  private readonly drawW3wSquare = (w3wAddress: LocationGeoJsonResponse) => {
-    const north = w3wAddress.bbox[0]
-    const east = w3wAddress.bbox[1]
-    const south = w3wAddress.bbox[2]
-    const west = w3wAddress.bbox[3]
+  private readonly drawW3wSquare = () => {
+    const east = this.state.w3wAddress.bbox[0]
+    const north = this.state.w3wAddress.bbox[1]
+    const west = this.state.w3wAddress.bbox[2]
+    const south = this.state.w3wAddress.bbox[3]
     const w3wGraphic = new Graphic({
       geometry: new Polygon({
         rings: [
@@ -291,13 +289,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   private readonly zoomToW3w = () => {
-    const w3wPoint = webMercatorUtils.geographicToWebMercator(new Point({
-      x: this.state.w3wAddress.geometry.coordinates[1],
-      y: this.state.w3wAddress.geometry.coordinates[0],
-      spatialReference: {
-        wkid: 4326
-      }
-    }))
+    const w3wPoint = webMercatorUtils.geographicToWebMercator(this.state.w3wPoint)
     const w3wBuffer = geometryEngine.buffer(w3wPoint, 1, 'kilometers')
 
     this.view.goTo({
