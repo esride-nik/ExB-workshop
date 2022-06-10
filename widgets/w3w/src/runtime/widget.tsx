@@ -73,7 +73,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       host: 'https://api.what3words.com',
       apiVersion: ApiVersion.Version3
     }
-    const transport = 'fetch' as unknown as Transport
+    const transport = 'axios' as unknown as Transport
     this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: transport })
   }
 
