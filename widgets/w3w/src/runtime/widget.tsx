@@ -15,6 +15,9 @@ import geometryEngine from 'esri/geometry/geometryEngine'
 
 // const what3words = require('@what3words/api')
 import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, LocationJsonResponse, axiosTransport } from '@what3words/api'
+import { Extent } from 'esri/geometry'
+import geodesicUtils from 'esri/geometry/support/geodesicUtils'
+import GeoJSONLayer from 'esri/layers/GeoJSONLayer'
 
 interface W3wAddress {
   country: string
@@ -37,7 +40,7 @@ interface W3wPoint {
 interface State {
   extent: __esri.Extent
   center: __esri.Point
-  w3wAddress: W3wAddress
+  w3wAddress: LocationJsonResponse
   query: any
 }
 
@@ -46,11 +49,12 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   centerWatch: __esri.WatchHandle
   stationaryWatch: __esri.WatchHandle
   w3wLayer: GraphicsLayer
+  w3wGridLayer: GeoJSONLayer
   view: __esri.MapView | __esri.SceneView
   w3wService: What3wordsService
 
   // hard-coded w3w options
-  format: 'json' | 'geojson' = 'json'
+  format: 'json' | 'geojson' = 'geojson'
 
   state: State = {
     extent: null,
@@ -64,8 +68,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   componentDidMount () {
-    // what3words.setOptions({ key: this.props.config.w3wApiKey })
-
     const config: {
       host: string
       apiVersion: ApiVersion
@@ -73,10 +75,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       host: 'https://api.what3words.com',
       apiVersion: ApiVersion.Version3
     }
-    // const transport = 'axios' as unknown as Transport
-    // this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: transport })
-
-    // const transport: 'axios' | 'fetch' = 'fetch'
     this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: axiosTransport() })
   }
 
@@ -172,10 +170,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       geoPoint = point
     }
 
-    // return await this.w3wService.convertTo3wa({
-    //   lat: geoPoint.y,
-    //   lng: geoPoint.x
-    // })
     return await this.w3wService.convertTo3wa({
       coordinates: {
         lat: geoPoint.y,
@@ -186,32 +180,58 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     })
   }
 
-  private readonly getW3wGrid = () => {
-    const wgs84Extent = webMercatorUtils.webMercatorToGeographic(this.view.extent)
+  private readonly getW3wGrid = async () => {
+    const wgs84Extent = webMercatorUtils.webMercatorToGeographic(this.view.extent) as Extent
     console.log('wgs84Extent', wgs84Extent)
-    // this.w3wService.gridSection({
-    //   boundingBox: {
-    //     northeast: {
-    //       lat: wgs84Extent.ymax,
-    //       lng: this.view.extent.xmin
-    //     },
-    //     southwest: {
-    //       lat: this.view.extent.ymin,
-    //       lng: this.view.extent.xmax
-    //     }
-    //   },
-    //   format: this.format
-    // })
+    const diagonalDistance = geodesicUtils.geodesicDistance(new Point({
+      y: wgs84Extent.ymax,
+      x: wgs84Extent.xmax
+    }), new Point({
+      y: wgs84Extent.ymin,
+      x: wgs84Extent.xmin
+    }), 'kilometers')
+    console.log('diagonalDistance', diagonalDistance)
+
+    if (diagonalDistance.distance <= 4) {
+      const w3wGrid = await this.w3wService.gridSection({
+        boundingBox: {
+          northeast: {
+            lat: wgs84Extent.ymax,
+            lng: wgs84Extent.xmax
+          },
+          southwest: {
+            lat: wgs84Extent.ymin,
+            lng: wgs84Extent.xmin
+          }
+        },
+        format: this.format
+      })
+      console.log('w3wGrid', w3wGrid)
+
+      // create a new blob from geojson featurecollection
+      const blob = new Blob([JSON.stringify(w3wGrid)], {
+        type: 'application/json'
+      })
+
+      // URL reference to the blob
+      const url = URL.createObjectURL(blob)
+      // create new geojson layer using the blob url
+      this.w3wGridLayer = new GeoJSONLayer({
+        url
+      })
+
+      this.view.map.add(this.w3wGridLayer)
+    }
   }
 
-  private readonly updateW3wAddress= async (point: Point): Promise<LocationGeoJsonResponse | LocationJsonResponse> => {
-    const w3wAddress = await this.getW3wAddress(point)
+  private readonly updateW3wAddress= async (point: Point): Promise<LocationJsonResponse> => {
+    const w3wAddress = await this.getW3wAddress(point) as LocationJsonResponse
 
     console.log('w3wAddress', w3wAddress)
 
-    // this.setState({
-    //   w3wAddress
-    // })
+    this.setState({
+      w3wAddress
+    })
     return w3wAddress
   }
 
