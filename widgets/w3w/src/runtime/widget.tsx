@@ -35,9 +35,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   view: __esri.MapView | __esri.SceneView
   w3wService: What3wordsService
 
-  // hard-coded w3w options
+  // hard-coded options
   format: 'json' | 'geojson' = 'geojson'
-  showGridZoomThreshold: 17
+  showGridZoomThreshold = 17
 
   state: State = {
     center: null,
@@ -60,6 +60,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       apiVersion: ApiVersion.Version3
     }
     this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: axiosTransport() })
+    this.w3wGridLayer = new GeoJSONLayer({
+      visible: false
+    })
   }
 
   componentWillUnmount () {
@@ -137,6 +140,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.setState({
           zoom
         })
+        if (zoom >= this.showGridZoomThreshold && this.w3wGridLayer.visible) {
+          this.fillW3wGridLayer()
+        } else if (zoom < this.showGridZoomThreshold) {
+          this.w3wGridLayer.visible = false
+        }
       })
     }
     if (!this.centerWatch) {
@@ -201,12 +209,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         type: 'application/json'
       })
       const url = URL.createObjectURL(blob)
-      // TODO: refresh graphics instead of creating new layer? take graphics out when zooming out? grey symbology, fading out to the sides?
+      // need to create a new layer instead uf just updating the url. won't redraw otherwise.
+      this.view.map.remove(this.w3wGridLayer)
+      this.w3wGridLayer.destroy()
       this.w3wGridLayer = new GeoJSONLayer({
-        url
+        url,
+        visible: true
       })
       // TODO: add grid layer behind w3w graphics
       this.view.map.add(this.w3wGridLayer)
+    } else {
+      this.w3wGridLayer.visible = false
     }
   }
 
