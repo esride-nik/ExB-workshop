@@ -19,15 +19,15 @@ import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer'
 
 interface State {
-  extent: __esri.Extent
   center: __esri.Point
+  zoom: number
   w3wAddress: LocationGeoJsonResponse
   w3wPoint: Point
   query: any
 }
 
 export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> {
-  extentWatch: __esri.WatchHandle
+  zoomWatch: __esri.WatchHandle
   centerWatch: __esri.WatchHandle
   stationaryWatch: __esri.WatchHandle
   w3wLayer: GraphicsLayer
@@ -37,10 +37,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   // hard-coded w3w options
   format: 'json' | 'geojson' = 'geojson'
+  showGridZoomThreshold: 17
 
   state: State = {
-    extent: null,
     center: null,
+    zoom: null,
     w3wAddress: null,
     w3wPoint: null,
     query: null
@@ -62,9 +63,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   componentWillUnmount () {
-    if (this.extentWatch) {
-      this.extentWatch.remove()
-      this.extentWatch = null
+    if (this.zoomWatch) {
+      this.zoomWatch.remove()
+      this.zoomWatch = null
     }
     if (this.centerWatch) {
       this.centerWatch.remove()
@@ -95,13 +96,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   refreshAndZoom = async () => {
     this.refreshW3wGraphics()
+    if (this.state.zoom > this.showGridZoomThreshold) {
+      this.fillW3wGridLayer()
+    }
     if (this.props.config.zoomToW3wSquare) {
       this.zoomToW3w()
     }
   }
 
   handleMapClick = async (mapClick: any) => {
-    this.fillW3wGridLayer()
     if (!this.props.config.useMapMidpoint) {
       await this.updateRefreshAndZoom(mapClick.mapPoint as Point)
     }
@@ -129,10 +132,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.stationaryWatchHandler(stationary, this.view)
       )
     }
-    if (!this.extentWatch) {
-      this.extentWatch = this.view.watch('extent', (extent) => {
+    if (!this.zoomWatch) {
+      this.zoomWatch = this.view.watch('zoom', (zoom) => {
         this.setState({
-          extent
+          zoom
         })
       })
     }
@@ -168,7 +171,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     return (w3wAddressCollection as any).features[0]
   }
 
-  // TODO: call this when exceeding a certain zoom level
   private readonly fillW3wGridLayer = async () => {
     const wgs84Extent = webMercatorUtils.webMercatorToGeographic(this.view.extent) as Extent
     const diagonalDistance = geodesicUtils.geodesicDistance(new Point({
@@ -297,7 +299,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     await this.view.goTo({
       target: w3wBuffer
     })
-    this.fillW3wGridLayer()
   }
 
   render () {
