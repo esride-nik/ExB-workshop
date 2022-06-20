@@ -39,7 +39,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   // hard-coded options
   format: 'json' | 'geojson' = 'geojson'
-  showGridZoomThreshold = 17
+  showGridZoomThreshold = 18
 
   state: State = {
     center: null,
@@ -96,15 +96,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }
   }
 
-  updateRefreshAndZoom = async (point: Point) => {
-    await this.updateW3wAddress(point)
-  }
-
   refreshAndZoom = async () => {
     this.refreshW3wGraphics()
-    // if (this.state.zoom > this.showGridZoomThreshold) {
-    //   this.fillW3wGridLayer()
-    // }
     if (this.props.config.zoomToW3wSquare) {
       this.zoomToW3w()
     }
@@ -112,41 +105,33 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   handleMapClick = async (mapClick: any) => {
     if (!this.props.config.useMapMidpoint) {
-      await this.updateRefreshAndZoom(mapClick.mapPoint as Point)
+      await this.updateW3wAddress(mapClick.mapPoint as Point)
     }
   }
 
   async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
     console.log('stationaryWatchHandler')
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
-      await this.updateRefreshAndZoom(this.state.center)
+      await this.updateW3wAddress(this.state.center)
     }
-    // if (stationary && this.view.zoom >= this.showGridZoomThreshold) {
-    //   this.w3wGridLayer.visible = true
-    //   console.log('fillW3wGridLayer()')
-    //   this.fillW3wGridLayer()
-    // } else if (this.view.zoom < this.showGridZoomThreshold) {
-    //   this.w3wGridLayer.visible = false
-    // }
+    if (stationary) {
+      if (this.view.zoom >= this.showGridZoomThreshold && !this.compareExtents(this.view.extent, this.state.extent)) {
+        this.setState({
+          extent: this.view.extent
+        }, this.enableAndFillW3wGridLayer)
+      } else if (this.view.zoom < this.showGridZoomThreshold) {
+        this.w3wGridLayer.visible = false
+      }
+    }
+  }
+
+  enableAndFillW3wGridLayer (): void {
+    this.w3wGridLayer.visible = true
+    this.fillW3wGridLayer()
   }
 
   compareExtents (oneExtent: Extent, anotherExtent: Extent): boolean {
     return oneExtent?.xmin === anotherExtent?.xmin && oneExtent?.xmax === anotherExtent?.xmax && oneExtent?.ymin === anotherExtent?.ymin && oneExtent?.ymax === anotherExtent?.ymax && oneExtent?.spatialReference.wkid === anotherExtent?.spatialReference.wkid
-  }
-
-  async extentWatchHandler (extent: Extent, view: __esri.MapView | __esri.SceneView) {
-    // console.log('extentWatchHandler', extent.xmin, extent.xmax, extent.ymin, extent.ymax, this.view.stationary, extent === this.state.extent)
-    console.log('extentWatchHandler', this.view.stationary, this.compareExtents(extent, this.state.extent))
-    if (this.view.zoom >= this.showGridZoomThreshold && !this.compareExtents(extent, this.state.extent)) {
-      this.w3wGridLayer.visible = true
-      console.log('fillW3wGridLayer()')
-      this.fillW3wGridLayer()
-    } else if (this.view.zoom < this.showGridZoomThreshold) {
-      this.w3wGridLayer.visible = false
-    }
-    this.setState({
-      extent
-    })
   }
 
   onActiveViewChange = (jimuMapView: JimuMapView) => {
@@ -163,11 +148,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     if (!this.stationaryWatch) {
       this.stationaryWatch = this.view.watch('stationary', (stationary) =>
         this.stationaryWatchHandler(stationary, this.view)
-      )
-    }
-    if (!this.extentWatch) {
-      this.extentWatch = this.view.watch('extent', (extent) =>
-        this.extentWatchHandler(extent as Extent, this.view)
       )
     }
     if (!this.zoomWatch) {
