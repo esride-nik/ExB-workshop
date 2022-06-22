@@ -110,7 +110,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   async stationaryWatchHandler (stationary: boolean, view: __esri.MapView | __esri.SceneView) {
-    console.log('stationaryWatchHandler')
     if (this.props.config.useMapMidpoint && stationary && this.state.center) {
       await this.updateW3wAddress(this.state.center)
     }
@@ -139,7 +138,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     this.view = jimuMapView.view
 
     this.w3wLayer = new GraphicsLayer({
-      listMode: 'hide'
+      listMode: 'hide',
+      id: 'w3wLayer'
     })
     this.view.map.add(this.w3wLayer)
 
@@ -224,12 +224,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       this.w3wGridLayer.destroy()
       this.w3wGridLayer = new GeoJSONLayer({
         url,
-        visible: true
+        visible: true,
+        id: 'w3wGridLayer'
       })
-      // TODO: add grid layer behind w3w graphics
-      this.view.map.add(this.w3wGridLayer)
+
+      // add w3wGridLayer under w3wLayer
+      this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
     } else {
       this.w3wGridLayer.visible = false
+      this.w3wGridLayer.destroy()
     }
   }
 
