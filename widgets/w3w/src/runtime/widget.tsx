@@ -17,6 +17,8 @@ import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, axi
 import { Extent } from 'esri/geometry'
 import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer'
+import { SimpleRenderer } from 'esri/renderers'
+import Query from 'esri/rest/support/Query'
 
 interface State {
   center: __esri.Point
@@ -214,10 +216,38 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         format: this.format
       })
 
+      // const coordinatesCount = w3wGrid.features[0].geometry.coordinates.length
+      // console.log('coordinates count', coordinatesCount)
+      // w3wGrid.features[0].geometry.coordinates = w3wGrid.features[0].geometry.coordinates.filter((coordinate: any, index: number) => index <= coordinatesCount / 2)
+
+      const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any) => {
+        return { geometry: { coordinates: [coordinate], type: 'MultiLineString' }, type: 'Feature', properties: { value: coordinate[0][0] } }
+      })
+      const w3wLines = { features: w3wLinesCollection, type: 'FeatureCollection' }
+
+      console.log(JSON.stringify(w3wLines), w3wLinesCollection.length)
+
+      // {"features":[{"geometry":{"coordinates":[],"type":"MultiLineString"},"type":"Feature","properties":{}}],"type":"FeatureCollection"}
+
+      // create renderer
+      const defaultSym = {
+        type: 'simple-line', // autocasts as new SimpleFillSymbol()
+        color: [255, 0, 0, 0.8],
+        width: '0.5px'
+      }
+      const renderer = {
+        type: 'simple', // autocasts as new SimpleRenderer()
+        symbol: defaultSym,
+        label: 'w3wGrid'
+      } as unknown as SimpleRenderer
+
       // create a new blob from geojson featurecollection
-      const blob = new Blob([JSON.stringify(w3wGrid)], {
+      const blob = new Blob([JSON.stringify(w3wLines)], {
         type: 'application/json'
       })
+      // const blob = new Blob([JSON.stringify(w3wGrid)], {
+      //   type: 'application/json'
+      // })
       const url = URL.createObjectURL(blob)
       // need to create a new layer instead uf just updating the url. won't redraw otherwise.
       this.view.map.remove(this.w3wGridLayer)
@@ -225,8 +255,12 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       this.w3wGridLayer = new GeoJSONLayer({
         url,
         visible: true,
-        id: 'w3wGridLayer'
+        id: 'w3wGridLayer',
+        renderer: renderer
       })
+
+      const features = await this.w3wGridLayer.queryFeatures(new Query({ where: '1=1' }))
+      console.log('features', features)
 
       // add w3wGridLayer under w3wLayer
       this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
