@@ -14,11 +14,9 @@ import { Button } from 'jimu-ui'
 import geometryEngine from 'esri/geometry/geometryEngine'
 
 import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, axiosTransport } from '@what3words/api'
-import { Extent } from 'esri/geometry'
+import { Extent, Polyline } from 'esri/geometry'
 import geodesicUtils from 'esri/geometry/support/geodesicUtils'
-import GeoJSONLayer from 'esri/layers/GeoJSONLayer'
-import { SimpleRenderer } from 'esri/renderers'
-import Query from 'esri/rest/support/Query'
+import FeatureLayer from 'esri/layers/FeatureLayer'
 
 interface State {
   center: __esri.Point
@@ -35,7 +33,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   stationaryWatch: __esri.WatchHandle
   extentWatch: __esri.WatchHandle
   w3wLayer: GraphicsLayer
-  w3wGridLayer: GeoJSONLayer
+  w3wGridLayer: FeatureLayer
   view: __esri.MapView | __esri.SceneView
   w3wService: What3wordsService
 
@@ -65,9 +63,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       apiVersion: ApiVersion.Version3
     }
     this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: axiosTransport() })
-    this.w3wGridLayer = new GeoJSONLayer({
-      visible: false
-    })
+    // this.w3wGridLayer = new GeoJSONLayer({
+    //   visible: false
+    // })
   }
 
   componentWillUnmount () {
@@ -120,14 +118,13 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         this.setState({
           extent: this.view.extent
         }, this.enableAndFillW3wGridLayer)
-      } else if (this.view.zoom < this.showGridZoomThreshold) {
+      } else if (this.view.zoom < this.showGridZoomThreshold && this.w3wGridLayer) {
         this.w3wGridLayer.visible = false
       }
     }
   }
 
   enableAndFillW3wGridLayer (): void {
-    this.w3wGridLayer.visible = true
     this.fillW3wGridLayer()
   }
 
@@ -202,6 +199,18 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }), 'kilometers')
 
     if (diagonalDistance.distance <= 0.5) {
+      // create renderer
+      const defaultSym = {
+        type: 'simple-line', // autocasts as new SimpleFillSymbol()
+        color: [255, 0, 0, 0.8],
+        width: '0.5px'
+      }
+      const renderer = {
+        type: 'simple', // autocasts as new SimpleRenderer()
+        symbol: defaultSym,
+        label: 'w3wGrid'
+      } as unknown as __esri.SimpleRenderer
+
       const w3wGrid = await this.w3wService.gridSection({
         boundingBox: {
           northeast: {
@@ -220,52 +229,66 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       // console.log('coordinates count', coordinatesCount)
       // w3wGrid.features[0].geometry.coordinates = w3wGrid.features[0].geometry.coordinates.filter((coordinate: any, index: number) => index <= coordinatesCount / 2)
 
-      const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any) => {
-        return { geometry: { coordinates: [coordinate], type: 'MultiLineString' }, type: 'Feature', properties: { value: coordinate[0][0] } }
+      const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any, index: number) => {
+        // return { geometry: { coordinates: [coordinate], type: 'MultiLineString' }, type: 'Feature', properties: { value: coordinate[0][0] } }
+        return new Graphic({
+          attributes: { 
+            id: index,
+            value: coordinate[0][0] 
+          },
+          geometry: {
+          type: 'polyline',
+          spatialReference: {
+            wkid: 4326
+          },
+          paths: coordinate,
+          symbol: defaultSym
+        } as unknown as __esri.geometry.Polyline
+      })
+        // return new Polyline({
+        //   spatialReference: {
+        //     wkid: 4326
+        //   },
+        //   paths: coordinate
+        // })
       })
       const w3wLines = { features: w3wLinesCollection, type: 'FeatureCollection' }
-
       console.log(JSON.stringify(w3wLines), w3wLinesCollection.length)
-
       // {"features":[{"geometry":{"coordinates":[],"type":"MultiLineString"},"type":"Feature","properties":{}}],"type":"FeatureCollection"}
 
-      // create renderer
-      const defaultSym = {
-        type: 'simple-line', // autocasts as new SimpleFillSymbol()
-        color: [255, 0, 0, 0.8],
-        width: '0.5px'
-      }
-      const renderer = {
-        type: 'simple', // autocasts as new SimpleRenderer()
-        symbol: defaultSym,
-        label: 'w3wGrid'
-      } as unknown as SimpleRenderer
-
-      // create a new blob from geojson featurecollection
-      const blob = new Blob([JSON.stringify(w3wLines)], {
-        type: 'application/json'
-      })
-      // const blob = new Blob([JSON.stringify(w3wGrid)], {
-      //   type: 'application/json'
-      // })
-      const url = URL.createObjectURL(blob)
-      // need to create a new layer instead uf just updating the url. won't redraw otherwise.
       this.view.map.remove(this.w3wGridLayer)
-      this.w3wGridLayer.destroy()
-      this.w3wGridLayer = new GeoJSONLayer({
-        url,
+      this.w3wGridLayer = new FeatureLayer({
+        objectIdField: 'id',
         visible: true,
         id: 'w3wGridLayer',
-        renderer: renderer
+        spatialReference: {
+          wkid: 4326
+        },
+        source: w3wLinesCollection,
+        renderer
       })
+      this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
 
-      const features = await this.w3wGridLayer.queryFeatures(new Query({ where: '1=1' }))
-      console.log('features', features)
+      // // create a new blob from geojson featurecollection
+      // const blob = new Blob([JSON.stringify(w3wLines)], {
+      //   type: 'application/json'
+      // })
+      // const url = URL.createObjectURL(blob)
+      // // need to create a new layer instead uf just updating the url. won't redraw otherwise.
+      // this.view.map.remove(this.w3wGridLayer)
+      // this.w3wGridLayer.destroy()
+      // this.w3wGridLayer = new GeoJSONLayer({
+      //   url,
+      //   visible: true,
+      //   id: 'w3wGridLayer',
+      //   renderer: renderer
+      // })
+      // const features = await this.w3wGridLayer.queryFeatures(new Query({ where: '1=1' }))
+      // console.log('features', features)
 
       // add w3wGridLayer under w3wLayer
-      this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
+      // this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
     } else {
-      this.w3wGridLayer.visible = false
       this.w3wGridLayer.destroy()
     }
   }
