@@ -13,7 +13,7 @@ import Polygon from 'esri/geometry/Polygon'
 import { Button } from 'jimu-ui'
 import geometryEngine from 'esri/geometry/geometryEngine'
 
-import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, axiosTransport } from '@what3words/api'
+import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, axiosTransport, GridSectionGeoJsonResponse } from '@what3words/api'
 import { Extent, Polyline } from 'esri/geometry'
 import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import FeatureLayer from 'esri/layers/FeatureLayer'
@@ -64,9 +64,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       apiVersion: ApiVersion.Version3
     }
     this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: axiosTransport() })
-    // this.w3wGridLayer = new GeoJSONLayer({
-    //   visible: false
-    // })
   }
 
   componentWillUnmount () {
@@ -214,9 +211,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
           }
         },
         format: this.format
-      })
+      }) as GridSectionGeoJsonResponse
 
-      const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any, index: number) => {
+      // "as any" is a workaround, because the GridSectionGeoJsonResponse is wrong: features prop is missing
+      const w3wLinesCollection = (w3wGrid as any).features[0].geometry.coordinates.map((coordinate: any, index: number) => {
         const rangeX = wgs84Extent.xmax - wgs84Extent.xmin
         const rangeY = wgs84Extent.ymax - wgs84Extent.ymin
         const midPoint = new Point({
@@ -232,8 +230,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         const rangeCenterToYmin = Math.abs(gridCenterPoint.y - wgs84Extent.ymin)
         const rangeCenterToYmax = Math.abs(gridCenterPoint.y - wgs84Extent.ymax)
         const isVertical = coordinate[0][0] === coordinate[1][0]
-
-        // console.log(index, coordinate.map((point: any) => `${point[0]} ${point[1]}`), gridCenterPoint, isVertical, rangeX, rangeCenterToXmin, rangeCenterToXmax, '|', rangeY, rangeCenterToYmin, rangeCenterToYmax)
 
         let value = 0
         if (isVertical) {
@@ -289,23 +285,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         source: w3wLinesCollection,
         renderer
       })
-
-      // // create a new blob from geojson featurecollection
-      // const blob = new Blob([JSON.stringify(w3wLines)], {
-      //   type: 'application/json'
-      // })
-      // const url = URL.createObjectURL(blob)
-      // // need to create a new layer instead uf just updating the url. won't redraw otherwise.
-      // this.view.map.remove(this.w3wGridLayer)
-      // this.w3wGridLayer.destroy()
-      // this.w3wGridLayer = new GeoJSONLayer({
-      //   url,
-      //   visible: true,
-      //   id: 'w3wGridLayer',
-      //   renderer: renderer
-      // })
-      // const features = await this.w3wGridLayer.queryFeatures(new Query({ where: '1=1' }))
-      // console.log('features', features)
 
       // add w3wGridLayer under w3wLayer
       this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
@@ -404,21 +383,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       target: w3wBuffer
     })
   }
-
-  // private getGeoJsonLayer (w3wGridV: { features: any, type: string }, renderer: __esri.Renderer) {
-  //   // create a new blob from geojson featurecollection
-  //   const blob = new Blob([JSON.stringify(w3wGridV)], {
-  //     type: 'application/json'
-  //   })
-  //   const url = URL.createObjectURL(blob)
-  //   const geoJsonLayer = new GeoJSONLayer({
-  //     url,
-  //     visible: true,
-  //     id: 'w3wGridLayer',
-  //     renderer: renderer
-  //   })
-  //   return geoJsonLayer
-  // }
 
   private getRenderer (color: __esri.Color) {
     const defaultSym = {
