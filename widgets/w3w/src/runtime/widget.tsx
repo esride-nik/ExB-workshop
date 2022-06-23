@@ -225,6 +225,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         format: this.format
       })
 
+      // create renderer
+      const renderer1 = this.getRenderer(new Color([255, 0, 0, 0.8]))
+      const renderer2 = this.getRenderer(new Color([0, 255, 0, 0.8]))
+
       // const coordinatesCount = w3wGrid.features[0].geometry.coordinates.length
       // console.log('coordinates count', coordinatesCount)
       // w3wGrid.features[0].geometry.coordinates = w3wGrid.features[0].geometry.coordinates.filter((coordinate: any, index: number) => index <= coordinatesCount / 2)
@@ -382,6 +386,35 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     await this.view.goTo({
       target: w3wBuffer
     })
+  }
+
+  private getGeoJsonLayer (w3wGridV: { features: any, type: string }, renderer: __esri.Renderer) {
+    // create a new blob from geojson featurecollection
+    const blob = new Blob([JSON.stringify(w3wGridV)], {
+      type: 'application/json'
+    })
+    const url = URL.createObjectURL(blob)
+    const geoJsonLayer = new GeoJSONLayer({
+      url,
+      visible: true,
+      id: 'w3wGridLayer',
+      renderer: renderer
+    })
+    return geoJsonLayer
+  }
+
+  private getRenderer (color: __esri.Color) {
+    const defaultSym1 = {
+      type: 'simple-line',
+      color: color,
+      width: '0.5px'
+    }
+    const renderer1 = {
+      type: 'simple',
+      symbol: defaultSym1,
+      label: 'w3wGrid'
+    } as unknown as SimpleRenderer
+    return renderer1
   }
 
   render () {
