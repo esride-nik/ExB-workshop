@@ -216,23 +216,34 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         format: this.format
       })
 
-      // const coordinatesCount = w3wGrid.features[0].geometry.coordinates.length
-      // console.log('coordinates count', coordinatesCount)
-      // w3wGrid.features[0].geometry.coordinates = w3wGrid.features[0].geometry.coordinates.filter((coordinate: any, index: number) => index <= coordinatesCount / 2)
-
       const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any, index: number) => {
+        const rangeX = wgs84Extent.xmax - wgs84Extent.xmin
+        const rangeY = wgs84Extent.ymax - wgs84Extent.ymin
         const midPoint = new Point({
-          x: wgs84Extent.xmax-wgs84Extent.xmin,
-          y: wgs84Extent.ymax-wgs84Extent.ymin,
+          x: rangeX / 2 + wgs84Extent.xmin,
+          y: rangeY / 2 + wgs84Extent.ymin,
           spatialReference: {
             wkid: 4326
           }
         })
         const gridCenterPoint = this.state.w3wPoint ?? midPoint
+        const rangeCenterToXmin = Math.abs(gridCenterPoint.x - wgs84Extent.xmin)
+        const rangeCenterToXmax = Math.abs(gridCenterPoint.x - wgs84Extent.xmax)
+        const rangeCenterToYmin = Math.abs(gridCenterPoint.y - wgs84Extent.ymin)
+        const rangeCenterToYmax = Math.abs(gridCenterPoint.y - wgs84Extent.ymax)
         const isVertical = coordinate[0][0] === coordinate[1][0]
 
-        console.log(index, coordinate.map((point: any) => `${point[0]} ${point[1]}`), gridCenterPoint, isVertical)
-        // return { geometry: { coordinates: [coordinate], type: 'MultiLineString' }, type: 'Feature', properties: { value: coordinate[0][0] } }
+        console.log(index, coordinate.map((point: any) => `${point[0]} ${point[1]}`), gridCenterPoint, isVertical, rangeX, rangeCenterToXmin, rangeCenterToXmax, '|', rangeY, rangeCenterToYmin, rangeCenterToYmax)
+
+        if (isVertical) {
+          console.log('vertical')
+          // 1st member of a coordinate is X
+        } else {
+          console.log('horizontal')
+          // 2nd member of a coordinate is Y
+          // coordinate[0][1]
+        }
+
         return new Graphic({
           attributes: {
             id: index,
@@ -246,19 +257,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             paths: coordinate
           } as unknown as __esri.geometry.Polyline
         })
-        // return new Polyline({
-        //   spatialReference: {
-        //     wkid: 4326
-        //   },
-        //   paths: coordinate
-        // })
       })
-      // const w3wLines = { features: w3wLinesCollection, type: 'FeatureCollection' }
-      // {"features":[{"geometry":{"coordinates":[],"type":"MultiLineString"},"type":"Feature","properties":{}}],"type":"FeatureCollection"}
 
       // create renderer
       const renderer = this.getRenderer(new Color([255, 0, 0, 0.8]))
-      // const renderer2 = this.getRenderer(new Color([0, 255, 0, 0.8]))
 
       this.view.map.remove(this.w3wGridLayer)
       this.w3wGridLayer?.destroy()
