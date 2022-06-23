@@ -34,7 +34,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   stationaryWatch: __esri.WatchHandle
   extentWatch: __esri.WatchHandle
   w3wLayer: GraphicsLayer
-  w3wGridLayer: GraphicsLayer
+  w3wGridLayer: FeatureLayer
   view: __esri.MapView | __esri.SceneView
   w3wService: What3wordsService
 
@@ -67,10 +67,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     // this.w3wGridLayer = new GeoJSONLayer({
     //   visible: false
     // })
-    this.w3wGridLayer = new GraphicsLayer({
-      visible: true,
-      id: 'w3wGridLayer'
-    })
   }
 
   componentWillUnmount () {
@@ -206,10 +202,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     }), 'kilometers')
 
     if (diagonalDistance.distance <= 0.5) {
-      // create renderer
-      const renderer = this.getRenderer(new Color([255, 0, 0, 0.8]))
-      // const renderer2 = this.getRenderer(new Color([0, 255, 0, 0.8]))
-
       const w3wGrid = await this.w3wService.gridSection({
         boundingBox: {
           northeast: {
@@ -223,7 +215,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         },
         format: this.format
       })
-
 
       // const coordinatesCount = w3wGrid.features[0].geometry.coordinates.length
       // console.log('coordinates count', coordinatesCount)
@@ -255,14 +246,19 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       console.log(JSON.stringify(w3wLines), w3wLinesCollection.length)
       // {"features":[{"geometry":{"coordinates":[],"type":"MultiLineString"},"type":"Feature","properties":{}}],"type":"FeatureCollection"}
 
-      // this.view.map.remove(this.w3wGridLayer)
-      // this.w3wGridLayer = new GraphicsLayer({
-      //   visible: true,
-      //   id: 'w3wGridLayer'
-      // })
-      this.w3wGridLayer.removeAll()
-      this.w3wGridLayer.visible = true
-      this.w3wGridLayer.addMany(w3wLinesCollection)
+      // create renderer
+      const renderer = this.getRenderer(new Color([255, 0, 0, 0.8]))
+      // const renderer2 = this.getRenderer(new Color([0, 255, 0, 0.8]))
+
+      this.view.map.remove(this.w3wGridLayer)
+      this.w3wGridLayer?.destroy()
+      this.w3wGridLayer = new FeatureLayer({
+        visible: true,
+        objectIdField: 'id',
+        id: 'w3wGridLayer',
+        source: w3wLinesCollection,
+        renderer
+      })
 
       // // create a new blob from geojson featurecollection
       // const blob = new Blob([JSON.stringify(w3wLines)], {
@@ -282,9 +278,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       // console.log('features', features)
 
       // add w3wGridLayer under w3wLayer
-      // this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
+      this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
     } else {
-      // this.w3wGridLayer.destroy()
+      this.w3wGridLayer.destroy()
     }
   }
 
