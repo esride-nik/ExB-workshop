@@ -233,21 +233,37 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         const rangeCenterToYmax = Math.abs(gridCenterPoint.y - wgs84Extent.ymax)
         const isVertical = coordinate[0][0] === coordinate[1][0]
 
-        console.log(index, coordinate.map((point: any) => `${point[0]} ${point[1]}`), gridCenterPoint, isVertical, rangeX, rangeCenterToXmin, rangeCenterToXmax, '|', rangeY, rangeCenterToYmin, rangeCenterToYmax)
+        // console.log(index, coordinate.map((point: any) => `${point[0]} ${point[1]}`), gridCenterPoint, isVertical, rangeX, rangeCenterToXmin, rangeCenterToXmax, '|', rangeY, rangeCenterToYmin, rangeCenterToYmax)
 
+        let value = 0
         if (isVertical) {
-          console.log('vertical')
           // 1st member of a coordinate is X
+          if (coordinate[0][0] <= gridCenterPoint.x) {
+            // line is west of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmin)
+            value = gcpRange / rangeCenterToXmin
+          } else {
+            // line is wast of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmax)
+            value = gcpRange / rangeCenterToXmax
+          }
         } else {
-          console.log('horizontal')
           // 2nd member of a coordinate is Y
-          // coordinate[0][1]
+          if (coordinate[0][1] <= gridCenterPoint.y) {
+            // line is south of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymin)
+            value = gcpRange / rangeCenterToYmin
+          } else {
+            // line is north of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymax)
+            value = gcpRange / rangeCenterToYmax
+          }
         }
 
-        return new Graphic({
+        const graphic = new Graphic({
           attributes: {
             id: index,
-            value: coordinate[0][0] + coordinate[0][1] + coordinate[1][0] + coordinate[1][1]
+            value: value
           },
           geometry: {
             type: 'polyline',
@@ -257,6 +273,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             paths: coordinate
           } as unknown as __esri.geometry.Polyline
         })
+        console.log(graphic.attributes.value)
+        return graphic
       })
 
       // create renderer
@@ -387,20 +405,20 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     })
   }
 
-  private getGeoJsonLayer (w3wGridV: { features: any, type: string }, renderer: __esri.Renderer) {
-    // create a new blob from geojson featurecollection
-    const blob = new Blob([JSON.stringify(w3wGridV)], {
-      type: 'application/json'
-    })
-    const url = URL.createObjectURL(blob)
-    const geoJsonLayer = new GeoJSONLayer({
-      url,
-      visible: true,
-      id: 'w3wGridLayer',
-      renderer: renderer
-    })
-    return geoJsonLayer
-  }
+  // private getGeoJsonLayer (w3wGridV: { features: any, type: string }, renderer: __esri.Renderer) {
+  //   // create a new blob from geojson featurecollection
+  //   const blob = new Blob([JSON.stringify(w3wGridV)], {
+  //     type: 'application/json'
+  //   })
+  //   const url = URL.createObjectURL(blob)
+  //   const geoJsonLayer = new GeoJSONLayer({
+  //     url,
+  //     visible: true,
+  //     id: 'w3wGridLayer',
+  //     renderer: renderer
+  //   })
+  //   return geoJsonLayer
+  // }
 
   private getRenderer (color: __esri.Color) {
     const defaultSym = {
@@ -410,20 +428,14 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         {
           type: 'color',
           field: 'value',
-          // normalizationField: "TOTPOP_CY",
-          // legendOptions: {
-          //   title: "% population in poverty by county"
-          // },
           stops: [
             {
-              value: 9,
-              color: '#FFFCD4',
-              label: '<10%'
+              value: 0,
+              color: '#FFFCD4'
             },
             {
-              value: 10,
-              color: '#350242',
-              label: '>30%'
+              value: 1,
+              color: '#350242'
             }
           ]
         }
