@@ -221,11 +221,22 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       // w3wGrid.features[0].geometry.coordinates = w3wGrid.features[0].geometry.coordinates.filter((coordinate: any, index: number) => index <= coordinatesCount / 2)
 
       const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any, index: number) => {
+        const midPoint = new Point({
+          x: wgs84Extent.xmax-wgs84Extent.xmin,
+          y: wgs84Extent.ymax-wgs84Extent.ymin,
+          spatialReference: {
+            wkid: 4326
+          }
+        })
+        const gridCenterPoint = this.state.w3wPoint ?? midPoint
+        const isVertical = coordinate[0][0] === coordinate[1][0]
+
+        console.log(index, coordinate.map((point: any) => `${point[0]} ${point[1]}`), gridCenterPoint, isVertical)
         // return { geometry: { coordinates: [coordinate], type: 'MultiLineString' }, type: 'Feature', properties: { value: coordinate[0][0] } }
         return new Graphic({
           attributes: {
             id: index,
-            value: coordinate[0][0]
+            value: coordinate[0][0] + coordinate[0][1] + coordinate[1][0] + coordinate[1][1]
           },
           geometry: {
             type: 'polyline',
@@ -242,8 +253,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         //   paths: coordinate
         // })
       })
-      const w3wLines = { features: w3wLinesCollection, type: 'FeatureCollection' }
-      console.log(JSON.stringify(w3wLines), w3wLinesCollection.length)
+      // const w3wLines = { features: w3wLinesCollection, type: 'FeatureCollection' }
       // {"features":[{"geometry":{"coordinates":[],"type":"MultiLineString"},"type":"Feature","properties":{}}],"type":"FeatureCollection"}
 
       // create renderer
@@ -393,8 +403,29 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   private getRenderer (color: __esri.Color) {
     const defaultSym = {
       type: 'simple-line',
-      color: color,
-      width: '0.5px'
+      width: '0.5px',
+      visualVariables: [
+        {
+          type: 'color',
+          field: 'value',
+          // normalizationField: "TOTPOP_CY",
+          // legendOptions: {
+          //   title: "% population in poverty by county"
+          // },
+          stops: [
+            {
+              value: 9,
+              color: '#FFFCD4',
+              label: '<10%'
+            },
+            {
+              value: 10,
+              color: '#350242',
+              label: '>30%'
+            }
+          ]
+        }
+      ]
     }
     const renderer = {
       type: 'simple',
