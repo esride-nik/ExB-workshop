@@ -19,6 +19,7 @@ import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import GeoJSONLayer from 'esri/layers/GeoJSONLayer'
 import { SimpleRenderer } from 'esri/renderers'
 import Query from 'esri/rest/support/Query'
+import Color from 'esri/Color'
 
 interface State {
   center: __esri.Point
@@ -35,7 +36,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   stationaryWatch: __esri.WatchHandle
   extentWatch: __esri.WatchHandle
   w3wLayer: GraphicsLayer
-  w3wGridLayer: GeoJSONLayer
+  w3wGridLayerV: GeoJSONLayer
+  w3wGridLayerH: GeoJSONLayer
   view: __esri.MapView | __esri.SceneView
   w3wService: What3wordsService
 
@@ -65,7 +67,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       apiVersion: ApiVersion.Version3
     }
     this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: axiosTransport() })
-    this.w3wGridLayer = new GeoJSONLayer({
+    this.w3wGridLayerV = new GeoJSONLayer({
+      visible: false
+    })
+    this.w3wGridLayerH = new GeoJSONLayer({
       visible: false
     })
   }
@@ -121,13 +126,13 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
           extent: this.view.extent
         }, this.enableAndFillW3wGridLayer)
       } else if (this.view.zoom < this.showGridZoomThreshold) {
-        this.w3wGridLayer.visible = false
+        this.w3wGridLayerV.visible = false
       }
     }
   }
 
   enableAndFillW3wGridLayer (): void {
-    this.w3wGridLayer.visible = true
+    this.w3wGridLayerV.visible = true
     this.fillW3wGridLayer()
   }
 
@@ -216,57 +221,44 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         format: this.format
       })
 
+      // create renderer
+      const renderer1 = this.getRenderer(new Color([255, 0, 0, 0.8]))
+      const renderer2 = this.getRenderer(new Color([0, 255, 0, 0.8]))
+
       // const coordinatesCount = w3wGrid.features[0].geometry.coordinates.length
       // console.log('coordinates count', coordinatesCount)
       // w3wGrid.features[0].geometry.coordinates = w3wGrid.features[0].geometry.coordinates.filter((coordinate: any, index: number) => index <= coordinatesCount / 2)
 
-      const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any) => {
+      const w3wGridLines = w3wGrid.features[0].geometry.coordinates.map((coordinate: any) => {
         return { geometry: { coordinates: [coordinate], type: 'MultiLineString' }, type: 'Feature', properties: { value: coordinate[0][0] } }
       })
-      const w3wLines = { features: w3wLinesCollection, type: 'FeatureCollection' }
-
-      console.log(JSON.stringify(w3wLines), w3wLinesCollection.length)
+      const coordinatesCount = w3wGridLines.length
+      const w3wGridLinesV = w3wGridLines.filter((coordinate: any, index: number) => index > coordinatesCount / 2)
+      const w3wGridLinesH = w3wGridLines.filter((coordinate: any, index: number) => index <= coordinatesCount / 2)
+      const w3wGridV = { features: w3wGridLinesV, type: 'FeatureCollection' }
+      const w3wGridH = { features: w3wGridLinesH, type: 'FeatureCollection' }
 
       // {"features":[{"geometry":{"coordinates":[],"type":"MultiLineString"},"type":"Feature","properties":{}}],"type":"FeatureCollection"}
 
-      // create renderer
-      const defaultSym = {
-        type: 'simple-line', // autocasts as new SimpleFillSymbol()
-        color: [255, 0, 0, 0.8],
-        width: '0.5px'
-      }
-      const renderer = {
-        type: 'simple', // autocasts as new SimpleRenderer()
-        symbol: defaultSym,
-        label: 'w3wGrid'
-      } as unknown as SimpleRenderer
-
-      // create a new blob from geojson featurecollection
-      const blob = new Blob([JSON.stringify(w3wLines)], {
-        type: 'application/json'
-      })
-      // const blob = new Blob([JSON.stringify(w3wGrid)], {
-      //   type: 'application/json'
-      // })
-      const url = URL.createObjectURL(blob)
       // need to create a new layer instead uf just updating the url. won't redraw otherwise.
-      this.view.map.remove(this.w3wGridLayer)
-      this.w3wGridLayer.destroy()
-      this.w3wGridLayer = new GeoJSONLayer({
-        url,
-        visible: true,
-        id: 'w3wGridLayer',
-        renderer: renderer
-      })
+      this.view.map.remove(this.w3wGridLayerV)
+      this.w3wGridLayerV.destroy()
+      this.w3wGridLayerV = this.getGeoJsonLayer(w3wGridV, renderer1)
+      this.view.map.remove(this.w3wGridLayerH)
+      this.w3wGridLayerH.destroy()
+      this.w3wGridLayerH = this.getGeoJsonLayer(w3wGridH, renderer2)
 
-      const features = await this.w3wGridLayer.queryFeatures(new Query({ where: '1=1' }))
+      const features = await this.w3wGridLayerV.queryFeatures(new Query({ where: '1=1' }))
       console.log('features', features)
 
       // add w3wGridLayer under w3wLayer
-      this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
+      this.view.map.add(this.w3wGridLayerV, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
+      this.view.map.add(this.w3wGridLayerH, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
     } else {
-      this.w3wGridLayer.visible = false
-      this.w3wGridLayer.destroy()
+      this.w3wGridLayerV.visible = false
+      this.w3wGridLayerV.destroy()
+      this.w3wGridLayerH.visible = false
+      this.w3wGridLayerH.destroy()
     }
   }
 
@@ -359,6 +351,35 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     await this.view.goTo({
       target: w3wBuffer
     })
+  }
+
+  private getGeoJsonLayer (w3wGridV: { features: any, type: string }, renderer: __esri.Renderer) {
+    // create a new blob from geojson featurecollection
+    const blob = new Blob([JSON.stringify(w3wGridV)], {
+      type: 'application/json'
+    })
+    const url = URL.createObjectURL(blob)
+    const geoJsonLayer = new GeoJSONLayer({
+      url,
+      visible: true,
+      id: 'w3wGridLayer',
+      renderer: renderer
+    })
+    return geoJsonLayer
+  }
+
+  private getRenderer (color: __esri.Color) {
+    const defaultSym1 = {
+      type: 'simple-line',
+      color: color,
+      width: '0.5px'
+    }
+    const renderer1 = {
+      type: 'simple',
+      symbol: defaultSym1,
+      label: 'w3wGrid'
+    } as unknown as SimpleRenderer
+    return renderer1
   }
 
   render () {
