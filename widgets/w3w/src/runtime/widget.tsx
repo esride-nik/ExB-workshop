@@ -17,6 +17,7 @@ import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, axi
 import { Extent, Polyline } from 'esri/geometry'
 import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import FeatureLayer from 'esri/layers/FeatureLayer'
+import Color from 'esri/Color'
 
 interface State {
   center: __esri.Point
@@ -200,16 +201,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
     if (diagonalDistance.distance <= 0.5) {
       // create renderer
-      const defaultSym = {
-        type: 'simple-line', // autocasts as new SimpleFillSymbol()
-        color: [255, 0, 0, 0.8],
-        width: '0.5px'
-      }
-      const renderer = {
-        type: 'simple', // autocasts as new SimpleRenderer()
-        symbol: defaultSym,
-        label: 'w3wGrid'
-      } as unknown as __esri.SimpleRenderer
+      const renderer = this.getRenderer(new Color([255, 0, 0, 0.8]))
+      // const renderer2 = this.getRenderer(new Color([0, 255, 0, 0.8]))
 
       const w3wGrid = await this.w3wService.gridSection({
         boundingBox: {
@@ -225,9 +218,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         format: this.format
       })
 
-      // create renderer
-      const renderer1 = this.getRenderer(new Color([255, 0, 0, 0.8]))
-      const renderer2 = this.getRenderer(new Color([0, 255, 0, 0.8]))
 
       // const coordinatesCount = w3wGrid.features[0].geometry.coordinates.length
       // console.log('coordinates count', coordinatesCount)
@@ -236,19 +226,18 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       const w3wLinesCollection = w3wGrid.features[0].geometry.coordinates.map((coordinate: any, index: number) => {
         // return { geometry: { coordinates: [coordinate], type: 'MultiLineString' }, type: 'Feature', properties: { value: coordinate[0][0] } }
         return new Graphic({
-          attributes: { 
+          attributes: {
             id: index,
-            value: coordinate[0][0] 
+            value: coordinate[0][0]
           },
           geometry: {
-          type: 'polyline',
-          spatialReference: {
-            wkid: 4326
-          },
-          paths: coordinate,
-          symbol: defaultSym
-        } as unknown as __esri.geometry.Polyline
-      })
+            type: 'polyline',
+            spatialReference: {
+              wkid: 4326
+            },
+            paths: coordinate
+          } as unknown as __esri.geometry.Polyline
+        })
         // return new Polyline({
         //   spatialReference: {
         //     wkid: 4326
@@ -404,17 +393,17 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   private getRenderer (color: __esri.Color) {
-    const defaultSym1 = {
+    const defaultSym = {
       type: 'simple-line',
       color: color,
       width: '0.5px'
     }
-    const renderer1 = {
+    const renderer = {
       type: 'simple',
-      symbol: defaultSym1,
+      symbol: defaultSym,
       label: 'w3wGrid'
-    } as unknown as SimpleRenderer
-    return renderer1
+    } as unknown as __esri.SimpleRenderer
+    return renderer
   }
 
   render () {
