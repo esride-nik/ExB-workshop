@@ -25,9 +25,48 @@ import { ArcGISDataSourceTypes } from 'jimu-arcgis'
 import { IMConfig } from '../config'
 import defaultMessages from './translations/default'
 import { Select, Switch, TextInput, Option } from 'jimu-ui'
+import what3words, { ApiVersion, What3wordsService, axiosTransport, AvailableLanguagesResponse } from '@what3words/api'
+
+interface AvailableLanguage {
+  code: string
+  name: string
+  nativeName: string
+}
+
+interface State {
+  languages: AvailableLanguage[]
+}
 
 export default class Setting extends React.PureComponent<AllWidgetSettingProps<IMConfig>, any> {
+  w3wService: What3wordsService
   supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap])
+
+  state: State = {
+    languages: null
+  }
+
+  constructor (props) {
+    super(props)
+
+    const w3wConfig: {
+      host: string
+      apiVersion: ApiVersion
+    } = {
+      host: 'https://api.what3words.com',
+      apiVersion: ApiVersion.Version3
+    }
+    this.w3wService = what3words(this.props.config.w3wApiKey, w3wConfig, { transport: axiosTransport() })
+
+    this.getLanguages()
+  }
+
+  async getLanguages () {
+    this.setState({
+      languages: (await this.w3wService.availableLanguages()).languages
+    }, () => {
+      console.log('this.availableLanguages', this.state.languages)
+    })
+  }
 
   onMapSelected = (useMapWidgetIds: string[]) => {
     this.props.onSettingChange({
@@ -168,8 +207,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                         <div className="w-100">
                             <div className="checkbox-row">
                                 <Select onChange={this.setw3wLanguage}>
-                                  <Option>en</Option>
-                                  <Option>de</Option>
+                                  {this.state.languages?.map((language: AvailableLanguage) => <Option key={language.code} value={language.code}>{language.nativeName} ({language.name})</Option>)}
                                 </Select>
                                 <label>
                                     <FormattedMessage id="w3wLanguage" defaultMessage={defaultMessages.w3wLanguage} />

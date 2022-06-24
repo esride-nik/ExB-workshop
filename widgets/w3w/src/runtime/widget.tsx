@@ -18,7 +18,6 @@ import { Extent } from 'esri/geometry'
 import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import FeatureLayer from 'esri/layers/FeatureLayer'
 import Color from 'esri/Color'
-import { Rgba } from 'jimu-ui/basic/color-picker'
 
 interface State {
   center: __esri.Point
@@ -55,14 +54,14 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   }
 
   componentDidMount () {
-    const config: {
+    const w3wConfig: {
       host: string
       apiVersion: ApiVersion
     } = {
       host: 'https://api.what3words.com',
       apiVersion: ApiVersion.Version3
     }
-    this.w3wService = what3words(this.props.config.w3wApiKey, config, { transport: axiosTransport() })
+    this.w3wService = what3words(this.props.config.w3wApiKey, w3wConfig, { transport: axiosTransport() })
   }
 
   componentWillUnmount () {
@@ -328,7 +327,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   private readonly zoomToW3w = async () => {
     const w3wPoint = webMercatorUtils.geographicToWebMercator(this.state.w3wPoint)
-    const w3wBuffer = geometryEngine.buffer(w3wPoint, 1, 'kilometers')
+    const w3wBuffer = geometryEngine.buffer(w3wPoint, 200, 'meters')
 
     await this.view.goTo({
       target: w3wBuffer
