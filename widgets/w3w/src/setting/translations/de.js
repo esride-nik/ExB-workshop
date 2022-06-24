@@ -2,6 +2,7 @@ define({
   selectMapWidget: 'Bitte Karte wählen',
   mapDisplayOptions: 'Kartenanzeige',
   widgetDisplayOptions: 'Widgetanzeige',
+  w3wSettings: 'what3words Einstellungen',
   userOptions: 'Benutzereinstellungen',
   showW3wLogo: 'Logo zeigen',
   showW3wSquare: 'Quadrat zeigen',

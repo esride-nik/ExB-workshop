@@ -169,8 +169,38 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                      id: 'displayOption',
-                      defaultMessage: defaultMessages.displayOptions
+                      id: 'w3wSettings',
+                      defaultMessage: defaultMessages.w3wSettings
+                    })}>
+                    <SettingRow>
+                      <label>
+                          <FormattedMessage id="w3wApiKey" defaultMessage={defaultMessages.w3wApiKey} />
+                      </label><br/>
+                      <TextInput
+                          type="password"
+                          placeholder={defaultMessages.w3wApiKey}
+                          defaultValue={this.props.config.w3wApiKey}
+                          onAcceptValue={this.setW3wApiKey}
+                      />
+                    </SettingRow>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <label>
+                                    <FormattedMessage id="w3wLanguage" defaultMessage={defaultMessages.w3wLanguage} />
+                                </label>
+                                <Select onChange={(evt: any) => this.setw3wLanguage(evt.target.value)} value={this.props.config.w3wLanguage}>
+                                  {this.state.languages?.map((language: AvailableLanguage) => <Option key={language.code} value={language.code}>{language.nativeName} ({language.name})</Option>)}
+                                </Select>
+                            </div>
+                        </div>
+                    </SettingRow>
+                </SettingSection>
+                <SettingSection
+                    className="map-selector-section"
+                    title={this.props.intl.formatMessage({
+                      id: 'mapDisplayOptions',
+                      defaultMessage: defaultMessages.mapDisplayOptions
                     })}>
                     <SettingRow>
                         <div className="w-100">
@@ -208,18 +238,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                             </div>
                         </div>
                     </SettingRow>
-                    <SettingRow>
-                        <div className="w-100">
-                            <div className="checkbox-row">
-                                <label>
-                                    <FormattedMessage id="w3wLanguage" defaultMessage={defaultMessages.w3wLanguage} />
-                                </label>
-                                <Select onChange={(evt: any) => this.setw3wLanguage(evt.target.value)} value={this.props.config.w3wLanguage}>
-                                  {this.state.languages?.map((language: AvailableLanguage) => <Option key={language.code} value={language.code}>{language.nativeName} ({language.name})</Option>)}
-                                </Select>
-                            </div>
-                        </div>
-                    </SettingRow>
+                </SettingSection>
+                <SettingSection
+                    className="map-selector-section"
+                    title={this.props.intl.formatMessage({
+                      id: 'widgetDisplayOptions',
+                      defaultMessage: defaultMessages.widgetDisplayOptions
+                    })}>
                     <SettingRow>
                         <div className="w-100">
                             <div className="checkbox-row">
@@ -268,21 +293,6 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                                 </label>
                             </div>
                         </div>
-                    </SettingRow>
-                </SettingSection>
-                <SettingSection
-                    className="map-selector-section"
-                    title={this.props.intl.formatMessage({
-                      id: 'w3wApiKey',
-                      defaultMessage: defaultMessages.w3wApiKey
-                    })}>
-                    <SettingRow>
-                        <TextInput
-                            type="password"
-                            placeholder={defaultMessages.w3wApiKey}
-                            defaultValue={this.props.config.w3wApiKey}
-                            onAcceptValue={this.setW3wApiKey}
-                        />
                     </SettingRow>
                 </SettingSection>
             </div>

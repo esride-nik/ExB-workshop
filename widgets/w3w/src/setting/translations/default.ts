@@ -21,6 +21,7 @@ export default {
   selectMapWidget: 'Please select map',
   mapDisplayOptions: 'Map display options',
   widgetDisplayOptions: 'Widget display options',
+  w3wSettings: 'what3words settings',
   userOptions: 'User options',
   showW3wLogo: 'show logo',
   showW3wSquare: 'show square',
