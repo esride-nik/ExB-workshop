@@ -103,6 +103,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   handleMapClick = async (mapClick: any) => {
     if (!this.props.config.useMapMidpoint) {
       await this.updateW3wAddress(mapClick.mapPoint as Point)
+      this.fillW3wGridLayer()
     }
   }
 
