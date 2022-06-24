@@ -213,67 +213,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         format: this.format
       }) as GridSectionGeoJsonResponse
 
-      // "as any" is a workaround, because the GridSectionGeoJsonResponse is wrong: features prop is missing
-      const w3wLinesCollection = (w3wGrid as any).features[0].geometry.coordinates.map((coordinate: any, index: number) => {
-        const rangeX = wgs84Extent.xmax - wgs84Extent.xmin
-        const rangeY = wgs84Extent.ymax - wgs84Extent.ymin
-        const midPoint = new Point({
-          x: rangeX / 2 + wgs84Extent.xmin,
-          y: rangeY / 2 + wgs84Extent.ymin,
-          spatialReference: {
-            wkid: 4326
-          }
-        })
-        const gridCenterPoint = this.state.w3wPoint ?? midPoint
-        const rangeCenterToXmin = Math.abs(gridCenterPoint.x - wgs84Extent.xmin)
-        const rangeCenterToXmax = Math.abs(gridCenterPoint.x - wgs84Extent.xmax)
-        const rangeCenterToYmin = Math.abs(gridCenterPoint.y - wgs84Extent.ymin)
-        const rangeCenterToYmax = Math.abs(gridCenterPoint.y - wgs84Extent.ymax)
-        const isVertical = coordinate[0][0] === coordinate[1][0]
+      const w3wGridLines = this.getW3wGridLineGraphics(w3wGrid, wgs84Extent)
 
-        let value = 0
-        if (isVertical) {
-          // 1st member of a coordinate is X
-          if (coordinate[0][0] <= gridCenterPoint.x) {
-            // line is west of gridCenterPoint
-            const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmin)
-            value = gcpRange / rangeCenterToXmin
-          } else {
-            // line is wast of gridCenterPoint
-            const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmax)
-            value = gcpRange / rangeCenterToXmax
-          }
-        } else {
-          // 2nd member of a coordinate is Y
-          if (coordinate[0][1] <= gridCenterPoint.y) {
-            // line is south of gridCenterPoint
-            const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymin)
-            value = gcpRange / rangeCenterToYmin
-          } else {
-            // line is north of gridCenterPoint
-            const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymax)
-            value = gcpRange / rangeCenterToYmax
-          }
-        }
-
-        const graphic = new Graphic({
-          attributes: {
-            id: index,
-            value: value
-          },
-          geometry: {
-            type: 'polyline',
-            spatialReference: {
-              wkid: 4326
-            },
-            paths: coordinate
-          } as unknown as __esri.geometry.Polyline
-        })
-        console.log(graphic.attributes.value)
-        return graphic
-      })
-
-      // create renderer
       const renderer = this.getRenderer(new Color([255, 0, 0, 0.8]))
 
       this.view.map.remove(this.w3wGridLayer)
@@ -282,7 +223,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         visible: true,
         objectIdField: 'id',
         id: 'w3wGridLayer',
-        source: w3wLinesCollection,
+        source: w3wGridLines,
         renderer
       })
 
@@ -384,31 +325,103 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     })
   }
 
+  private getW3wGridLineGraphics (w3wGrid: GridSectionGeoJsonResponse, wgs84Extent: __esri.Extent) {
+    // "as any" is a workaround, because the GridSectionGeoJsonResponse is wrong: features prop is missing
+    return (w3wGrid as any).features[0].geometry.coordinates.map((coordinate: any, index: number) => {
+      const rangeX = wgs84Extent.xmax - wgs84Extent.xmin
+      const rangeY = wgs84Extent.ymax - wgs84Extent.ymin
+      const midPoint = new Point({
+        x: rangeX / 2 + wgs84Extent.xmin,
+        y: rangeY / 2 + wgs84Extent.ymin,
+        spatialReference: {
+          wkid: 4326
+        }
+      })
+      const gridCenterPoint = this.state.w3wPoint ?? midPoint
+      const rangeCenterToXmin = Math.abs(gridCenterPoint.x - wgs84Extent.xmin)
+      const rangeCenterToXmax = Math.abs(gridCenterPoint.x - wgs84Extent.xmax)
+      const rangeCenterToYmin = Math.abs(gridCenterPoint.y - wgs84Extent.ymin)
+      const rangeCenterToYmax = Math.abs(gridCenterPoint.y - wgs84Extent.ymax)
+      const isVertical = coordinate[0][0] === coordinate[1][0]
+
+      let value = 0
+      let norm = 0
+      if (isVertical) {
+        // 1st member of a coordinate is X
+        if (coordinate[0][0] <= gridCenterPoint.x) {
+          // line is west of gridCenterPoint
+          const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmin)
+          value = rangeCenterToXmin - gcpRange
+          norm = rangeCenterToXmin
+        } else {
+          // line is wast of gridCenterPoint
+          const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmax)
+          value = rangeCenterToXmax - gcpRange
+          norm = rangeCenterToXmax
+        }
+      } else {
+        // 2nd member of a coordinate is Y
+        if (coordinate[0][1] <= gridCenterPoint.y) {
+          // line is south of gridCenterPoint
+          const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymin)
+          value = rangeCenterToYmin - gcpRange
+          norm = rangeCenterToYmin
+        } else {
+          // line is north of gridCenterPoint
+          const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymax)
+          value = rangeCenterToYmax - gcpRange
+          norm = rangeCenterToYmax
+        }
+      }
+      console.log(value * 10000, norm * 10000)
+
+      return new Graphic({
+        attributes: {
+          id: index,
+          value: value * 10000,
+          norm: norm * 10000
+        },
+        geometry: {
+          type: 'polyline',
+          spatialReference: {
+            wkid: 4326
+          },
+          paths: coordinate
+        } as unknown as __esri.geometry.Polyline
+      })
+    })
+  }
+
   private getRenderer (color: __esri.Color) {
     const defaultSym = {
       type: 'simple-line',
-      width: '0.5px',
-      visualVariables: [
-        {
-          type: 'color',
-          field: 'value',
-          stops: [
-            {
-              value: 0,
-              color: '#FFFCD4'
-            },
-            {
-              value: 1,
-              color: '#350242'
-            }
-          ]
-        }
-      ]
+      width: '0.5px'
     }
     const renderer = {
       type: 'simple',
       symbol: defaultSym,
-      label: 'w3wGrid'
+      label: 'w3wGrid',
+      visualVariables: [
+        {
+          type: 'color',
+          field: 'value',
+          normalizationField: 'norm',
+          // valueExpression: '$feature.value',
+          legendOptions: {
+            showLegend: false
+          },
+          stops: [
+            {
+              value: 5,
+              color: '#ccc'
+            },
+            {
+              value: 0,
+              color: '#f00'
+            }
+          ]
+        }
+      ]
     } as unknown as __esri.SimpleRenderer
     return renderer
   }
