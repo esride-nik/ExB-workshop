@@ -25,7 +25,6 @@ interface State {
   zoom: number
   w3wAddress: LocationGeoJsonResponse
   w3wPoint: Point
-  query: any
 }
 
 export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> {
@@ -47,8 +46,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     extent: null,
     zoom: null,
     w3wAddress: null,
-    w3wPoint: null,
-    query: null
+    w3wPoint: null
   }
 
   isConfigured = () => {
@@ -222,10 +220,27 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       this.w3wGridLayer = new FeatureLayer({
         visible: true,
         objectIdField: 'id',
+        fields: [
+          {
+            name: 'id',
+            type: 'integer'
+          },
+          {
+            name: 'value',
+            type: 'double'
+          },
+          {
+            name: 'norm',
+            type: 'double'
+          }
+        ],
         id: 'w3wGridLayer',
         source: w3wGridLines,
         renderer
       })
+
+      const allF = await this.w3wGridLayer.queryFeatures({ where: '1=1' })
+      console.log('all Features', allF)
 
       // add w3wGridLayer under w3wLayer
       this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
@@ -406,17 +421,20 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
           type: 'color',
           field: 'value',
           normalizationField: 'norm',
-          // valueExpression: '$feature.value',
           legendOptions: {
             showLegend: false
           },
           stops: [
             {
-              value: 5,
+              value: 0,
               color: '#ccc'
             },
             {
-              value: 0,
+              value: 0.5,
+              color: '#c88'
+            },
+            {
+              value: 1,
               color: '#f00'
             }
           ]
