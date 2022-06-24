@@ -19,7 +19,8 @@
 */
 export default {
   selectMapWidget: 'Please select map',
-  displayOptions: 'Display options',
+  mapDisplayOptions: 'Map display options',
+  widgetDisplayOptions: 'Widget display options',
   userOptions: 'User options',
   showW3wLogo: 'show logo',
   showW3wSquare: 'show square',
@@ -28,5 +29,6 @@ export default {
   w3wApiKey: 'what3words API Key',
   useClickpoint: 'use click point',
   useMapMidpoint: 'use map midpoint',
-  w3wLanguage: 'what3words language'
+  w3wLanguage: 'what3words language',
+  showCoordinates: 'show coordinates'
 }

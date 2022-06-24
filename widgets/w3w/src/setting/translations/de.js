@@ -1,6 +1,7 @@
 define({
   selectMapWidget: 'Bitte Karte wählen',
-  displayOptions: 'Anzeigevarianten',
+  mapDisplayOptions: 'Kartenanzeige',
+  widgetDisplayOptions: 'Widgetanzeige',
   userOptions: 'Benutzereinstellungen',
   showW3wLogo: 'Logo zeigen',
   showW3wSquare: 'Quadrat zeigen',
@@ -9,5 +10,6 @@ define({
   w3wApiKey: 'what3words API Key',
   useClickpoint: 'Klickpunkt verwenden',
   useMapMidpoint: 'Kartenmittelpunkt verwenden',
-  w3wLanguage: 'what3words Sprache'
+  w3wLanguage: 'what3words Sprache',
+  showCoordinates: 'Koordinaten zeigen'
 });

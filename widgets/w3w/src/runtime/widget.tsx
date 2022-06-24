@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core'
+import { AllWidgetProps, FormattedMessage, jsx, BaseWidget, css } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import { IMConfig } from '../config'
@@ -421,7 +421,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             },
             {
               value: 1,
-              color: 'rgba(255, 0, 0, 0.8)'
+              color: this.getW3wColorRgba(0.8)
             }
           ]
         }
@@ -430,46 +430,59 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     return renderer
   }
 
+  private getW3wColorRgba (opacity: number) {
+    return `rgba(225, 31, 38, ${opacity})`
+  }
+
   render () {
+    const style = css`
+      .w3wBlock {
+        display:block;
+        white-space: nowrap;
+      }
+      .w3wRed {
+        color:#e11f26;
+      }
+    `
+
     if (!this.isConfigured()) {
       return 'Select a map'
     }
 
     return (
-            <div className="custom-widget p-3 m-4 surface-1">
-                <h3>
-                    <FormattedMessage id="w3w" defaultMessage={defaultMessages.w3w} />
+            <div className="custom-widget p-1" css={style}>
+              {this.state.w3wAddress?.properties?.words && (
+                <h3 className="w3wBlock">
+                      <span className='w3wRed'>///</span><FormattedMessage id={this.state.w3wAddress?.properties?.words ?? '.'} defaultMessage={this.state.w3wAddress?.properties?.words ?? '.'} />
                 </h3>
+              )}
 
-                {{}.hasOwnProperty.call(this.props, 'useMapWidgetIds') &&
-                    this.props.useMapWidgetIds &&
-                    this.props.useMapWidgetIds.length === 1 && (
-                        <JimuMapViewComponent
-                            useMapWidgetId={this.props.useMapWidgetIds?.[0]}
-                            onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
-                )}
+              {{}.hasOwnProperty.call(this.props, 'useMapWidgetIds') &&
+                  this.props.useMapWidgetIds &&
+                  this.props.useMapWidgetIds.length === 1 && (
+                      <JimuMapViewComponent
+                          useMapWidgetId={this.props.useMapWidgetIds?.[0]}
+                          onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
+              )}
 
-                <table className="table table-striped">
-                    <tbody>
-                        <tr>
-                            <td scope="row">X</td>
-                            <td>{this.state.center && this.state.center.x}</td>
-                        </tr>
-                        <tr>
-                            <td scope="row">Y</td>
-                            <td>{this.state.center && this.state.center.y}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <FormattedMessage id="centerLabel" />
-                            </th>
-                            <td>{this.state.w3wAddress?.properties?.words}</td>
-                        </tr>
-                        <tr>
-                            <td colSpan={2}><Button onClick={this.zoomToW3w}>Zoom</Button></td>
-                        </tr>
-                    </tbody>
-                </table>
+              <table className="table table-striped">
+                  <tbody>
+                    {this.props.config.showCoordinates &&
+                    <div>
+                      <tr>
+                          <td scope="row" className='w3wRed'>X</td>
+                          <td>{this.state.w3wPoint && this.state.w3wPoint.x}</td>
+                      </tr>
+                      <tr>
+                          <td scope="row" className='w3wRed'>Y</td>
+                          <td>{this.state.w3wPoint && this.state.w3wPoint.y}</td>
+                      </tr>
+                    </div>}
+                    <tr>
+                        <td colSpan={2}><Button onClick={this.zoomToW3w}>Zoom</Button></td>
+                    </tr>
+                  </tbody>
+              </table>
             </div>
     )
   }

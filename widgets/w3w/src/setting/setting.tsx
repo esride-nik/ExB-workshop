@@ -108,6 +108,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     })
   }
 
+  switchShowCoordinates = (evt: React.FormEvent<HTMLInputElement>) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('showCoordinates', evt.currentTarget.checked)
+    })
+  }
+
   setW3wApiKey = (w3wApiKey: string) => {
     this.props.onSettingChange({
       id: this.props.id,
@@ -124,25 +131,25 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   render () {
     const style = css`
-            label {
-              display: inline-flex;
-              margin-left: 5px;
-            }
-            .switch-select {
-              background-color: #01AABB;
-              border-color: #01AABB;
-            }
-            .switch-select .switch-slider {
-              background-color: #000 !important;
-            }
-            .switch-select.checked {
-              background-color: #000;
-              border-color: #01AABB;
-            }
-            .switch-select.checked .switch-slider {
-              background-color: #01AABB !important;
-            }
-        `
+      label {
+        display: inline-flex;
+        margin-left: 5px;
+      }
+      .switch-select {
+        background-color: #01AABB;
+        border-color: #01AABB;
+      }
+      .switch-select .switch-slider {
+        background-color: #000 !important;
+      }
+      .switch-select.checked {
+        background-color: #000;
+        border-color: #01AABB;
+      }
+      .switch-select.checked .switch-slider {
+        background-color: #01AABB !important;
+      }
+    `
 
     return (
             <div className="widget-setting p-2" css={style}>
@@ -210,6 +217,19 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                                 <Select onChange={(evt: any) => this.setw3wLanguage(evt.target.value)} value={this.props.config.w3wLanguage}>
                                   {this.state.languages?.map((language: AvailableLanguage) => <Option key={language.code} value={language.code}>{language.nativeName} ({language.name})</Option>)}
                                 </Select>
+                            </div>
+                        </div>
+                    </SettingRow>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <Switch
+                                    checked={(this.props.config && this.props.config.showCoordinates) || false}
+                                    onChange={this.switchShowCoordinates}
+                                />
+                                <label>
+                                    <FormattedMessage id="showCoordinates" defaultMessage={defaultMessages.showCoordinates} />
+                                </label>
                             </div>
                         </div>
                     </SettingRow>
