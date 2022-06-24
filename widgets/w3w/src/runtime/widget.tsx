@@ -14,10 +14,11 @@ import { Button } from 'jimu-ui'
 import geometryEngine from 'esri/geometry/geometryEngine'
 
 import what3words, { ApiVersion, What3wordsService, LocationGeoJsonResponse, axiosTransport, GridSectionGeoJsonResponse } from '@what3words/api'
-import { Extent, Polyline } from 'esri/geometry'
+import { Extent } from 'esri/geometry'
 import geodesicUtils from 'esri/geometry/support/geodesicUtils'
 import FeatureLayer from 'esri/layers/FeatureLayer'
 import Color from 'esri/Color'
+import { Rgba } from 'jimu-ui/basic/color-picker'
 
 interface State {
   center: __esri.Point
@@ -113,15 +114,11 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       if (this.view.zoom >= this.showGridZoomThreshold && !this.compareExtents(this.view.extent, this.state.extent)) {
         this.setState({
           extent: this.view.extent
-        }, this.enableAndFillW3wGridLayer)
+        }, this.fillW3wGridLayer)
       } else if (this.view.zoom < this.showGridZoomThreshold && this.w3wGridLayer) {
         this.w3wGridLayer.visible = false
       }
     }
-  }
-
-  enableAndFillW3wGridLayer (): void {
-    this.fillW3wGridLayer()
   }
 
   compareExtents (oneExtent: Extent, anotherExtent: Extent): boolean {
@@ -239,9 +236,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         renderer
       })
 
-      const allF = await this.w3wGridLayer.queryFeatures({ where: '1=1' })
-      console.log('all Features', allF)
-
       // add w3wGridLayer under w3wLayer
       this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
     } else {
@@ -259,7 +253,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       }
     })
 
-    // remember that setState is async!
+    // using a callback because setState is async!
     this.setState({
       w3wAddress,
       w3wPoint
@@ -388,7 +382,6 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
           norm = rangeCenterToYmax
         }
       }
-      console.log(value * 10000, norm * 10000)
 
       return new Graphic({
         attributes: {
@@ -427,15 +420,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
           stops: [
             {
               value: 0,
-              color: '#ccc'
+              color: 'rgba(120, 120, 120, 0.5)'
             },
             {
-              value: 0.5,
-              color: '#c88'
+              value: 0.8,
+              color: 'rgba(200, 100, 100, 0.6)'
             },
             {
               value: 1,
-              color: '#f00'
+              color: 'rgba(255, 0, 0, 0.8)'
             }
           ]
         }
