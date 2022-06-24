@@ -25,7 +25,7 @@ import { ArcGISDataSourceTypes } from 'jimu-arcgis'
 import { IMConfig } from '../config'
 import defaultMessages from './translations/default'
 import { Select, Switch, TextInput, Option } from 'jimu-ui'
-import what3words, { ApiVersion, What3wordsService, axiosTransport, AvailableLanguagesResponse } from '@what3words/api'
+import what3words, { ApiVersion, What3wordsService, axiosTransport } from '@what3words/api'
 
 interface AvailableLanguage {
   code: string
@@ -63,9 +63,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   async getLanguages () {
     this.setState({
       languages: (await this.w3wService.availableLanguages()).languages
-    }, () => {
-      console.log('this.availableLanguages', this.state.languages)
-    })
+    }, () => console.log(this.state.languages))
   }
 
   onMapSelected = (useMapWidgetIds: string[]) => {
@@ -206,12 +204,12 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                     <SettingRow>
                         <div className="w-100">
                             <div className="checkbox-row">
-                                <Select onChange={this.setw3wLanguage}>
-                                  {this.state.languages?.map((language: AvailableLanguage) => <Option key={language.code} value={language.code}>{language.nativeName} ({language.name})</Option>)}
-                                </Select>
                                 <label>
                                     <FormattedMessage id="w3wLanguage" defaultMessage={defaultMessages.w3wLanguage} />
                                 </label>
+                                <Select onChange={(evt: any) => this.setw3wLanguage(evt.target.value)} value={this.props.config.w3wLanguage}>
+                                  {this.state.languages?.map((language: AvailableLanguage) => <Option key={language.code} value={language.code}>{language.nativeName} ({language.name})</Option>)}
+                                </Select>
                             </div>
                         </div>
                     </SettingRow>
