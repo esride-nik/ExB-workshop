@@ -28,6 +28,7 @@ export interface Config {
   useMapMidpoint: boolean
   w3wLanguage: string
   showCoordinates: boolean
+  showZoomButton: boolean
 }
 
 export type IMConfig = ImmutableObject<Config>

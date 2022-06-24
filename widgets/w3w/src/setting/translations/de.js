@@ -12,5 +12,6 @@ define({
   useClickpoint: 'Klickpunkt verwenden',
   useMapMidpoint: 'Kartenmittelpunkt verwenden',
   w3wLanguage: 'what3words Sprache',
-  showCoordinates: 'Koordinaten zeigen'
+  showCoordinates: 'Koordinaten zeigen',
+  showZoomButton: 'Zoom-Button zeigen'
 });

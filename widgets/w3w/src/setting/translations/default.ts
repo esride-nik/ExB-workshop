@@ -31,5 +31,6 @@ export default {
   useClickpoint: 'use click point',
   useMapMidpoint: 'use map midpoint',
   w3wLanguage: 'what3words language',
-  showCoordinates: 'show coordinates'
+  showCoordinates: 'show coordinates',
+  showZoomButton: 'show zoom button'
 }

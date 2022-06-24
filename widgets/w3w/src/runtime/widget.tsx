@@ -40,6 +40,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   // hard-coded options
   format: 'json' | 'geojson' = 'geojson'
   showGridZoomThreshold = 18
+  w3wZoomBufferRadiusMeters = 100
 
   state: State = {
     center: null,
@@ -239,7 +240,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       // add w3wGridLayer under w3wLayer
       this.view.map.add(this.w3wGridLayer, this.view.map.layers.findIndex((item: __esri.Layer, index: number) => this.w3wLayer.id === item.id) - 1)
     } else {
-      this.w3wGridLayer.destroy()
+      this.w3wGridLayer?.destroy()
     }
   }
 
@@ -317,7 +318,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       }),
       symbol: {
         type: 'simple-line',
-        color: [225, 31, 38, 1],
+        color: this.getW3wColorRgba(1),
         width: '2px',
         style: 'short-dot'
       } as unknown as __esri.Symbol
@@ -327,7 +328,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
   private readonly zoomToW3w = async () => {
     const w3wPoint = webMercatorUtils.geographicToWebMercator(this.state.w3wPoint)
-    const w3wBuffer = geometryEngine.buffer(w3wPoint, 200, 'meters')
+    const w3wBuffer = geometryEngine.buffer(w3wPoint, this.w3wZoomBufferRadiusMeters, 'meters')
 
     await this.view.goTo({
       target: w3wBuffer
@@ -443,6 +444,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       .w3wRed {
         color:#e11f26;
       }
+      .float-right {
+        float:right;
+      }
     `
 
     if (!this.isConfigured()) {
@@ -451,6 +455,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
 
     return (
             <div className="custom-widget p-1" css={style}>
+              {this.state.w3wAddress?.properties?.words && this.props.config.showZoomButton && (
+                <Button onClick={this.zoomToW3w} className="esri-icon-zoom-in-magnifying-glass float-right" />
+              )}
+
               {this.state.w3wAddress?.properties?.words && (
                 <h3 className="w3wBlock">
                       <span className='w3wRed'>///</span><FormattedMessage id={this.state.w3wAddress?.properties?.words ?? '.'} defaultMessage={this.state.w3wAddress?.properties?.words ?? '.'} />
@@ -465,24 +473,22 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                           onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
               )}
 
-              <table className="table table-striped">
-                  <tbody>
-                    {this.props.config.showCoordinates &&
-                    <div>
-                      <tr>
-                          <td scope="row" className='w3wRed'>X</td>
-                          <td>{this.state.w3wPoint && this.state.w3wPoint.x}</td>
-                      </tr>
-                      <tr>
-                          <td scope="row" className='w3wRed'>Y</td>
-                          <td>{this.state.w3wPoint && this.state.w3wPoint.y}</td>
-                      </tr>
-                    </div>}
-                    <tr>
-                        <td colSpan={2}><Button onClick={this.zoomToW3w}>Zoom</Button></td>
-                    </tr>
-                  </tbody>
-              </table>
+              {this.props.config.showCoordinates &&
+                <table className="table table-striped">
+                    <tbody>
+                      <div>
+                        <tr>
+                            <td scope="row" className='w3wRed'>X</td>
+                            <td>{this.state.w3wPoint && this.state.w3wPoint.x}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row" className='w3wRed'>Y</td>
+                            <td>{this.state.w3wPoint && this.state.w3wPoint.y}</td>
+                        </tr>
+                      </div>
+                    </tbody>
+                </table>
+              }
             </div>
     )
   }

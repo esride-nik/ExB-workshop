@@ -115,6 +115,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     })
   }
 
+  switchShowZoomButton = (evt: React.FormEvent<HTMLInputElement>) => {
+    this.props.onSettingChange({
+      id: this.props.id,
+      config: this.props.config.set('showZoomButton', evt.currentTarget.checked)
+    })
+  }
+
   setW3wApiKey = (w3wApiKey: string) => {
     this.props.onSettingChange({
       id: this.props.id,
@@ -254,6 +261,19 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
                                 />
                                 <label>
                                     <FormattedMessage id="showCoordinates" defaultMessage={defaultMessages.showCoordinates} />
+                                </label>
+                            </div>
+                        </div>
+                    </SettingRow>
+                    <SettingRow>
+                        <div className="w-100">
+                            <div className="checkbox-row">
+                                <Switch
+                                    checked={(this.props.config && this.props.config.showZoomButton) || false}
+                                    onChange={this.switchShowZoomButton}
+                                />
+                                <label>
+                                    <FormattedMessage id="showZoomButton" defaultMessage={defaultMessages.showZoomButton} />
                                 </label>
                             </div>
                         </div>

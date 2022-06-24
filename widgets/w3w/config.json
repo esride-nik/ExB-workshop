@@ -6,5 +6,6 @@
   "zoomToW3wSquare": false,
   "useMapMidpoint": false,
   "w3wLanguage": "en",
-  "showCoordinates": false
+  "showCoordinates": false,
+  "showZoomButton": true
 }
