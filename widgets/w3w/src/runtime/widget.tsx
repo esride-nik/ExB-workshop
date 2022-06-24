@@ -337,49 +337,42 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
   private getW3wGridLineGraphics (w3wGrid: GridSectionGeoJsonResponse, wgs84Extent: __esri.Extent) {
     // "as any" is a workaround, because the GridSectionGeoJsonResponse is wrong: features prop is missing
     return (w3wGrid as any).features[0].geometry.coordinates.map((coordinate: any, index: number) => {
-      const rangeX = wgs84Extent.xmax - wgs84Extent.xmin
-      const rangeY = wgs84Extent.ymax - wgs84Extent.ymin
-      const midPoint = new Point({
-        x: rangeX / 2 + wgs84Extent.xmin,
-        y: rangeY / 2 + wgs84Extent.ymin,
-        spatialReference: {
-          wkid: 4326
-        }
-      })
-      const gridCenterPoint = this.state.w3wPoint ?? midPoint
-      const rangeCenterToXmin = Math.abs(gridCenterPoint.x - wgs84Extent.xmin)
-      const rangeCenterToXmax = Math.abs(gridCenterPoint.x - wgs84Extent.xmax)
-      const rangeCenterToYmin = Math.abs(gridCenterPoint.y - wgs84Extent.ymin)
-      const rangeCenterToYmax = Math.abs(gridCenterPoint.y - wgs84Extent.ymax)
-      const isVertical = coordinate[0][0] === coordinate[1][0]
+      let value = 1
+      let norm = 1
+      if (this.state.w3wPoint) {
+        const gridCenterPoint = this.state.w3wPoint
+        const rangeCenterToXmin = Math.abs(gridCenterPoint.x - wgs84Extent.xmin)
+        const rangeCenterToXmax = Math.abs(gridCenterPoint.x - wgs84Extent.xmax)
+        const rangeCenterToYmin = Math.abs(gridCenterPoint.y - wgs84Extent.ymin)
+        const rangeCenterToYmax = Math.abs(gridCenterPoint.y - wgs84Extent.ymax)
+        const isVertical = coordinate[0][0] === coordinate[1][0]
 
-      let value = 0
-      let norm = 0
-      if (isVertical) {
-        // 1st member of a coordinate is X
-        if (coordinate[0][0] <= gridCenterPoint.x) {
-          // line is west of gridCenterPoint
-          const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmin)
-          value = rangeCenterToXmin - gcpRange
-          norm = rangeCenterToXmin
+        if (isVertical) {
+          // 1st member of a coordinate is X
+          if (coordinate[0][0] <= gridCenterPoint.x) {
+            // line is west of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmin)
+            value = rangeCenterToXmin - gcpRange
+            norm = rangeCenterToXmin
+          } else {
+            // line is wast of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmax)
+            value = rangeCenterToXmax - gcpRange
+            norm = rangeCenterToXmax
+          }
         } else {
-          // line is wast of gridCenterPoint
-          const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmax)
-          value = rangeCenterToXmax - gcpRange
-          norm = rangeCenterToXmax
-        }
-      } else {
-        // 2nd member of a coordinate is Y
-        if (coordinate[0][1] <= gridCenterPoint.y) {
-          // line is south of gridCenterPoint
-          const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymin)
-          value = rangeCenterToYmin - gcpRange
-          norm = rangeCenterToYmin
-        } else {
-          // line is north of gridCenterPoint
-          const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymax)
-          value = rangeCenterToYmax - gcpRange
-          norm = rangeCenterToYmax
+          // 2nd member of a coordinate is Y
+          if (coordinate[0][1] <= gridCenterPoint.y) {
+            // line is south of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymin)
+            value = rangeCenterToYmin - gcpRange
+            norm = rangeCenterToYmin
+          } else {
+            // line is north of gridCenterPoint
+            const gcpRange = Math.abs(coordinate[0][1] - wgs84Extent.ymax)
+            value = rangeCenterToYmax - gcpRange
+            norm = rangeCenterToYmax
+          }
         }
       }
 
@@ -420,7 +413,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
           stops: [
             {
               value: 0,
-              color: 'rgba(120, 120, 120, 0.5)'
+              color: 'rgba(230, 230, 230, 0.5)'
             },
             {
               value: 0.8,
