@@ -448,15 +448,28 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
         color:#e11f26;
       }
       .w3wInfo {
-        background: #00456b;
-        width: 100%;
-        color: #fff;
+        background:#00456b;
+        width:100%;
+        color:#fff;
+      }
+      .w3wInfoProp {
+        display:inline-block;
+        margin-right:20px;
       }
       .w3wInfoFirstCol {
-        width:22px;
+        display:inline-block;
+        margin-right:5px;
       }
       .float-right {
         float:right;
+      }
+      .w3wBtn {
+        background:#00456b;
+        color:#fff;
+      }
+      .w3wBtn:hover {
+        background:#fff;
+        color:#e11f26;
       }
     `
 
@@ -467,7 +480,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     return (
             <div className="custom-widget p-1" css={style}>
               {this.state.w3wAddress?.properties?.words && this.props.config.showZoomButton && (
-                <Button onClick={this.zoomToW3w} className="esri-icon-zoom-in-magnifying-glass float-right" />
+                <Button onClick={this.zoomToW3w} className="esri-icon-zoom-in-magnifying-glass float-right w3wBtn" />
               )}
 
               <h3 className="w3wBlock">
@@ -483,20 +496,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
               )}
 
               {this.props.config.showCoordinates &&
-                <table className="w3wInfo">
-                    <tbody>
-                      <div>
-                        <tr>
-                            <td scope="row" className='w3wRed w3wInfoFirstCol'>X</td>
-                            <td>{this.state.w3wPoint && this.state.w3wPoint.x}</td>
-                        </tr>
-                        <tr>
-                            <td scope="row" className='w3wRed w3wInfoFirstCol'>Y</td>
-                            <td>{this.state.w3wPoint && this.state.w3wPoint.y}</td>
-                        </tr>
-                      </div>
-                    </tbody>
-                </table>
+                <div className="w3wInfo">
+                  <div className="w3wInfoProp"><span className='w3wRed w3wInfoFirstCol'>{defaultMessages.x}</span><span>{this.state.w3wPoint && this.state.w3wPoint.x}</span></div>
+                  <div className="w3wInfoProp"><span className='w3wRed w3wInfoFirstCol'>{defaultMessages.y}</span><span>{this.state.w3wPoint && this.state.w3wPoint.y}</span></div>
+                </div>
               }
             </div>
     )

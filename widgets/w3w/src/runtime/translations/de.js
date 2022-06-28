@@ -7,4 +7,6 @@ define({
   ll: 'Links unten',
   centerLabel: 'Mittelpunkt',
   w3w: 'what3words Mittelpunkt',
+  x: 'Lang',
+  y: 'Breit'
 });
