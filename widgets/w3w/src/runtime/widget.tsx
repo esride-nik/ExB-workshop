@@ -104,6 +104,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     if (!this.props.config.useMapMidpoint) {
       await this.updateW3wAddress(mapClick.mapPoint as Point)
       this.fillW3wGridLayer()
+      const hitTestResult = await this.view.hitTest(mapClick.mapPoint as Point)
+      console.log('hitTestResult', hitTestResult)
     }
   }
 
@@ -439,10 +441,19 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     const style = css`
       .w3wBlock {
         display:block;
-        white-space: nowrap;
+        white-space:nowrap;
+        overflow:hidden;
       }
       .w3wRed {
         color:#e11f26;
+      }
+      .w3wInfo {
+        background: #00456b;
+        width: 100%;
+        color: #fff;
+      }
+      .w3wInfoFirstCol {
+        width:22px;
       }
       .float-right {
         float:right;
@@ -459,11 +470,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
                 <Button onClick={this.zoomToW3w} className="esri-icon-zoom-in-magnifying-glass float-right" />
               )}
 
-              {this.state.w3wAddress?.properties?.words && (
-                <h3 className="w3wBlock">
-                      <span className='w3wRed'>///</span><FormattedMessage id={this.state.w3wAddress?.properties?.words ?? '.'} defaultMessage={this.state.w3wAddress?.properties?.words ?? '.'} />
-                </h3>
-              )}
+              <h3 className="w3wBlock">
+                  <span className='w3wRed'>///</span>{this.state.w3wAddress?.properties?.words && (<FormattedMessage id={this.state.w3wAddress?.properties?.words ?? '.'} defaultMessage={this.state.w3wAddress?.properties?.words ?? '.'} />)}
+              </h3>
 
               {{}.hasOwnProperty.call(this.props, 'useMapWidgetIds') &&
                   this.props.useMapWidgetIds &&
@@ -474,15 +483,15 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
               )}
 
               {this.props.config.showCoordinates &&
-                <table className="table table-striped">
+                <table className="w3wInfo">
                     <tbody>
                       <div>
                         <tr>
-                            <td scope="row" className='w3wRed'>X</td>
+                            <td scope="row" className='w3wRed w3wInfoFirstCol'>X</td>
                             <td>{this.state.w3wPoint && this.state.w3wPoint.x}</td>
                         </tr>
                         <tr>
-                            <td scope="row" className='w3wRed'>Y</td>
+                            <td scope="row" className='w3wRed w3wInfoFirstCol'>Y</td>
                             <td>{this.state.w3wPoint && this.state.w3wPoint.y}</td>
                         </tr>
                       </div>
