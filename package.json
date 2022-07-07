@@ -7,7 +7,6 @@
   "author": "",
   "dependencies": {
     "@tmcw/togeojson": "^5.1.3",
-    "@what3words/api": "^4.0.6",
     "axios": "^0.27.2",
     "react-dropzone": "^14.2.1",
     "xlsx": "^0.18.5"
