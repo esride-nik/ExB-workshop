@@ -1,6 +1,6 @@
 {
   "name": "w3w",
-  "label": "what3words Position",
+  "label": "what3words",
   "type": "widget",
   "dependency": ["jimu-arcgis"],
   "version": "1.2.0",

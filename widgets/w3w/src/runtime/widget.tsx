@@ -358,7 +358,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
             value = rangeCenterToXmin - gcpRange
             norm = rangeCenterToXmin
           } else {
-            // line is wast of gridCenterPoint
+            // line is east of gridCenterPoint
             const gcpRange = Math.abs(coordinate[0][0] - wgs84Extent.xmax)
             value = rangeCenterToXmax - gcpRange
             norm = rangeCenterToXmax

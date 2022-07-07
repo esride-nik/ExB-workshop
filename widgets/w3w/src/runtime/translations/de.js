@@ -1,5 +1,5 @@
 define({
-  _widgetLabel: 'was3wörter',
+  _widgetLabel: 'what3words',
   widgetProperties: 'Widget Eigenschaften',
   widgetFunctions: 'Widget Funktionen',
   widgetName: 'Widget Name:',
