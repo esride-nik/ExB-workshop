@@ -18,68 +18,63 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, Immutable, css, jsx } from 'jimu-core'
-import { AllWidgetSettingProps } from 'jimu-for-builder'
-import { JimuMapViewSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
-import { ArcGISDataSourceTypes } from 'jimu-arcgis'
-import { IMConfig } from '../config'
-import defaultMessages from './translations/default'
-import { NumericInput } from 'jimu-ui'
+import { React, Immutable, css, jsx } from 'jimu-core';
+import { AllWidgetSettingProps } from 'jimu-for-builder';
+import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components';
+import { ArcGISDataSourceTypes } from 'jimu-arcgis';
+import { IMConfig } from '../config';
+import defaultMessages from './translations/default';
+import { NumericInput } from 'jimu-ui';
 
 export default class Setting extends React.PureComponent<AllWidgetSettingProps<IMConfig>, any> {
-  supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap])
+    supportedTypes = Immutable([ArcGISDataSourceTypes.WebMap]);
 
-  onMapSelected = (useMapWidgetIds: string[]) => {
-    this.props.onSettingChange({
-      id: this.props.id,
-      useMapWidgetIds: useMapWidgetIds
-    })
-  }
+    onMapSelected = (useMapWidgetIds: string[]) => {
+        this.props.onSettingChange({
+            id: this.props.id,
+            useMapWidgetIds: useMapWidgetIds,
+        });
+    };
 
-  setRadius = (radius: number) => {
-    this.props.onSettingChange({
-      id: this.props.id,
-      config: this.props.config.set('radiusKm', radius)
-    })
-  }
+    setRadius = (radius: number) => {
+        this.props.onSettingChange({
+            id: this.props.id,
+            config: this.props.config.set('radiusKm', radius),
+        });
+    };
 
-  render () {
-    const style = css`
+    render() {
+        const style = css`
             label {
                 display: inline-flex;
                 margin-left: 5px;
             }
-        `
+        `;
 
-    return (
+        return (
             <div className="widget-setting p-2" css={style}>
                 <SettingSection
                     className="map-selector-section"
                     title={this.props.intl.formatMessage({
-                      id: 'mapWidgetLabel',
-                      defaultMessage: defaultMessages.selectMapWidget
+                        id: 'mapWidgetLabel',
+                        defaultMessage: defaultMessages.selectMapWidget,
                     })}>
                     <SettingRow>
-                        <JimuMapViewSelector
-                            onSelect={this.onMapSelected}
-                            useMapWidgetIds={this.props.useMapWidgetIds}
-                        />
+                        <MapWidgetSelector onSelect={this.onMapSelected} useMapWidgetIds={this.props.useMapWidgetIds} />
                     </SettingRow>
                 </SettingSection>
                 <SettingSection
                     className="setting-section"
                     title={this.props.intl.formatMessage({
-                      id: 'radius',
-                      defaultMessage: defaultMessages.radius
+                        id: 'radius',
+                        defaultMessage: defaultMessages.radius,
                     })}>
                     <SettingRow>
-                        <NumericInput
-                            defaultValue={this.props.config.radiusKm}
-                            onAcceptValue={this.setRadius}
-                        />
+                        <NumericInput defaultValue={this.props.config.radiusKm} onAcceptValue={this.setRadius} />
                     </SettingRow>
                 </SettingSection>
             </div>
-    )
-  }
+        );
+    }
 }
+
