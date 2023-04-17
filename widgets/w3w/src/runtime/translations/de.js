@@ -1,4 +1,4 @@
-define({
+System.register([], function (_export) {return {execute: function () {_export({
   _widgetLabel: 'was3wörter',
   widgetProperties: 'Widget Eigenschaften',
   widgetFunctions: 'Widget Funktionen',
@@ -7,4 +7,4 @@ define({
   ll: 'Links unten',
   centerLabel: 'Mittelpunkt',
   w3w: 'what3words Mittelpunkt',
-});
+})}}});
