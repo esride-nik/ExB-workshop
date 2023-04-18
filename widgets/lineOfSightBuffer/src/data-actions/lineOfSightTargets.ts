@@ -1,12 +1,11 @@
-import * as Graphic from 'esri/Graphic'
+import Graphic from 'esri/Graphic'
 import { AbstractDataAction, DataSource, DataRecord, MutableStoreManager, DataRecordSet } from 'jimu-core'
 
-export default class ExportJson extends AbstractDataAction {
+export default class LineOfSightTargets extends AbstractDataAction {
   async isSupported (dataSet: DataRecordSet): Promise<boolean> {
     return dataSet.records?.length > 0
   }
 
-  // TODO: Hidden columns are exported as well. Can we see which ones are hidden in the datasource?
   async onExecute (dataSet: DataRecordSet, actionConfig: any): Promise<boolean> {
     if (dataSet.records.length > 0) {
       const features = dataSet.records.map((r) => (r as any).feature as Graphic)

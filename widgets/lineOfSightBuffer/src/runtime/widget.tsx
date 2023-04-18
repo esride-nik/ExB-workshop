@@ -1,39 +1,50 @@
-/**
-  Licensing
-
-  Copyright 2022 Esri
-
-  Licensed under the Apache License, Version 2.0 (the "License"); You
-  may not use this file except in compliance with the License. You may
-  obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-  implied. See the License for the specific language governing
-  permissions and limitations under the License.
-
-  A copy of the license is available in the repository's
-  LICENSE file.
-*/
+import Graphic from 'esri/Graphic'
 import { React, AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 
 import LineOfSight from 'esri/widgets/LineOfSight'
-// import LineOfSightViewModel from 'esri/widgets/LineOfSight/LineOfSightViewModel'
+import LineOfSightViewModel from 'esri/widgets/LineOfSight/LineOfSightViewModel'
 
 import defaultMessages from './translations/default'
+import { Point } from 'esri/geometry'
+import LineOfSightTarget from 'esri/widgets/LineOfSight/LineOfSightTarget'
+import SceneView from 'esri/views/SceneView'
 
 const { useState, useRef, useEffect } = React
 
-export default function ({
-  useMapWidgetIds
-}: AllWidgetProps<{}>) {
+export default function Widget (props: AllWidgetProps<{}>) {
   const apiWidgetContainer = useRef<HTMLDivElement>()
+  let features: Graphic[] = []
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [losWidget, setLosWidget] = useState<LineOfSight>(null)
+
+  const setIntersectionMarkers = (lineOfSightWidget: LineOfSight) => {
+    // an inverted cone marks the intersection that occludes the view
+    const intersectionSymbol = {
+      type: 'point-3d',
+      symbolLayers: [{
+        type: 'object',
+        resource: { primitive: 'inverted-cone' },
+        material: { color: [255, 100, 100] },
+        height: 10,
+        depth: 10,
+        width: 10,
+        anchor: 'relative',
+        anchorPosition: { x: 0, y: 0, z: -0.7 }
+      }]
+    }
+    jimuMapView.view.graphics.removeAll()
+    lineOfSightWidget.viewModel?.targets.forEach((target) => {
+      if (target.intersectedLocation) {
+        const graphic = new Graphic({
+          symbol: intersectionSymbol as __esri.SymbolProperties,
+          geometry: target.intersectedLocation
+        })
+        jimuMapView.view.graphics.add(graphic)
+      }
+    })
+  }
 
   useEffect(() => {
     if (jimuMapView && apiWidgetContainer.current) {
@@ -48,11 +59,25 @@ export default function ({
           container: container
         })
         setLosWidget(lineOfSight)
-      }
 
-      // const vm = new LineOfSightViewModel({
-      //   view: jimuMapView.view as __esri.SceneView
-      // })
+        // watch when observer location changes
+        lineOfSight.viewModel.watch('observer', (value) => {
+          setIntersectionMarkers(lineOfSight)
+        })
+
+        // watch when a new target is added or removed
+        lineOfSight.viewModel.targets.on('change', (event) => {
+          event.added.forEach((target) => {
+            setIntersectionMarkers(lineOfSight)
+            // for each target watch when the intersection changes
+            target.watch('intersectedLocation', setIntersectionMarkers)
+          })
+          event.removed.forEach(() => {
+            // remove intersection markers for removed targets (remove with right click on target)
+            setIntersectionMarkers(lineOfSight)
+          })
+        })
+      }
     }
 
     return () => {
@@ -77,7 +102,19 @@ export default function ({
     }
   }
 
-  const isConfigured = useMapWidgetIds && useMapWidgetIds.length === 1
+  const isConfigured = props.useMapWidgetIds && props.useMapWidgetIds.length === 1
+
+  features = props?.mutableStateProps?.results?.features
+  if (features?.length > 0) {
+    const observerPoint = features[0].geometry as Point
+    observerPoint.z = 200
+    losWidget.viewModel.observer = observerPoint
+    losWidget.viewModel.targets.addMany(features.map((f: Graphic) => {
+      return {
+        location: f.geometry as Point
+      } as unknown as LineOfSightTarget
+    }))
+  }
 
   return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
     {!isConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
@@ -86,15 +123,15 @@ export default function ({
     </h3>
 
     <JimuMapViewComponent
-      useMapWidgetId={useMapWidgetIds?.[0]}
+      useMapWidgetId={props.useMapWidgetIds?.[0]}
       onActiveViewChange={onActiveViewChange}
     />
 
     <hr />
     <h4><FormattedMessage id="thisUsesViewModel" defaultMessage={defaultMessages.thisUsesViewModel} /></h4>
-    {/* <div>
-      <FormattedMessage id="layerTitle" defaultMessage={defaultMessages.layerTitle} />: {layerInfo && layerInfo.title}
-    </div> */}
+    <div>
+      <FormattedMessage id="features" defaultMessage={defaultMessages.layerTitle} />: {features?.length}
+    </div>
 
     <hr />
 
@@ -102,3 +139,7 @@ export default function ({
     <div ref={apiWidgetContainer} />
   </div>
 }
+function add(arg0: LineOfSightTarget) {
+  throw new Error('Function not implemented.')
+}
+

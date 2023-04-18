@@ -9,6 +9,13 @@
   "copyright": "2023 Esri Deutschland",
   "dependency": "jimu-arcgis",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "dataActions": [
+    {
+      "name": "lineOfSightTargets",
+      "label": "Line of Sight Targets",
+      "uri": "data-actions/lineOfSightTargets"
+    }
+  ],
   "properties": {},
   "translatedLocales": [
     "en"
