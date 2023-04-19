@@ -1,12 +1,11 @@
 import { React, AllWidgetProps, Immutable, FormattedMessage } from 'jimu-core'
 import defaultMessages from './translations/default'
 
-// import XLSX from 'xlsx'
 import { JSON2SheetOpts, utils, writeFile } from 'xlsx'
 import Graphic from 'esri/Graphic'
 import FeatureLayer from 'esri/layers/FeatureLayer'
 import { Button, MultiSelect, MultiSelectItem } from 'jimu-ui'
-import * as Relationship from 'esri/layers/support/Relationship'
+import Relationship from 'esri/layers/support/Relationship'
 
 interface WorksheetObject {
   ws: any

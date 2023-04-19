@@ -1,5 +1,6 @@
 {
   "name": "excelExport",
+  "label": "Excel Export",
   "type": "widget",
   "version": "0.9.0",
   "exbVersion": "1.7.0",
