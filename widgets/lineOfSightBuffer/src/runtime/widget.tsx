@@ -1,14 +1,10 @@
-import Graphic from 'esri/Graphic'
 import { React, AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
-
-import LineOfSight from 'esri/widgets/LineOfSight'
-import LineOfSightViewModel from 'esri/widgets/LineOfSight/LineOfSightViewModel'
-
 import defaultMessages from './translations/default'
 import { Point } from 'esri/geometry'
+import Graphic from 'esri/Graphic'
+import LineOfSight from 'esri/widgets/LineOfSight'
 import LineOfSightTarget from 'esri/widgets/LineOfSight/LineOfSightTarget'
-import SceneView from 'esri/views/SceneView'
 
 const { useState, useRef, useEffect } = React
 
@@ -61,7 +57,7 @@ export default function Widget (props: AllWidgetProps<{}>) {
         setLosWidget(lineOfSight)
 
         // watch when observer location changes
-        lineOfSight.viewModel.watch('observer', (value) => {
+        lineOfSight.viewModel.watch('observer', () => {
           setIntersectionMarkers(lineOfSight)
         })
 
@@ -107,7 +103,7 @@ export default function Widget (props: AllWidgetProps<{}>) {
   features = props?.mutableStateProps?.results?.features
   if (features?.length > 0) {
     const observerPoint = features[0].geometry as Point
-    observerPoint.z = 200
+    // observerPoint.z -= 100
     losWidget.viewModel.observer = observerPoint
     losWidget.viewModel.targets.addMany(features.map((f: Graphic) => {
       return {
@@ -139,7 +135,3 @@ export default function Widget (props: AllWidgetProps<{}>) {
     <div ref={apiWidgetContainer} />
   </div>
 }
-function add(arg0: LineOfSightTarget) {
-  throw new Error('Function not implemented.')
-}
-
