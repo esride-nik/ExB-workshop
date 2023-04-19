@@ -1,6 +1,7 @@
 import Graphic from 'esri/Graphic'
-import { AbstractDataAction, MutableStoreManager, DataRecordSet } from 'jimu-core'
+import { AbstractDataAction, DataRecordSet } from 'jimu-core'
 import { JSON2SheetOpts, utils, writeFile } from 'xlsx'
+import defaultMessages from '../runtime/translations/default'
 
 interface WorksheetObject {
   ws: any
@@ -16,27 +17,32 @@ export default class ExportJson extends AbstractDataAction {
   async onExecute (dataSet: DataRecordSet, actionConfig: any): Promise<boolean> {
     if (dataSet.records.length > 0) {
       const features = dataSet.records.map((r) => (r as any).feature as Graphic)
-      MutableStoreManager.getInstance().updateStateValue(this.widgetId, 'results', {
-        features: features,
-        label: dataSet.records[0].dataSource?.belongToDataSource?.fetchedSchema?.label
-      })
+
+      const label = (dataSet.records[0].dataSource?.belongToDataSource as any).fetchedSchema?.label.length > 0
+        ? (dataSet.records[0].dataSource?.belongToDataSource as any).fetchedSchema?.label
+        : defaultMessages._widgetLabel
+      const filename = label.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+
+      this.excelExport(features, filename)
+
       return true
     }
     return false
   }
 
-  private readonly excelExport = () => {
+  private readonly excelExport = (features: Graphic[], filename: string) => {
+    const wss: WorksheetObject[] = []
     // selected features
-    if (this.features?.length > 0) {
+    if (features?.length > 0) {
       const sheetname = this.label
-      const featureAttributes = this.features.map((feature: Graphic) => {
+      const featureAttributes = features.map((feature: Graphic) => {
         return this.reduceToFields(feature.attributes)
       })
       // create worksheet of main table and add as first array element
       const wsObject = this.createWorksheet(featureAttributes, sheetname)
-      this.wss.unshift(wsObject)
+      wss.unshift(wsObject)
     }
-    this.exportExcelFile(this.wss, this.filename)
+    this.exportExcelFile(wss, filename)
   }
 
   private reduceToFields (attributes: any): {} {
