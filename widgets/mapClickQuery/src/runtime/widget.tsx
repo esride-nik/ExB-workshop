@@ -23,7 +23,6 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
 
   const activeViewChangeHandler = (jmv: JimuMapView) => {
     jimuMapView = jmv
-
     jmv.view.on('click', handleMapClick)
   }
 
