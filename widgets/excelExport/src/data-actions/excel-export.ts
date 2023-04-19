@@ -1,5 +1,5 @@
-import * as Graphic from 'esri/Graphic'
-import { AbstractDataAction, DataSource, DataRecord, MutableStoreManager, DataRecordSet } from 'jimu-core'
+import Graphic from 'esri/Graphic'
+import { AbstractDataAction, MutableStoreManager, DataRecordSet } from 'jimu-core'
 
 export default class ExportJson extends AbstractDataAction {
   async isSupported (dataSet: DataRecordSet): Promise<boolean> {
