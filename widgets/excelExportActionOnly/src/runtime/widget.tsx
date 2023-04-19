@@ -6,11 +6,6 @@ import FeatureLayer from 'esri/layers/FeatureLayer'
 import { Button, MultiSelect, MultiSelectItem } from 'jimu-ui'
 import Relationship from 'esri/layers/support/Relationship'
 
-interface WorksheetObject {
-  ws: any
-  wsName: string
-}
-
 interface RelationshipRecords {
   relationshipName: string
   relationshipRecords: any[]
@@ -27,7 +22,6 @@ interface State {
 }
 
 export default class Widget extends React.PureComponent<AllWidgetProps<unknown>, State> {
-  wss: WorksheetObject[]
   features: Graphic[]
   layer: FeatureLayer
   label: string
@@ -94,60 +88,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
         currentRelationshipRecordsSelectedFieldNames:
                     this.allRelationshipRecords[0].relationshipSelectedFieldNames
       })
-    }
-  }
-
-  private readonly excelExport = () => {
-    // selected features
-    if (this.features?.length > 0) {
-      const sheetname = this.label
-      const featureAttributes = this.features.map((feature: Graphic) => {
-        return this.reduceToSelectedFields(feature.attributes, this.state.selectedFieldNames)
-      })
-      // create worksheet of main table and add as first array element
-      const wsObject = this.createWorksheet(featureAttributes, sheetname)
-      this.wss.unshift(wsObject)
-    }
-
-    // relationships
-    if (this.allRelationshipRecords?.length > 0) {
-      this.allRelationshipRecords.forEach((relationshipRecords: RelationshipRecords) => {
-        const relationshipAttributes = relationshipRecords.relationshipRecords.map((rel: any) => {
-          return this.reduceToSelectedFields(rel, relationshipRecords.relationshipSelectedFieldNames)
-        })
-        const wsObject = this.createWorksheet(
-          relationshipAttributes,
-          relationshipRecords.relationshipName.substr(0, 31)
-        )
-        this.wss.push(wsObject)
-      })
-    }
-
-    this.exportExcelFile(this.wss, this.filename)
-  }
-
-  private reduceToSelectedFields (attributes: any, selectedFieldNames: string[]): {} {
-    return Object.keys(attributes)
-      .filter((key) => selectedFieldNames.includes(key))
-      .reduce((obj, key) => {
-        obj[key] = attributes[key]
-        return obj
-      }, {})
-  }
-
-  private exportExcelFile (wss: WorksheetObject[], filename: any) {
-    const wb = utils.book_new()
-    wss.forEach((wsObject: WorksheetObject) =>
-      utils.book_append_sheet(wb, wsObject.ws, wsObject.wsName.substr(0, 31))
-    )
-    writeFile(wb, `${filename}.xlsb`)
-  }
-
-  private createWorksheet (featureAttributes: any[], sheetname: any): WorksheetObject {
-    const newWorksheet = utils.json_to_sheet(featureAttributes, { sheet: sheetname } as JSON2SheetOpts)
-    return {
-      ws: newWorksheet,
-      wsName: sheetname
     }
   }
 
