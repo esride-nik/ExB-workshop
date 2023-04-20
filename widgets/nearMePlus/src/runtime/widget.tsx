@@ -27,6 +27,7 @@ import Graphic from 'esri/Graphic'
 import { Geometry, Polygon } from 'esri/geometry'
 import { SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
+import FeatureLayerView from 'esri/views/layers/FeatureLayerView'
 
 const { useState, useRef, useEffect } = React
 
@@ -37,7 +38,8 @@ export default function ({
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
 
   let bufferDistance = 100
-  let featureFilter = {}
+  let featureFilter: __esri.FeatureFilter = null
+  let featureLayerView: FeatureLayerView = null
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
@@ -62,6 +64,7 @@ export default function ({
     if (jimuMapView && apiSketchWidgetContainer.current) {
       initSketch()
       initSlider()
+      getFlView()
 
       return () => {
         if (sketchWidget) {
@@ -71,6 +74,11 @@ export default function ({
       }
     }
   }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
+
+  const getFlView = async () => {
+    const fl = jimuMapView.view.map.findLayerById('Berlin_Verkehrszeichen_1241_1265')
+    featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+  }
 
   const initSketch = () => {
     if (!sketchWidget) {
@@ -157,12 +165,12 @@ export default function ({
     } as unknown as __esri.FeatureFilter
     // set effect on excluded features
     // make them gray and transparent
-    // if (featureLayerView) {
-    //   featureLayerView.featureEffect = {
-    //     filter: featureFilter,
-    //     excludedEffect: 'grayscale(100%) opacity(30%)'
-    //   }
-    // }
+    if (featureLayerView) {
+      featureLayerView.featureEffect = {
+        filter: featureFilter,
+        excludedEffect: 'grayscale(100%) opacity(30%)'
+      } as unknown as __esri.FeatureEffect
+    }
   }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
