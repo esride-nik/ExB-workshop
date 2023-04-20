@@ -27,8 +27,9 @@ import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import geometryEngine from 'esri/geometry/geometryEngine'
 import Graphic from 'esri/Graphic'
-import { Polygon } from 'esri/geometry'
+import { Geometry, Polygon } from 'esri/geometry'
 import { SimpleFillSymbol } from 'esri/symbols'
+import Slider from 'esri/widgets/Slider'
 
 const { useState, useRef, useEffect } = React
 
@@ -42,6 +43,19 @@ export default function ({
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
+  const bufferGraphic = new Graphic({
+    geometry: null,
+    symbol: {
+      type: 'simple-fill',
+      color: [51, 51, 204, 0.4],
+      style: 'solid',
+      outline: {
+        color: 'white',
+        width: 1
+      }
+    } as unknown as SimpleFillSymbol
+  })
+  sketchGraphicsLayer.add(bufferGraphic)
 
   useEffect(() => {
     if (jimuMapView && apiWidgetContainer.current) {
@@ -70,20 +84,7 @@ export default function ({
         sketch.on('create', (evt: __esri.SketchCreateEvent) => {
           if (evt.state === 'complete') {
             console.log('CREATE', evt)
-            const bufferGeometry = geometryEngine.geodesicBuffer(evt.graphic.geometry, 50, 'meters', true) as Polygon
-            const bufferGraphic = new Graphic({
-              geometry: bufferGeometry,
-              symbol: {
-                type: 'simple-fill',
-                color: [51, 51, 204, 0.4],
-                style: 'solid',
-                outline: {
-                  color: 'white',
-                  width: 1
-                }
-              } as unknown as SimpleFillSymbol
-            })
-            sketchGraphicsLayer.add(bufferGraphic)
+            updateBuffer(evt.graphic.geometry as Geometry)
           }
         })
 
@@ -103,7 +104,45 @@ export default function ({
         }
       }
     }
-  }, [apiWidgetContainer, jimuMapView, sketchWidget])
+  }, [apiWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
+
+  // const distanceNum = new Slider({
+  //   container: 'distanceNum',
+  //   min: 0,
+  //   max: 1000,
+  //   values: [0],
+  //   steps: 1,
+  //   visibleElements: {
+  //     rangeLabels: true,
+  //     labels: true
+  //   }
+  // })
+
+  // // listen to change and input events on UI components
+  // distanceNum.on('thumb-drag', distanceVariablesChanged)
+  // distanceUnit.onchange = distanceVariablesChanged
+  // spatialRelType.onchange = distanceVariablesChanged
+
+  // // get user entered values from distance related options
+  // function distanceVariablesChanged() {
+  //   unit = distanceUnit.value;
+  //   distance = distanceNum.values[0];
+  //   geometryRel = spatialRelType.value;
+  //   updateBuffer();
+  // }
+
+  // update the buffer graphic if user is filtering by distance
+  const updateBuffer = (filterGeometry: Geometry): void => {
+    const distance = 100
+    const unit = 'meters'
+    if (distance > 0 && filterGeometry) {
+      bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
+      // updateFilter()
+    } else {
+      bufferGraphic.geometry = null
+      // updateFilter();
+    }
+  }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
     if (jimuMapView && sketchWidget) {
