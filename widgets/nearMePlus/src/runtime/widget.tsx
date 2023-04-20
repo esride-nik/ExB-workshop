@@ -25,6 +25,10 @@ import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
+import geometryEngine from 'esri/geometry/geometryEngine'
+import Graphic from 'esri/Graphic'
+import { Polygon } from 'esri/geometry'
+import { SimpleFillSymbol } from 'esri/symbols'
 
 const { useState, useRef, useEffect } = React
 
@@ -62,6 +66,31 @@ export default function ({
             snappingControls: false
           }
         })
+
+        sketch.on('create', (evt: __esri.SketchCreateEvent) => {
+          if (evt.state === 'complete') {
+            console.log('CREATE', evt)
+            const bufferGeometry = geometryEngine.geodesicBuffer(evt.graphic.geometry, 50, 'meters', true) as Polygon
+            const bufferGraphic = new Graphic({
+              geometry: bufferGeometry,
+              symbol: {
+                type: 'simple-fill',
+                color: [51, 51, 204, 0.4],
+                style: 'solid',
+                outline: {
+                  color: 'white',
+                  width: 1
+                }
+              } as unknown as SimpleFillSymbol
+            })
+            sketchGraphicsLayer.add(bufferGraphic)
+          }
+        })
+
+        sketch.on('update', (evt: __esri.SketchCreateEvent) => {
+          console.log('UPDATE', evt)
+        })
+
         jimuMapView.view.map.add(sketchGraphicsLayer)
 
         // jimuMapView.view.ui.add(sketch, 'top-right')
@@ -94,24 +123,12 @@ export default function ({
 
   return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
     {!isConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
-    <h3>
-      <FormattedMessage id="widgetDemonstrates" defaultMessage={defaultMessages.widgetDemonstrates} />
-    </h3>
 
     <JimuMapViewComponent
       useMapWidgetId={useMapWidgetIds?.[0]}
       onActiveViewChange={onActiveViewChange}
     />
 
-    <hr />
-    <h4><FormattedMessage id="thisUsesViewModel" defaultMessage={defaultMessages.thisUsesViewModel} /></h4>
-    <div>
-      {/* <FormattedMessage id="layerTitle" defaultMessage={defaultMessages.layerTitle} />: {layerInfo && layerInfo.title} */}
-    </div>
-
-    <hr />
-
-    <h4><FormattedMessage id="thisShowsLegendWidget" defaultMessage={defaultMessages.thisShowsLegendWidget} /></h4>
     <div ref={apiWidgetContainer} />
   </div>
 }
