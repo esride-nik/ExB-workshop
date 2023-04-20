@@ -37,6 +37,8 @@ export default function ({
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
 
   let bufferDistance = 100
+  let featureFilter = {}
+
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
 
@@ -58,45 +60,7 @@ export default function ({
 
   useEffect(() => {
     if (jimuMapView && apiSketchWidgetContainer.current) {
-      if (!sketchWidget) {
-        const container = document.createElement('div')
-        apiSketchWidgetContainer.current.appendChild(container)
-
-        const sketch = new Sketch({
-          layer: sketchGraphicsLayer,
-          view: jimuMapView.view,
-          container: container,
-          // graphic will be selected as soon as it is created
-          creationMode: 'update',
-          availableCreateTools: ['point', 'polyline'],
-          visibleElements: {
-            undoRedoMenu: false,
-            selectionTools: {
-              'lasso-selection': false,
-              'rectangle-selection': false
-            },
-            settingsMenu: false,
-            snappingControls: false
-          }
-        })
-
-        sketch.on('create', (evt: __esri.SketchCreateEvent) => {
-          if (evt.state === 'complete') {
-            console.log('CREATE', evt)
-            filterGeometry = evt.graphic.geometry as Geometry
-            updateBuffer(bufferDistance, 'meters')
-          }
-        })
-
-        sketch.on('update', (evt: __esri.SketchCreateEvent) => {
-          console.log('UPDATE', evt)
-        })
-
-        jimuMapView.view.map.add(sketchGraphicsLayer)
-
-        // jimuMapView.view.ui.add(sketch, 'top-right')
-      }
-
+      initSketch()
       initSlider()
 
       return () => {
@@ -107,6 +71,41 @@ export default function ({
       }
     }
   }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
+
+  const initSketch = () => {
+    if (!sketchWidget) {
+      const container = document.createElement('div')
+      apiSketchWidgetContainer.current.appendChild(container)
+
+      const sketch = new Sketch({
+        layer: sketchGraphicsLayer,
+        view: jimuMapView.view,
+        container: container,
+        // graphic will be selected as soon as it is created
+        creationMode: 'update',
+        availableCreateTools: ['point', 'polyline'],
+        visibleElements: {
+          undoRedoMenu: false,
+          selectionTools: {
+            'lasso-selection': false,
+            'rectangle-selection': false
+          },
+          settingsMenu: false,
+          snappingControls: false
+        }
+      })
+
+      sketch.on('create', (evt: __esri.SketchCreateEvent) => {
+        if (evt.state === 'complete') {
+          console.log('CREATE', evt)
+          filterGeometry = evt.graphic.geometry as Geometry
+          updateBuffer(bufferDistance, 'meters')
+        }
+      })
+
+      jimuMapView.view.map.add(sketchGraphicsLayer)
+    }
+  }
 
   const initSlider = () => {
     const container = document.createElement('div')
@@ -142,11 +141,28 @@ export default function ({
   const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
     if (distance > 0 && filterGeometry) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
-      // updateFilter()
+      updateFilter()
     } else {
       bufferGraphic.geometry = null
-      // updateFilter();
+      updateFilter()
     }
+  }
+
+  const updateFilter = () => {
+    featureFilter = {
+      geometry: filterGeometry,
+      spatialRelationship: 'intersects',
+      distance: bufferDistance,
+      units: 'meters'
+    } as unknown as __esri.FeatureFilter
+    // set effect on excluded features
+    // make them gray and transparent
+    // if (featureLayerView) {
+    //   featureLayerView.featureEffect = {
+    //     filter: featureFilter,
+    //     excludedEffect: 'grayscale(100%) opacity(30%)'
+    //   }
+    // }
   }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
