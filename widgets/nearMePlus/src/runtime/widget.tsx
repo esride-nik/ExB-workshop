@@ -36,13 +36,15 @@ const { useState, useRef, useEffect } = React
 export default function ({
   useMapWidgetIds
 }: AllWidgetProps<{}>) {
-  const apiWidgetContainer = useRef<HTMLDivElement>()
+  const apiSketchWidgetContainer = useRef<HTMLDivElement>()
+  const apiSliderWidgetContainer = useRef<HTMLDivElement>()
 
   // const [layerInfo, setLayerInfo] = useState<ActiveLayerInfo>(null)
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
+  let filterGeometry: Geometry = null
   const bufferGraphic = new Graphic({
     geometry: null,
     symbol: {
@@ -58,10 +60,10 @@ export default function ({
   sketchGraphicsLayer.add(bufferGraphic)
 
   useEffect(() => {
-    if (jimuMapView && apiWidgetContainer.current) {
+    if (jimuMapView && apiSketchWidgetContainer.current) {
       if (!sketchWidget) {
         const container = document.createElement('div')
-        apiWidgetContainer.current.appendChild(container)
+        apiSketchWidgetContainer.current.appendChild(container)
 
         const sketch = new Sketch({
           layer: sketchGraphicsLayer,
@@ -84,7 +86,8 @@ export default function ({
         sketch.on('create', (evt: __esri.SketchCreateEvent) => {
           if (evt.state === 'complete') {
             console.log('CREATE', evt)
-            updateBuffer(evt.graphic.geometry as Geometry)
+            filterGeometry = evt.graphic.geometry as Geometry
+            updateBuffer(100, 'meters')
           }
         })
 
@@ -97,6 +100,8 @@ export default function ({
         // jimuMapView.view.ui.add(sketch, 'top-right')
       }
 
+      initSketch()
+
       return () => {
         if (sketchWidget) {
           sketchWidget.destroy()
@@ -104,37 +109,39 @@ export default function ({
         }
       }
     }
-  }, [apiWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
+  }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
 
-  // const distanceNum = new Slider({
-  //   container: 'distanceNum',
-  //   min: 0,
-  //   max: 1000,
-  //   values: [0],
-  //   steps: 1,
-  //   visibleElements: {
-  //     rangeLabels: true,
-  //     labels: true
-  //   }
-  // })
+  const initSketch = () => {
+    const container = document.createElement('div')
+    apiSliderWidgetContainer.current.appendChild(container)
+    const distanceNum = new Slider({
+      container: apiSliderWidgetContainer.current,
+      min: 0,
+      max: 1000,
+      values: [0],
+      steps: 1,
+      visibleElements: {
+        rangeLabels: true,
+        labels: true
+      }
+    })
 
-  // // listen to change and input events on UI components
-  // distanceNum.on('thumb-drag', distanceVariablesChanged)
-  // distanceUnit.onchange = distanceVariablesChanged
-  // spatialRelType.onchange = distanceVariablesChanged
+    // get user entered values from distance related options
+    const distanceVariablesChanged = (): void => {
+    // unit = distanceUnit.value
+      const distance = distanceNum.values[0]
+      // geometryRel = spatialRelType.value
+      updateBuffer(distance, 'meters')
+    }
 
-  // // get user entered values from distance related options
-  // function distanceVariablesChanged() {
-  //   unit = distanceUnit.value;
-  //   distance = distanceNum.values[0];
-  //   geometryRel = spatialRelType.value;
-  //   updateBuffer();
-  // }
+    // listen to change and input events on UI components
+    distanceNum.on('thumb-drag', distanceVariablesChanged)
+    // distanceUnit.onchange = distanceVariablesChanged
+    // spatialRelType.onchange = distanceVariablesChanged
+  }
 
   // update the buffer graphic if user is filtering by distance
-  const updateBuffer = (filterGeometry: Geometry): void => {
-    const distance = 100
-    const unit = 'meters'
+  const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
     if (distance > 0 && filterGeometry) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
       // updateFilter()
@@ -168,6 +175,7 @@ export default function ({
       onActiveViewChange={onActiveViewChange}
     />
 
-    <div ref={apiWidgetContainer} />
+    <div ref={apiSketchWidgetContainer} />
+    <div ref={apiSliderWidgetContainer} />
   </div>
 }
