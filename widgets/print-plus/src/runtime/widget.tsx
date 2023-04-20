@@ -47,7 +47,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   componentDidMount () {
     console.log('componentDidMount')
     console.log('createAPIWidget')
-    this.createAPIWidget()
+    // this.createAPIWidget()
   }
 
   componentWillUnmount () {
@@ -87,6 +87,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       return
     }
     this.mapView = jimuMapView.view
+
+    this.createAPIWidget()
     // this.frame = new Frame({
     //   map: jimuMapView.view
     // })
@@ -362,7 +364,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
 
       <JimuMapViewComponent useMapWidgetId={this.props.useMapWidgetIds?.[0]} onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
-
+      <div>Halllihallo</div>
       <div ref={this.apiWidgetContainer}></div>
     </div>
   }
