@@ -1,5 +1,5 @@
 {
-  "serviceURL": "https://siemsen.esri-de.com/server/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
+  "serviceURL": "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",
   "title": {
     "default": "ArcGIS Web Map"
   },
