@@ -130,6 +130,16 @@ export default function ({
       }
     })
 
+    distanceNum.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
+      if (evt.state === 'stop' && featureLayerView) {
+        const flvResults = await featureLayerView.queryFeatures({
+          geometry: bufferGraphic.geometry,
+          spatialRelationship: 'contains'
+        })
+        console.log(flvResults)
+      }
+    })
+
     // get user entered values from distance related options
     const distanceVariablesChanged = (): void => {
     // unit = distanceUnit.value
