@@ -19,9 +19,6 @@
 */
 import { React, AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
-
-// import ActiveLayerInfo from 'esri/widgets/Legend/support/ActiveLayerInfo'
-
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
@@ -39,7 +36,7 @@ export default function ({
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
 
-  // const [layerInfo, setLayerInfo] = useState<ActiveLayerInfo>(null)
+  let bufferDistance = 100
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
 
@@ -87,7 +84,7 @@ export default function ({
           if (evt.state === 'complete') {
             console.log('CREATE', evt)
             filterGeometry = evt.graphic.geometry as Geometry
-            updateBuffer(100, 'meters')
+            updateBuffer(bufferDistance, 'meters')
           }
         })
 
@@ -100,7 +97,7 @@ export default function ({
         // jimuMapView.view.ui.add(sketch, 'top-right')
       }
 
-      initSketch()
+      initSlider()
 
       return () => {
         if (sketchWidget) {
@@ -111,14 +108,14 @@ export default function ({
     }
   }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
 
-  const initSketch = () => {
+  const initSlider = () => {
     const container = document.createElement('div')
     apiSliderWidgetContainer.current.appendChild(container)
     const distanceNum = new Slider({
       container: apiSliderWidgetContainer.current,
       min: 0,
       max: 1000,
-      values: [0],
+      values: [bufferDistance],
       steps: 1,
       visibleElements: {
         rangeLabels: true,
@@ -129,9 +126,10 @@ export default function ({
     // get user entered values from distance related options
     const distanceVariablesChanged = (): void => {
     // unit = distanceUnit.value
-      const distance = distanceNum.values[0]
+      // setBufferDistance(distanceNum.values[0])
+      bufferDistance = distanceNum.values[0]
       // geometryRel = spatialRelType.value
-      updateBuffer(distance, 'meters')
+      updateBuffer(bufferDistance, 'meters')
     }
 
     // listen to change and input events on UI components
