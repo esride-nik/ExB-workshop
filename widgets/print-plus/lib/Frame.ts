@@ -27,6 +27,7 @@ export default class Frame {
     //Create unique ID for PrintFrameDiv in case there are several PrintWidgets/Maps in the Experience
     const idPrintFrame = 'print_frame_' + new Date().getTime().toString()
     const printTargetNode = document.createElement('div', { is: idPrintFrame })
+    printTargetNode.style.pointerEvents = 'none'
     printTargetNode.style.backgroundColor = '#f00'
     printTargetNode.style.height = '150px'
     printTargetNode.style.width = '300px'
