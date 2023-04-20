@@ -20,7 +20,7 @@
 import { React, AllWidgetProps } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import { IMConfig } from '../config'
-// import * as Frame from '../../lib/ECH_PrintMore/Frame.js'
+import Frame from '../../lib/Frame'
 
 import Print from 'esri/widgets/Print'
 import PrintVM from 'esri/widgets/Print/PrintViewModel'
@@ -35,7 +35,7 @@ interface IState {
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>, IState> {
   apiWidgetContainer: React.RefObject<HTMLDivElement>
   printWidget: Print
-  // frame: Frame
+  frame: Frame
   mapView: __esri.MapView | __esri.SceneView
 
   constructor (props) {
@@ -69,8 +69,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     const state = this.props.state
 
     if (state === 'CLOSED') {
-      console.log('Clear Frame')
-      // this.frame.clear()
+      this.frame.clear()
     } else if (state === 'OPENED' && this.printWidget) {
       const layoutName = this.printWidget.templateOptions.layout
 
@@ -89,9 +88,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.mapView = jimuMapView.view
 
     this.createAPIWidget()
-    // this.frame = new Frame({
-    //   map: jimuMapView.view
-    // })
+    this.frame = new Frame(jimuMapView.view as MapView)
   }
 
   createAPIWidget () {
@@ -274,8 +271,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         spatialReference: this.mapView.extent.spatialReference
       })
 
-      console.debug('printExtent', printExtent)
-      // this.frame.update(printExtent, layout, 0)
+      this.frame.update(printExtent, layout, 0)
     } else {
       //GEOGRAPHIC
       console.log('Geographic SRS')
@@ -319,8 +315,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
         spatialReference: this.mapView.extent.spatialReference
       })
 
-      console.debug('printExtent', printExtent)
-      // this.frame.update(printExtent, layout, 0)
+      this.frame.update(printExtent, layout, 0)
     }
   }
 
@@ -352,8 +347,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       spatialReference: this.mapView.extent.spatialReference
     })
 
-    console.debug('printExtent', printExtent)
-    // this.frame.update(printExtent, null, 0)
+    this.frame.update(printExtent, null, 0)
   }
 
   render () {
@@ -364,7 +358,6 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
 
       <JimuMapViewComponent useMapWidgetId={this.props.useMapWidgetIds?.[0]} onActiveViewChange={this.onActiveViewChange}></JimuMapViewComponent>
-      <div>Halllihallo</div>
       <div ref={this.apiWidgetContainer}></div>
     </div>
   }
