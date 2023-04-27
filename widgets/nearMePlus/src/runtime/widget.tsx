@@ -136,7 +136,8 @@ export default function ({
           geometry: bufferGraphic.geometry,
           spatialRelationship: 'contains'
         })
-        console.log(flvResults)
+        const highlightHandle = featureLayerView.highlight(flvResults.features)
+        console.log(highlightHandle, flvResults)
       }
     })
 
