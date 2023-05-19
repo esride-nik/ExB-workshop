@@ -137,7 +137,7 @@ export default function ({
           spatialRelationship: 'contains'
         })
         const highlightHandle = featureLayerView.highlight(flvResults.features)
-        console.log(highlightHandle, flvResults)
+        console.log('highlight', highlightHandle, flvResults)
       }
     })
 
