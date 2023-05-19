@@ -40,6 +40,7 @@ export default function ({
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
   let featureLayerView: FeatureLayerView = null
+  let highlightHandle: __esri.Handle = null
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
@@ -136,7 +137,8 @@ export default function ({
           geometry: bufferGraphic.geometry,
           spatialRelationship: 'contains'
         })
-        const highlightHandle = featureLayerView.highlight(flvResults.features)
+        if (highlightHandle) highlightHandle.remove()
+        highlightHandle = featureLayerView.highlight(flvResults.features)
         console.log('highlight', highlightHandle, flvResults)
       }
     })
