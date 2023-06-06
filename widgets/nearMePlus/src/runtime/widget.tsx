@@ -17,7 +17,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, AllWidgetProps, FormattedMessage } from 'jimu-core'
+import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -40,7 +40,10 @@ export default function ({
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
   let featureLayerView: FeatureLayerView = null
-  let highlightHandle: __esri.Handle = null
+  // let highlightHandle: __esri.Handle = null
+  let dsManager: DataSourceManager = null
+  const selectLayerId = 'Berlin_Verkehrszeichen_1241_1265'
+  let selectLayerDs: DataSource = null
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
@@ -67,6 +70,16 @@ export default function ({
       initSlider()
       getFlView()
 
+      console.log('getting instance of DataSourceManager', DataSourceManager)
+      dsManager = DataSourceManager.getInstance()
+
+      console.log('dsManager', dsManager)
+      const dss = dsManager.getDataSourcesAsArray()
+      const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
+      console.log('dss', myDs, dss.map((d: DataSource) => [d.jimuChildId, d.id, d]))
+      selectLayerDs = dsManager.getDataSource(myDs[0].id)
+      console.log('selectLayerDs', selectLayerDs)
+
       return () => {
         if (sketchWidget) {
           sketchWidget.destroy()
@@ -77,7 +90,7 @@ export default function ({
   }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
 
   const getFlView = async () => {
-    const fl = jimuMapView.view.map.findLayerById('Berlin_Verkehrszeichen_1241_1265')
+    const fl = jimuMapView.view.map.findLayerById(selectLayerId)
     featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
   }
 
@@ -137,9 +150,24 @@ export default function ({
           geometry: bufferGraphic.geometry,
           spatialRelationship: 'contains'
         })
-        if (highlightHandle) highlightHandle.remove()
-        highlightHandle = featureLayerView.highlight(flvResults.features)
-        console.log('highlight', highlightHandle, flvResults)
+        // if (highlightHandle) highlightHandle.remove()
+        // highlightHandle = featureLayerView.highlight(flvResults.features)
+        // console.log('highlight', highlightHandle, flvResults)
+
+        const dsResult = await (selectLayerDs as any).query({
+          where: 'objectid =' + flvResults.features.map((r: Graphic) => r.getObjectId()).join(' OR objectid='),
+          geometry: bufferGraphic.geometry,
+          spatialRelationship: 'contains'
+        } as __esri.Query)
+        console.log('dsResult', dsResult)
+        const records = dsResult?.records
+
+        if (records.length > 0) {
+          selectLayerDs.selectRecordsByIds(records.map((r: any) => r.getId()), records)
+        } else {
+          selectLayerDs.clearSelection()
+        }
+        console.log('records selected', records)
       }
     })
 
