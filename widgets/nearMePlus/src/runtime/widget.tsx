@@ -36,14 +36,13 @@ export default function ({
 }: AllWidgetProps<{}>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
+  const selectLayerDs = useRef<DataSource>()
+  const dsManager = useRef<DataSourceManager>()
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
   let featureLayerView: FeatureLayerView = null
-  // let highlightHandle: __esri.Handle = null
-  let dsManager: DataSourceManager = null
-  const selectLayerId = 'Berlin_Verkehrszeichen_1241_1265'
-  let selectLayerDs: DataSource = null
+  const selectLayerId = '1892651cc25-layer-3' // Baumkataster
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
@@ -71,14 +70,16 @@ export default function ({
       getFlView()
 
       console.log('getting instance of DataSourceManager', DataSourceManager)
-      dsManager = DataSourceManager.getInstance()
+      dsManager.current = DataSourceManager.getInstance()
 
       console.log('dsManager', dsManager)
-      const dss = dsManager.getDataSourcesAsArray()
+      const dss = dsManager.current.getDataSourcesAsArray()
       const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
       console.log('dss', myDs, dss.map((d: DataSource) => [d.jimuChildId, d.id, d]))
-      selectLayerDs = dsManager.getDataSource(myDs[0].id)
-      console.log('selectLayerDs', selectLayerDs)
+      if (myDs.length > 0) {
+        selectLayerDs.current = dsManager.current.getDataSource(myDs[0].id)
+        console.log('Setting selectLayerDs', selectLayerDs.current)
+      }
 
       return () => {
         if (sketchWidget) {
@@ -145,35 +146,14 @@ export default function ({
     })
 
     distanceNum.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
-      if (evt.state === 'stop' && featureLayerView) {
-        const flvResults = await featureLayerView.queryFeatures({
-          geometry: bufferGraphic.geometry,
-          spatialRelationship: 'contains'
-        })
-        // if (highlightHandle) highlightHandle.remove()
-        // highlightHandle = featureLayerView.highlight(flvResults.features)
-        // console.log('highlight', highlightHandle, flvResults)
-
-        const dsResult = await (selectLayerDs as any).query({
-          where: 'objectid =' + flvResults.features.map((r: Graphic) => r.getObjectId()).join(' OR objectid='),
-          geometry: bufferGraphic.geometry,
-          spatialRelationship: 'contains'
-        } as __esri.Query)
-        console.log('dsResult', dsResult)
-        const records = dsResult?.records
-
-        if (records.length > 0) {
-          selectLayerDs.selectRecordsByIds(records.map((r: any) => r.getId()), records)
-        } else {
-          selectLayerDs.clearSelection()
-        }
-        console.log('records selected', records)
+      if (evt.state === 'stop' && featureLayerView && bufferGraphic.geometry !== null) {
+        updateSelection()
       }
     })
 
     // get user entered values from distance related options
     const distanceVariablesChanged = (): void => {
-    // unit = distanceUnit.value
+      // unit = distanceUnit.value
       // setBufferDistance(distanceNum.values[0])
       bufferDistance = distanceNum.values[0]
       // geometryRel = spatialRelType.value
@@ -191,9 +171,25 @@ export default function ({
     if (distance > 0 && filterGeometry) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
       updateFilter()
+      updateSelection()
     } else {
       bufferGraphic.geometry = null
       updateFilter()
+    }
+  }
+
+  const updateSelection = async (): Promise<void> => {
+    // query features within buffer
+    const flvResults = await featureLayerView.queryFeatures({
+      geometry: bufferGraphic.geometry,
+      spatialRelationship: 'contains'
+    })
+    console.log('records selected', flvResults.features)
+
+    if (flvResults.features.length > 0) {
+      selectLayerDs.current.selectRecordsByIds(flvResults.features.map((f: Graphic) => f.getObjectId().toString()))
+    } else {
+      selectLayerDs.current.clearSelection()
     }
   }
 
