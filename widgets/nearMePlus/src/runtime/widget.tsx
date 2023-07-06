@@ -72,7 +72,7 @@ export default function ({
   const getFlView = useCallback(async () => {
     const fl = jimuMapView.view.map.findLayerById(selectLayerId)
     featureLayerView.current = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
-  }, [jimuMapView.view])
+  }, [jimuMapView])
 
   const updateFilter = useCallback(() => {
     featureFilter.current = {
@@ -104,7 +104,7 @@ export default function ({
     } else {
       selectLayerDs.current.clearSelection()
     }
-  }, [bufferGraphic.geometry])
+  }, [bufferGraphic])
 
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = useCallback((distance: number, unit: __esri.LinearUnits): void => {
@@ -151,7 +151,7 @@ export default function ({
 
       jimuMapView.view.map.add(sketchGraphicsLayer.current)
     }
-  }, [bufferDistance, jimuMapView.view, sketchWidget, updateBuffer])
+  }, [bufferDistance, jimuMapView, sketchWidget, updateBuffer])
 
   const initSlider = useCallback(() => {
     const container = document.createElement('div')
