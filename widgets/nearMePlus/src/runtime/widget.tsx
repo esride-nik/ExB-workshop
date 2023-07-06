@@ -28,6 +28,7 @@ import { Geometry, Polygon } from 'esri/geometry'
 import { SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import FeatureLayerView from 'esri/views/layers/FeatureLayerView'
+import { useCallback, useMemo } from 'react'
 
 const { useState, useRef, useEffect } = React
 
@@ -38,30 +39,150 @@ export default function ({
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const selectLayerDs = useRef<DataSource>()
   const dsManager = useRef<DataSourceManager>()
+  const featureLayerView = useRef<FeatureLayerView>()
+  const sketchGraphicsLayer = useRef<GraphicsLayer>()
+  const filterGeometry = useRef<Geometry>()
+  const bufferDistance = useRef<number>()
+  const featureFilter = useRef<__esri.FeatureFilter>()
 
-  let bufferDistance = 100
-  let featureFilter: __esri.FeatureFilter = null
-  let featureLayerView: FeatureLayerView = null
+  bufferDistance.current = 100
   const selectLayerId = '1892651cc25-layer-3' // Baumkataster
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
 
-  const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
-  let filterGeometry: Geometry = null
-  const bufferGraphic = new Graphic({
-    geometry: null,
-    symbol: {
-      type: 'simple-fill',
-      color: [51, 51, 204, 0.4],
-      style: 'solid',
-      outline: {
-        color: 'white',
-        width: 1
+  sketchGraphicsLayer.current = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
+
+  const bufferGraphic = useMemo(() => {
+    return new Graphic({
+      geometry: null,
+      symbol: {
+        type: 'simple-fill',
+        color: [51, 51, 204, 0.4],
+        style: 'solid',
+        outline: {
+          color: 'white',
+          width: 1
+        }
+      } as unknown as SimpleFillSymbol
+    })
+  }, [])
+  sketchGraphicsLayer.current.add(bufferGraphic)
+
+  const getFlView = useCallback(async () => {
+    const fl = jimuMapView.view.map.findLayerById(selectLayerId)
+    featureLayerView.current = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+  }, [jimuMapView.view])
+
+  const updateFilter = useCallback(() => {
+    featureFilter.current = {
+      geometry: filterGeometry,
+      spatialRelationship: 'intersects',
+      distance: bufferDistance,
+      units: 'meters'
+    } as unknown as __esri.FeatureFilter
+    // set effect on excluded features
+    // make them gray and transparent
+    if (featureLayerView) {
+      featureLayerView.current.featureEffect = {
+        filter: featureFilter.current,
+        excludedEffect: 'grayscale(100%) opacity(30%)'
+      } as unknown as __esri.FeatureEffect
+    }
+  }, [])
+
+  const updateSelection = useCallback(async (): Promise<void> => {
+    // query features within buffer
+    const flvResults = await featureLayerView.current.queryFeatures({
+      geometry: bufferGraphic.geometry,
+      spatialRelationship: 'contains'
+    })
+    console.log('records selected', flvResults.features)
+
+    if (flvResults.features.length > 0) {
+      selectLayerDs.current.selectRecordsByIds(flvResults.features.map((f: Graphic) => f.getObjectId().toString()))
+    } else {
+      selectLayerDs.current.clearSelection()
+    }
+  }, [bufferGraphic.geometry])
+
+  // update the buffer graphic if user is filtering by distance
+  const updateBuffer = useCallback((distance: number, unit: __esri.LinearUnits): void => {
+    if (distance > 0 && filterGeometry) {
+      bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry.current, distance, unit) as Polygon
+      updateFilter()
+      updateSelection()
+    } else {
+      bufferGraphic.geometry = null
+      updateFilter()
+    }
+  }, [bufferGraphic, updateFilter, updateSelection])
+
+  const initSketch = useCallback(() => {
+    if (!sketchWidget) {
+      const container = document.createElement('div')
+      apiSketchWidgetContainer.current.appendChild(container)
+
+      const sketch = new Sketch({
+        layer: sketchGraphicsLayer.current,
+        view: jimuMapView.view,
+        container: container,
+        // graphic will be selected as soon as it is created
+        creationMode: 'update',
+        availableCreateTools: ['point', 'polyline'],
+        visibleElements: {
+          undoRedoMenu: false,
+          selectionTools: {
+            'lasso-selection': false,
+            'rectangle-selection': false
+          },
+          settingsMenu: false,
+          snappingControls: false
+        }
+      })
+
+      sketch.on('create', (evt: __esri.SketchCreateEvent) => {
+        if (evt.state === 'complete') {
+          console.log('CREATE', evt)
+          filterGeometry.current = evt.graphic.geometry as Geometry
+          updateBuffer(bufferDistance.current, 'meters')
+        }
+      })
+
+      jimuMapView.view.map.add(sketchGraphicsLayer.current)
+    }
+  }, [bufferDistance, jimuMapView.view, sketchWidget, updateBuffer])
+
+  const initSlider = useCallback(() => {
+    const container = document.createElement('div')
+    apiSliderWidgetContainer.current.appendChild(container)
+    const distanceNum = new Slider({
+      container: apiSliderWidgetContainer.current,
+      min: 0,
+      max: 1000,
+      values: [bufferDistance.current],
+      steps: 1,
+      visibleElements: {
+        rangeLabels: true,
+        labels: true
       }
-    } as unknown as SimpleFillSymbol
-  })
-  sketchGraphicsLayer.add(bufferGraphic)
+    })
+
+    distanceNum.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
+      if (evt.state === 'stop' && featureLayerView && bufferGraphic.geometry !== null) {
+        updateSelection()
+      }
+    })
+
+    // get user entered values from distance related options
+    const distanceVariablesChanged = (): void => {
+      bufferDistance.current = distanceNum.values[0]
+      updateBuffer(bufferDistance.current, 'meters')
+    }
+
+    // listen to change and input events on UI components
+    distanceNum.on('thumb-drag', distanceVariablesChanged)
+  }, [])
 
   useEffect(() => {
     if (jimuMapView && apiSketchWidgetContainer.current) {
@@ -88,127 +209,7 @@ export default function ({
         }
       }
     }
-  }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
-
-  const getFlView = async () => {
-    const fl = jimuMapView.view.map.findLayerById(selectLayerId)
-    featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
-  }
-
-  const initSketch = () => {
-    if (!sketchWidget) {
-      const container = document.createElement('div')
-      apiSketchWidgetContainer.current.appendChild(container)
-
-      const sketch = new Sketch({
-        layer: sketchGraphicsLayer,
-        view: jimuMapView.view,
-        container: container,
-        // graphic will be selected as soon as it is created
-        creationMode: 'update',
-        availableCreateTools: ['point', 'polyline'],
-        visibleElements: {
-          undoRedoMenu: false,
-          selectionTools: {
-            'lasso-selection': false,
-            'rectangle-selection': false
-          },
-          settingsMenu: false,
-          snappingControls: false
-        }
-      })
-
-      sketch.on('create', (evt: __esri.SketchCreateEvent) => {
-        if (evt.state === 'complete') {
-          console.log('CREATE', evt)
-          filterGeometry = evt.graphic.geometry as Geometry
-          updateBuffer(bufferDistance, 'meters')
-        }
-      })
-
-      jimuMapView.view.map.add(sketchGraphicsLayer)
-    }
-  }
-
-  const initSlider = () => {
-    const container = document.createElement('div')
-    apiSliderWidgetContainer.current.appendChild(container)
-    const distanceNum = new Slider({
-      container: apiSliderWidgetContainer.current,
-      min: 0,
-      max: 1000,
-      values: [bufferDistance],
-      steps: 1,
-      visibleElements: {
-        rangeLabels: true,
-        labels: true
-      }
-    })
-
-    distanceNum.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
-      if (evt.state === 'stop' && featureLayerView && bufferGraphic.geometry !== null) {
-        updateSelection()
-      }
-    })
-
-    // get user entered values from distance related options
-    const distanceVariablesChanged = (): void => {
-      // unit = distanceUnit.value
-      // setBufferDistance(distanceNum.values[0])
-      bufferDistance = distanceNum.values[0]
-      // geometryRel = spatialRelType.value
-      updateBuffer(bufferDistance, 'meters')
-    }
-
-    // listen to change and input events on UI components
-    distanceNum.on('thumb-drag', distanceVariablesChanged)
-    // distanceUnit.onchange = distanceVariablesChanged
-    // spatialRelType.onchange = distanceVariablesChanged
-  }
-
-  // update the buffer graphic if user is filtering by distance
-  const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
-    if (distance > 0 && filterGeometry) {
-      bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
-      updateFilter()
-      updateSelection()
-    } else {
-      bufferGraphic.geometry = null
-      updateFilter()
-    }
-  }
-
-  const updateSelection = async (): Promise<void> => {
-    // query features within buffer
-    const flvResults = await featureLayerView.queryFeatures({
-      geometry: bufferGraphic.geometry,
-      spatialRelationship: 'contains'
-    })
-    console.log('records selected', flvResults.features)
-
-    if (flvResults.features.length > 0) {
-      selectLayerDs.current.selectRecordsByIds(flvResults.features.map((f: Graphic) => f.getObjectId().toString()))
-    } else {
-      selectLayerDs.current.clearSelection()
-    }
-  }
-
-  const updateFilter = () => {
-    featureFilter = {
-      geometry: filterGeometry,
-      spatialRelationship: 'intersects',
-      distance: bufferDistance,
-      units: 'meters'
-    } as unknown as __esri.FeatureFilter
-    // set effect on excluded features
-    // make them gray and transparent
-    if (featureLayerView) {
-      featureLayerView.featureEffect = {
-        filter: featureFilter,
-        excludedEffect: 'grayscale(100%) opacity(30%)'
-      } as unknown as __esri.FeatureEffect
-    }
-  }
+  }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer, initSketch, initSlider, getFlView])
 
   const onActiveViewChange = (jmv: JimuMapView) => {
     if (jimuMapView && sketchWidget) {
