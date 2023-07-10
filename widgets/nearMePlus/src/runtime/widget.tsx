@@ -17,7 +17,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource } from 'jimu-core'
+import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, QueriableDataSource, SqlQueryParams, DataRecord } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -38,12 +38,15 @@ export default function ({
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const selectLayerDs = useRef<DataSource>()
+  const queryableLayerDs = useRef<QueriableDataSource>()
   const dsManager = useRef<DataSourceManager>()
   const featureLayerView = useRef<FeatureLayerView>()
   const sketchGraphicsLayer = useRef<GraphicsLayer>()
   const filterGeometry = useRef<Geometry>()
   const bufferDistance = useRef<number>()
   const featureFilter = useRef<__esri.FeatureFilter>()
+  // DataSourceView
+  const dsv = useRef<QueriableDataSource[]>()
 
   bufferDistance.current = 100
   const selectLayerId = '1892651cc25-layer-3' // Baumkataster
@@ -100,21 +103,59 @@ export default function ({
     console.log('records selected', flvResults.features)
 
     if (flvResults.features.length > 0) {
-      selectLayerDs.current.selectRecordsByIds(flvResults.features.map((f: Graphic) => f.getObjectId().toString()))
+      const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
+      const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
+      const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
+      console.log('objectIdsWhere', objectIdsWhere)
+      // selectLayerDs.current.selectRecordsByIds(flvResults.features.map((f: Graphic) => f.getObjectId().toString()))
+
+      // queryableLayerDs.current.load()
+
+      // const dataRecord = await queryableLayerDs.current.loadById(objectIdStrings[0])
+      console.log('useMapWidgetIds', useMapWidgetIds[0])
+      queryableLayerDs.current.updateQueryParams({
+        where: objectIdsWhere
+      } as SqlQueryParams, useMapWidgetIds[0])
+      console.log('getRealQueryParams', queryableLayerDs.current.getRealQueryParams({
+        page: 0,
+        pageSize: 100
+      }, 'query'))
+      const dataRecord = await queryableLayerDs.current.load({
+        page: 0,
+        pageSize: 100
+      }, {
+        widgetId: useMapWidgetIds[0]
+      })
+      const drIds = dataRecord.map((d: DataRecord) => d.getId())
+      console.log('drIds', drIds)
+      queryableLayerDs.current.selectRecordsByIds(drIds)
+      // queryableLayerDs.current.updateSelectionInfo([objectIdStrings[0]], queryableLayerDs.current, true)
+      console.log('Status loaded', queryableLayerDs.current.getStatus(), dataRecord)
+      // TODO: after app reload, features appear selected
+
+      // const dataRecord = await dsv.current[0].loadById(objectIdStrings[0])
+      // while (dsv.current[0].getStatus() !== 'LOADED') {
+      //   console.log('Status check', dsv.current[0].getStatus())
+      // }
+      // console.log('Status loaded', dsv.current[0].getStatus(), dataRecord)
+
+      // dsv.current[0].selectRecordsByIds(objectIdStrings)
+      // dsv.current[0].updateSelectionInfo(objectIdStrings, queryableLayerDs.current, true)
     } else {
-      selectLayerDs.current.clearSelection()
+      // selectLayerDs.current.clearSelection()
+      queryableLayerDs.current.clearSelection()
     }
   }, [bufferGraphic])
 
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = useCallback((distance: number, unit: __esri.LinearUnits): void => {
-    if (distance > 0 && filterGeometry) {
+    if (distance > 0 && filterGeometry.current !== undefined) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry.current, distance, unit) as Polygon
       updateFilter()
       updateSelection()
     } else {
       bufferGraphic.geometry = null
-      updateFilter()
+      featureFilter.current = null
     }
   }, [bufferGraphic, updateFilter, updateSelection])
 
@@ -182,7 +223,7 @@ export default function ({
 
     // listen to change and input events on UI components
     distanceNum.on('thumb-drag', distanceVariablesChanged)
-  }, [])
+  }, [bufferGraphic, updateBuffer, updateSelection])
 
   useEffect(() => {
     if (jimuMapView && apiSketchWidgetContainer.current) {
@@ -198,8 +239,11 @@ export default function ({
       const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
       console.log('dss', myDs, dss.map((d: DataSource) => [d.jimuChildId, d.id, d]))
       if (myDs.length > 0) {
-        selectLayerDs.current = dsManager.current.getDataSource(myDs[0].id)
-        console.log('Setting selectLayerDs', selectLayerDs.current)
+        // selectLayerDs.current = dsManager.current.getDataSource(myDs[0].id)
+        queryableLayerDs.current = dsManager.current.getDataSource(myDs[0].id) as QueriableDataSource
+        console.log('Setting queryableLayerDs', queryableLayerDs.current)
+        dsv.current = queryableLayerDs.current.getDataViews()
+        console.log('queryableLayerDs dsv', dsv.current)
       }
 
       return () => {
