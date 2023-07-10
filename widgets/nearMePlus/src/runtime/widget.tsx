@@ -48,7 +48,7 @@ export default function ({
   // DataSourceView
   const dsv = useRef<QueriableDataSource[]>()
 
-  bufferDistance.current = 100
+  bufferDistance.current = 30
   const selectLayerId = '1892651cc25-layer-3' // Baumkataster
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
@@ -107,11 +107,7 @@ export default function ({
       const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
       const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
       console.log('objectIdsWhere', objectIdsWhere)
-      // selectLayerDs.current.selectRecordsByIds(flvResults.features.map((f: Graphic) => f.getObjectId().toString()))
-
-      // queryableLayerDs.current.load()
-
-      // const dataRecord = await queryableLayerDs.current.loadById(objectIdStrings[0])
+      
       console.log('useMapWidgetIds', useMapWidgetIds[0])
       queryableLayerDs.current.updateQueryParams({
         where: objectIdsWhere
@@ -120,18 +116,23 @@ export default function ({
         page: 0,
         pageSize: 100
       }, 'query'))
-      const dataRecord = await queryableLayerDs.current.load({
-        page: 0,
-        pageSize: 100
-      }, {
-        widgetId: useMapWidgetIds[0]
-      })
-      const drIds = dataRecord.map((d: DataRecord) => d.getId())
-      console.log('drIds', drIds)
-      queryableLayerDs.current.selectRecordsByIds(drIds)
-      // queryableLayerDs.current.updateSelectionInfo([objectIdStrings[0]], queryableLayerDs.current, true)
-      console.log('Status loaded', queryableLayerDs.current.getStatus(), dataRecord)
+      queryableLayerDs.current.selectRecordsByIds(objectIdStrings)
+
+
+      // const queryResult = await queryableLayerDs.current.query({
+      //   page: 0,
+      //   pageSize: 100
+      // }, {
+      //   widgetId: useMapWidgetIds[0]
+      // })
+      // const drIds = queryResult.records.map((d: DataRecord) => d.getId())
+      // console.log('drIds', drIds)
+      // queryableLayerDs.current.selectRecordsByIds(drIds)
+      // // queryableLayerDs.current.updateSelectionInfo([objectIdStrings[0]], queryableLayerDs.current, true)
+      // console.log('Status loaded', queryableLayerDs.current.getStatus(), queryResult.records)
       // TODO: after app reload, features appear selected
+
+
 
       // const dataRecord = await dsv.current[0].loadById(objectIdStrings[0])
       // while (dsv.current[0].getStatus() !== 'LOADED') {
