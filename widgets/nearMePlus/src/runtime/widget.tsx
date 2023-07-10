@@ -17,7 +17,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, QueriableDataSource, SqlQueryParams, DataRecord, MessageManager, DataRecordsSelectionChangeMessage } from 'jimu-core'
+import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, QueriableDataSource, SqlQueryParams, DataRecord, FeatureLayerQueryParams } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -38,7 +38,7 @@ export default function ({
 }: AllWidgetProps<{}>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
-  const selectLayerDs = useRef<DataSource>()
+  // const selectLayerDs = useRef<DataSource>()
   const queryableLayerDs = useRef<QueriableDataSource>()
   const dsManager = useRef<DataSourceManager>()
   const featureLayerView = useRef<FeatureLayerView>()
@@ -95,7 +95,7 @@ export default function ({
     }
   }, [])
 
-  const executeQueryStuff = useCallback(async (flvResults: FeatureSet, ds: QueriableDataSource): Promise<void> => { //DataRecord[]> => {
+  const executeAttributiveQuery = useCallback(async (flvResults: FeatureSet, ds: QueriableDataSource): Promise<void> => { //DataRecord[]> => {
     const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
     const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
     const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
@@ -131,8 +131,46 @@ export default function ({
     // return records
   }, [useMapWidgetIds])
 
+  const executeSpatialQuery = useCallback(async (buffer: __esri.Geometry, ds: QueriableDataSource): Promise<void> => { //DataRecord[]> => {
+    // selection works with previous load, but this also applies a definition expression => it's not what we want! :(
+    const queryResult = await ds.load({
+      page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
+      pageSize: 100,
+      geometry: buffer
+    } as FeatureLayerQueryParams, {
+      widgetId: useMapWidgetIds[0]
+    })
+    console.log('Status loaded', ds.getStatus(), queryResult)
+
+    const drIds = queryResult.map((d: DataRecord) => d.getId())
+    console.log('drIds', drIds)
+
+    // this causes the features to appear selected on the map. nothing else.
+    ds.selectRecordsByIds(drIds) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
+    ds.updateSelectionInfo(drIds, ds, false)
+
+    // No need for the message to notify other widgets of the selection change
+    // const records = ds.getSelectedRecords()
+    // console.log('records', records)
+    // MessageManager.getInstance().publishMessage(
+    //   new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
+    // )
+
+    console.log('selection dataview?', queryableLayerDs.current.getDataViews())
+
+    // return records
+  }, [useMapWidgetIds])
+
   const updateSelection = useCallback(async (): Promise<void> => {
     // query features within buffer
+    if (bufferGraphic?.geometry !== undefined) {
+      const r = await executeSpatialQuery(bufferGraphic.geometry, queryableLayerDs.current)
+      console.log('r', r)
+    } else {
+      queryableLayerDs.current.clearSelection()
+    }
+
+    // query features within buffer => attributive query
     const flvResults = await featureLayerView.current.queryFeatures({
       geometry: bufferGraphic.geometry,
       spatialRelationship: 'contains'
@@ -140,23 +178,12 @@ export default function ({
     console.log('records selected', flvResults.features)
 
     if (flvResults.features.length > 0) {
-      const r = await executeQueryStuff(flvResults, queryableLayerDs.current)
+      const r = await executeAttributiveQuery(flvResults, queryableLayerDs.current)
       console.log('r', r)
-      // TODO: after app reload, features appear selected
-
-      // const dataRecord = await dsv.current[0].loadById(objectIdStrings[0])
-      // while (dsv.current[0].getStatus() !== 'LOADED') {
-      //   console.log('Status check', dsv.current[0].getStatus())
-      // }
-      // console.log('Status loaded', dsv.current[0].getStatus(), dataRecord)
-
-      // dsv.current[0].selectRecordsByIds(objectIdStrings)
-      // dsv.current[0].updateSelectionInfo(objectIdStrings, queryableLayerDs.current, true)
     } else {
-      // selectLayerDs.current.clearSelection()
       queryableLayerDs.current.clearSelection()
     }
-  }, [bufferGraphic, executeQueryStuff])
+  }, [bufferGraphic, executeAttributiveQuery])
 
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = useCallback((distance: number, unit: __esri.LinearUnits): void => {
