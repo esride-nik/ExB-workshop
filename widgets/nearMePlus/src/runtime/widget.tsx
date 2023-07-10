@@ -17,7 +17,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, QueriableDataSource, SqlQueryParams, DataRecord } from 'jimu-core'
+import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, QueriableDataSource, SqlQueryParams, DataRecord, MessageManager, DataRecordsSelectionChangeMessage } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -102,28 +102,39 @@ export default function ({
     console.log('objectIdsWhere', objectIdsWhere)
     console.log('useMapWidgetIds', useMapWidgetIds[0])
 
-    ds.updateQueryParams({
-      where: objectIdsWhere
-    } as SqlQueryParams, useMapWidgetIds[0])
-    console.log('getRealQueryParams', ds.getRealQueryParams({
-      page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
-      pageSize: 100
-    }, 'query'))
+    // ds.updateQueryParams({
+    //   where: objectIdsWhere
+    // } as SqlQueryParams, useMapWidgetIds[0])
+    // console.log('getRealQueryParams', ds.getRealQueryParams({
+    //   page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
+    //   pageSize: 100
+    // }, 'query'))
 
-    const queryResult = await ds.query({
+    const queryResult = await ds.load({
       page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
-      pageSize: 100
-    }, {
+      pageSize: 100,
+      where: objectIdsWhere
+    } as SqlQueryParams, {
       widgetId: useMapWidgetIds[0]
     })
-    console.log('Status loaded', ds.getStatus(), queryResult.records)
+    console.log('Status loaded', ds.getStatus(), queryResult)
 
-    const drIds = queryResult.records.map((d: DataRecord) => d.getId())
-    console.log('drIds', drIds)
-    ds.selectRecordsByIds(drIds)
-    ds.updateSelectionInfo(drIds, ds, true)
+    // const drIds = queryResult.records.map((d: DataRecord) => d.getId())
+    // console.log('drIds', drIds)
 
-    return queryResult.records
+    // this causes the features to appear selected on the map. nothing else.
+    ds.selectRecordsByIds(objectIdStrings) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
+    ds.updateSelectionInfo(objectIdStrings, ds, false)
+
+    const records = ds.getSelectedRecords()
+    console.log('records', records)
+    MessageManager.getInstance().publishMessage(
+      new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
+    )
+
+    console.log('selection dataview?', queryableLayerDs.current.getDataViews())
+
+    return records
   }, [useMapWidgetIds])
 
   const updateSelection = useCallback(async (): Promise<void> => {
