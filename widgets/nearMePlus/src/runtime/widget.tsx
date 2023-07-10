@@ -29,6 +29,7 @@ import { SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import FeatureLayerView from 'esri/views/layers/FeatureLayerView'
 import { useCallback, useMemo } from 'react'
+import FeatureSet from 'esri/rest/support/FeatureSet'
 
 const { useState, useRef, useEffect } = React
 
@@ -94,6 +95,37 @@ export default function ({
     }
   }, [])
 
+  const executeQueryStuff = useCallback(async (flvResults: FeatureSet, ds: QueriableDataSource): Promise<DataRecord[]> => {
+    const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
+    const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
+    const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
+    console.log('objectIdsWhere', objectIdsWhere)
+    console.log('useMapWidgetIds', useMapWidgetIds[0])
+
+    ds.updateQueryParams({
+      where: objectIdsWhere
+    } as SqlQueryParams, useMapWidgetIds[0])
+    console.log('getRealQueryParams', ds.getRealQueryParams({
+      page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
+      pageSize: 100
+    }, 'query'))
+
+    const queryResult = await ds.query({
+      page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
+      pageSize: 100
+    }, {
+      widgetId: useMapWidgetIds[0]
+    })
+    console.log('Status loaded', ds.getStatus(), queryResult.records)
+
+    const drIds = queryResult.records.map((d: DataRecord) => d.getId())
+    console.log('drIds', drIds)
+    ds.selectRecordsByIds(drIds)
+    ds.updateSelectionInfo(drIds, ds, true)
+
+    return queryResult.records
+  }, [useMapWidgetIds])
+
   const updateSelection = useCallback(async (): Promise<void> => {
     // query features within buffer
     const flvResults = await featureLayerView.current.queryFeatures({
@@ -103,36 +135,9 @@ export default function ({
     console.log('records selected', flvResults.features)
 
     if (flvResults.features.length > 0) {
-      const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
-      const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
-      const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
-      console.log('objectIdsWhere', objectIdsWhere)
-      
-      console.log('useMapWidgetIds', useMapWidgetIds[0])
-      queryableLayerDs.current.updateQueryParams({
-        where: objectIdsWhere
-      } as SqlQueryParams, useMapWidgetIds[0])
-      console.log('getRealQueryParams', queryableLayerDs.current.getRealQueryParams({
-        page: 0,
-        pageSize: 100
-      }, 'query'))
-      queryableLayerDs.current.selectRecordsByIds(objectIdStrings)
-
-
-      // const queryResult = await queryableLayerDs.current.query({
-      //   page: 0,
-      //   pageSize: 100
-      // }, {
-      //   widgetId: useMapWidgetIds[0]
-      // })
-      // const drIds = queryResult.records.map((d: DataRecord) => d.getId())
-      // console.log('drIds', drIds)
-      // queryableLayerDs.current.selectRecordsByIds(drIds)
-      // // queryableLayerDs.current.updateSelectionInfo([objectIdStrings[0]], queryableLayerDs.current, true)
-      // console.log('Status loaded', queryableLayerDs.current.getStatus(), queryResult.records)
+      const r = await executeQueryStuff(flvResults, queryableLayerDs.current)
+      console.log('r', r)
       // TODO: after app reload, features appear selected
-
-
 
       // const dataRecord = await dsv.current[0].loadById(objectIdStrings[0])
       // while (dsv.current[0].getStatus() !== 'LOADED') {
@@ -146,7 +151,7 @@ export default function ({
       // selectLayerDs.current.clearSelection()
       queryableLayerDs.current.clearSelection()
     }
-  }, [bufferGraphic])
+  }, [bufferGraphic, executeQueryStuff])
 
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = useCallback((distance: number, unit: __esri.LinearUnits): void => {
