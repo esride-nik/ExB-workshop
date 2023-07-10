@@ -95,21 +95,14 @@ export default function ({
     }
   }, [])
 
-  const executeQueryStuff = useCallback(async (flvResults: FeatureSet, ds: QueriableDataSource): Promise<DataRecord[]> => {
+  const executeQueryStuff = useCallback(async (flvResults: FeatureSet, ds: QueriableDataSource): Promise<void> => { //DataRecord[]> => {
     const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
     const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
     const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
     console.log('objectIdsWhere', objectIdsWhere)
     console.log('useMapWidgetIds', useMapWidgetIds[0])
 
-    // ds.updateQueryParams({
-    //   where: objectIdsWhere
-    // } as SqlQueryParams, useMapWidgetIds[0])
-    // console.log('getRealQueryParams', ds.getRealQueryParams({
-    //   page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
-    //   pageSize: 100
-    // }, 'query'))
-
+    // selection works with previous load, but this also applies a definition expression => it's not what we want! :(
     const queryResult = await ds.load({
       page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
       pageSize: 100,
@@ -126,15 +119,16 @@ export default function ({
     ds.selectRecordsByIds(objectIdStrings) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
     ds.updateSelectionInfo(objectIdStrings, ds, false)
 
-    const records = ds.getSelectedRecords()
-    console.log('records', records)
-    MessageManager.getInstance().publishMessage(
-      new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
-    )
+    // No need for the message to notify other widgets of the selection change
+    // const records = ds.getSelectedRecords()
+    // console.log('records', records)
+    // MessageManager.getInstance().publishMessage(
+    //   new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
+    // )
 
     console.log('selection dataview?', queryableLayerDs.current.getDataViews())
 
-    return records
+    // return records
   }, [useMapWidgetIds])
 
   const updateSelection = useCallback(async (): Promise<void> => {
