@@ -132,43 +132,35 @@ export default function ({
   }, [useMapWidgetIds])
 
   const executeSpatialQuery = useCallback(async (buffer: __esri.Geometry, ds: QueriableDataSource): Promise<void> => { //DataRecord[]> => {
-    // selection works with previous load, but this also applies a definition expression => it's not what we want! :(
-    const queryResult = await ds.load({
+    // TODO: BUG? geometry parameter does not work!
+    const queryResult = await ds.query({
       page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
       pageSize: 100,
-      geometry: buffer
+      geometry: buffer,
+      geometryType: 'esriGeometryPolygon',
+      returnGeometry: true
     } as FeatureLayerQueryParams, {
       widgetId: useMapWidgetIds[0]
     })
     console.log('Status loaded', ds.getStatus(), queryResult)
 
-    const drIds = queryResult.map((d: DataRecord) => d.getId())
+    const drIds = queryResult.records.map((d: DataRecord) => d.getId())
     console.log('drIds', drIds)
 
     // this causes the features to appear selected on the map. nothing else.
     ds.selectRecordsByIds(drIds) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
     ds.updateSelectionInfo(drIds, ds, false)
-
-    // No need for the message to notify other widgets of the selection change
-    // const records = ds.getSelectedRecords()
-    // console.log('records', records)
-    // MessageManager.getInstance().publishMessage(
-    //   new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
-    // )
-
-    console.log('selection dataview?', queryableLayerDs.current.getDataViews())
-
-    // return records
   }, [useMapWidgetIds])
 
   const updateSelection = useCallback(async (): Promise<void> => {
-    // query features within buffer
-    if (bufferGraphic?.geometry !== undefined) {
-      const r = await executeSpatialQuery(bufferGraphic.geometry, queryableLayerDs.current)
-      console.log('r', r)
-    } else {
-      queryableLayerDs.current.clearSelection()
-    }
+    // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work!
+    // // query features within buffer
+    // if (bufferGraphic?.geometry !== undefined) {
+    //   const r = await executeSpatialQuery(bufferGraphic.geometry, queryableLayerDs.current)
+    //   console.log('r', r)
+    // } else {
+    //   queryableLayerDs.current.clearSelection()
+    // }
 
     // query features within buffer => attributive query
     const flvResults = await featureLayerView.current.queryFeatures({
