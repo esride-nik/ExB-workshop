@@ -17,7 +17,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, SqlQueryParams, DataRecord, FeatureLayerQueryParams } from 'jimu-core'
+import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, SqlQueryParams, DataRecord, FeatureLayerQueryParams, MessageManager, DataRecordsSelectionChangeMessage } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView, FeatureLayerDataSource } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -103,11 +103,13 @@ export default function ({
     if (flvResults.features.length > 0) {
       const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
       const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
-      const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
+
+      // TODO: idea: add 'OR 1=1' to definitely load the geometries in the buffer but also keep everything else on the map => selection not transferred to other widgets anymore
+      const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`// OR 1=1`
       console.log('objectIdsWhere', objectIdsWhere)
       console.log('useMapWidgetIds', useMapWidgetIds[0])
 
-      // selection works with previous load, but this also applies a definition expression => it's not what we want! :(
+      // TODO: selection works with previous load, but this also applies a definition expression => it's not what we want! :(
       const queryResult = await ds.load({
         page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
         pageSize: 100,
@@ -117,25 +119,30 @@ export default function ({
       })
       console.log('Status loaded', ds.getStatus(), queryResult)
 
-      // const drIds = queryResult.records.map((d: DataRecord) => d.getId())
-      // console.log('drIds', drIds)
+      // TODO: Doesn't seem to do anything.
+      // ds.updateQueryParams({
+      //   page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
+      //   pageSize: 100,
+      //   where: objectIdsWhere
+      // } as SqlQueryParams, useMapWidgetIds[0])
+      // console.log('Count', ds.count, ds.getCountStatus())
 
       // this causes the features to appear selected on the map. nothing else.
       ds.selectRecordsByIds(objectIdStrings) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
-      ds.updateSelectionInfo(objectIdStrings, ds, false)
 
-      // No need for the message to notify other widgets of the selection change
-      // const records = ds.getSelectedRecords()
-      // console.log('records', records)
-      // MessageManager.getInstance().publishMessage(
-      //   new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
-      // )
+      // TODO: Doesn't seem to do anything.
+      // ds.updateSelectionInfo(objectIdStrings, ds, false)
+
+      // TODO: What is this message for? Doesn't seem to notify anyone when I don't perform the previous load.
+      const records = ds.getSelectedRecords()
+      console.log('records', records)
+      MessageManager.getInstance().publishMessage(
+        new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
+      )
 
       console.log('selection dataview?', flDs.current.getDataViews())
-
-    // return records
     }
-  }, [useMapWidgetIds])
+  }, [bufferGraphic, useMapWidgetIds])
 
   const executeSpatialQuery = useCallback(async (buffer: __esri.Geometry, ds: FeatureLayerDataSource): Promise<void> => {
     // TODO: BUG? geometry parameter on QueryableDataSource does not work!
@@ -159,8 +166,8 @@ export default function ({
   const updateSelection = useCallback(async (): Promise<void> => {
     if (bufferGraphic?.geometry !== undefined) {
       // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work! Same when pushing in the DataView instead of DataSource.
-      const r = await executeSpatialQuery(bufferGraphic.geometry, flDs.current)
-      // const r = await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
+      // const r = await executeSpatialQuery(bufferGraphic.geometry, flDs.current)
+      const r = await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
       console.log('r', r)
     } else {
       flDs.current.clearSelection()
