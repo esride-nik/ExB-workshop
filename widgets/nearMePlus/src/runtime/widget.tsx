@@ -92,7 +92,7 @@ export default function ({
     }
   }, [])
 
-  const executeAttributiveQuery = useCallback(async (buffer: __esri.Geometry, ds: FeatureLayerDataSource): Promise<void> => {
+  const executeAttributiveQuery = useCallback(async (buffer: __esri.Geometry, ds: FeatureLayerDataSource, getAll: boolean = false): Promise<void> => {
     // query features within buffer => attributive query
     const flvResults = await featureLayerView.current.queryFeatures({
       geometry: bufferGraphic.geometry,
@@ -105,7 +105,7 @@ export default function ({
       const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
 
       // TODO: idea: add 'OR 1=1' to definitely load the geometries in the buffer but also keep everything else on the map => selection not transferred to other widgets anymore
-      const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`// OR 1=1`
+      const objectIdsWhere = getAll ? '1=1' : `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`// OR 1=1`
       console.log('objectIdsWhere', objectIdsWhere)
       console.log('useMapWidgetIds', useMapWidgetIds[0])
 
@@ -134,13 +134,11 @@ export default function ({
       // ds.updateSelectionInfo(objectIdStrings, ds, false)
 
       // TODO: What is this message for? Doesn't seem to notify anyone when I don't perform the previous load.
-      const records = ds.getSelectedRecords()
-      console.log('records', records)
-      MessageManager.getInstance().publishMessage(
-        new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
-      )
-
-      console.log('selection dataview?', flDs.current.getDataViews())
+      // const records = ds.getSelectedRecords()
+      // console.log('records', records)
+      // MessageManager.getInstance().publishMessage(
+      //   new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
+      // )
     }
   }, [bufferGraphic, useMapWidgetIds])
 
@@ -165,10 +163,11 @@ export default function ({
 
   const updateSelection = useCallback(async (): Promise<void> => {
     if (bufferGraphic?.geometry !== undefined) {
+      flDs.current.clearSelection()
+      await executeAttributiveQuery(bufferGraphic.geometry, flDs.current, true)
       // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work! Same when pushing in the DataView instead of DataSource.
-      // const r = await executeSpatialQuery(bufferGraphic.geometry, flDs.current)
-      const r = await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
-      console.log('r', r)
+      // await executeSpatialQuery(bufferGraphic.geometry, flDs.current)
+      await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
     } else {
       flDs.current.clearSelection()
     }
