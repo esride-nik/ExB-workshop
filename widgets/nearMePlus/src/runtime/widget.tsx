@@ -137,7 +137,7 @@ export default function ({
     }
   }, [useMapWidgetIds])
 
-  const executeSpatialQuery = useCallback(async (buffer: __esri.Geometry, ds: FeatureLayerDataSource): Promise<void> => { //DataRecord[]> => {
+  const executeSpatialQuery = useCallback(async (buffer: __esri.Geometry, ds: FeatureLayerDataSource): Promise<void> => {
     // TODO: BUG? geometry parameter on QueryableDataSource does not work!
     const queryResult = await ds.query({
       page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
@@ -154,11 +154,11 @@ export default function ({
     // this causes the features to appear selected on the map. nothing else.
     ds.selectRecordsByIds(drIds) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
     ds.updateSelectionInfo(drIds, ds, false)
-  }, [useMapWidgetIds])
+  }, [])
 
   const updateSelection = useCallback(async (): Promise<void> => {
     if (bufferGraphic?.geometry !== undefined) {
-      // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work!
+      // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work! Same when pushing in the DataView instead of DataSource.
       const r = await executeSpatialQuery(bufferGraphic.geometry, flDs.current)
       // const r = await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
       console.log('r', r)
