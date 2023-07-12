@@ -18,7 +18,7 @@
   LICENSE file.
 */
 import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, QueriableDataSource, SqlQueryParams, DataRecord, FeatureLayerQueryParams } from 'jimu-core'
-import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
+import { JimuMapViewComponent, JimuMapView, FeatureLayerDataSource } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
@@ -38,16 +38,14 @@ export default function ({
 }: AllWidgetProps<{}>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
-  // const selectLayerDs = useRef<DataSource>()
-  const queryableLayerDs = useRef<QueriableDataSource>()
+  const flDs = useRef<FeatureLayerDataSource>()
+  const flDv = useRef<FeatureLayerDataSource[]>() // DataView
   const dsManager = useRef<DataSourceManager>()
   const featureLayerView = useRef<FeatureLayerView>()
   const sketchGraphicsLayer = useRef<GraphicsLayer>()
   const filterGeometry = useRef<Geometry>()
   const bufferDistance = useRef<number>()
   const featureFilter = useRef<__esri.FeatureFilter>()
-  // DataSourceView
-  const dsv = useRef<QueriableDataSource[]>()
 
   bufferDistance.current = 30
   const selectLayerId = '1892651cc25-layer-3' // Baumkataster
@@ -95,53 +93,60 @@ export default function ({
     }
   }, [])
 
-  const executeAttributiveQuery = useCallback(async (flvResults: FeatureSet, ds: QueriableDataSource): Promise<void> => { //DataRecord[]> => {
-    const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
-    const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
-    const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
-    console.log('objectIdsWhere', objectIdsWhere)
-    console.log('useMapWidgetIds', useMapWidgetIds[0])
-
-    // selection works with previous load, but this also applies a definition expression => it's not what we want! :(
-    const queryResult = await ds.load({
-      page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
-      pageSize: 100,
-      where: objectIdsWhere
-    } as SqlQueryParams, {
-      widgetId: useMapWidgetIds[0]
+  const executeAttributiveQuery = useCallback(async (buffer: __esri.Geometry, ds: FeatureLayerDataSource): Promise<void> => {
+    // query features within buffer => attributive query
+    const flvResults = await featureLayerView.current.queryFeatures({
+      geometry: bufferGraphic.geometry,
+      spatialRelationship: 'contains'
     })
-    console.log('Status loaded', ds.getStatus(), queryResult)
+    console.log('records selected', flvResults.features)
 
-    // const drIds = queryResult.records.map((d: DataRecord) => d.getId())
-    // console.log('drIds', drIds)
+    if (flvResults.features.length > 0) {
+      const objectIdStrings = flvResults.features.map((f: Graphic) => f.getObjectId().toString())
+      const objectIds = flvResults.features.map((f: Graphic) => f.getObjectId())
+      const objectIdsWhere = `OBJECTID = ${objectIds.join(' OR OBJECTID = ')}`
+      console.log('objectIdsWhere', objectIdsWhere)
+      console.log('useMapWidgetIds', useMapWidgetIds[0])
 
-    // this causes the features to appear selected on the map. nothing else.
-    ds.selectRecordsByIds(objectIdStrings) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
-    ds.updateSelectionInfo(objectIdStrings, ds, false)
+      // selection works with previous load, but this also applies a definition expression => it's not what we want! :(
+      const queryResult = await ds.load({
+        page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
+        pageSize: 100,
+        where: objectIdsWhere
+      } as SqlQueryParams, {
+        widgetId: useMapWidgetIds[0]
+      })
+      console.log('Status loaded', ds.getStatus(), queryResult)
 
-    // No need for the message to notify other widgets of the selection change
-    // const records = ds.getSelectedRecords()
-    // console.log('records', records)
-    // MessageManager.getInstance().publishMessage(
-    //   new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
-    // )
+      // const drIds = queryResult.records.map((d: DataRecord) => d.getId())
+      // console.log('drIds', drIds)
 
-    console.log('selection dataview?', queryableLayerDs.current.getDataViews())
+      // this causes the features to appear selected on the map. nothing else.
+      ds.selectRecordsByIds(objectIdStrings) // mysterious from the docs: "when the selected records are not loaded, we can add them in"
+      ds.updateSelectionInfo(objectIdStrings, ds, false)
+
+      // No need for the message to notify other widgets of the selection change
+      // const records = ds.getSelectedRecords()
+      // console.log('records', records)
+      // MessageManager.getInstance().publishMessage(
+      //   new DataRecordsSelectionChangeMessage(useMapWidgetIds[0], records)
+      // )
+
+      console.log('selection dataview?', flDs.current.getDataViews())
 
     // return records
+    }
   }, [useMapWidgetIds])
 
-  const executeSpatialQuery = useCallback(async (buffer: __esri.Geometry, ds: QueriableDataSource): Promise<void> => { //DataRecord[]> => {
-    // TODO: BUG? geometry parameter does not work!
+  const executeSpatialQuery = useCallback(async (buffer: __esri.Geometry, ds: FeatureLayerDataSource): Promise<void> => { //DataRecord[]> => {
+    // TODO: BUG? geometry parameter on QueryableDataSource does not work!
     const queryResult = await ds.query({
       page: 1, // if 0 is used here, the query to the service will contain 'resultOffset: -100' and FAIL :(
       pageSize: 100,
       geometry: buffer,
       geometryType: 'esriGeometryPolygon',
       returnGeometry: true
-    } as FeatureLayerQueryParams, {
-      widgetId: useMapWidgetIds[0]
-    })
+    } as FeatureLayerQueryParams)
     console.log('Status loaded', ds.getStatus(), queryResult)
 
     const drIds = queryResult.records.map((d: DataRecord) => d.getId())
@@ -153,27 +158,13 @@ export default function ({
   }, [useMapWidgetIds])
 
   const updateSelection = useCallback(async (): Promise<void> => {
-    // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work!
-    // // query features within buffer
-    // if (bufferGraphic?.geometry !== undefined) {
+    if (bufferGraphic?.geometry !== undefined) {
+      // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work!
     //   const r = await executeSpatialQuery(bufferGraphic.geometry, queryableLayerDs.current)
-    //   console.log('r', r)
-    // } else {
-    //   queryableLayerDs.current.clearSelection()
-    // }
-
-    // query features within buffer => attributive query
-    const flvResults = await featureLayerView.current.queryFeatures({
-      geometry: bufferGraphic.geometry,
-      spatialRelationship: 'contains'
-    })
-    console.log('records selected', flvResults.features)
-
-    if (flvResults.features.length > 0) {
-      const r = await executeAttributiveQuery(flvResults, queryableLayerDs.current)
+      const r = await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
       console.log('r', r)
     } else {
-      queryableLayerDs.current.clearSelection()
+      flDs.current.clearSelection()
     }
   }, [bufferGraphic, executeAttributiveQuery])
 
@@ -270,10 +261,10 @@ export default function ({
       console.log('dss', myDs, dss.map((d: DataSource) => [d.jimuChildId, d.id, d]))
       if (myDs.length > 0) {
         // selectLayerDs.current = dsManager.current.getDataSource(myDs[0].id)
-        queryableLayerDs.current = dsManager.current.getDataSource(myDs[0].id) as QueriableDataSource
-        console.log('Setting queryableLayerDs', queryableLayerDs.current)
-        dsv.current = queryableLayerDs.current.getDataViews()
-        console.log('queryableLayerDs dsv', dsv.current)
+        flDs.current = dsManager.current.getDataSource(myDs[0].id) as FeatureLayerDataSource
+        console.log('Setting queryableLayerDs', flDs.current)
+        flDv.current = flDs.current.getDataViews()
+        console.log('queryableLayerDs dsv', flDv.current)
       }
 
       return () => {
