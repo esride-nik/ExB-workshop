@@ -17,7 +17,7 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, QueriableDataSource, SqlQueryParams, DataRecord, FeatureLayerQueryParams } from 'jimu-core'
+import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource, SqlQueryParams, DataRecord, FeatureLayerQueryParams } from 'jimu-core'
 import { JimuMapViewComponent, JimuMapView, FeatureLayerDataSource } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -29,7 +29,6 @@ import { SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import FeatureLayerView from 'esri/views/layers/FeatureLayerView'
 import { useCallback, useMemo } from 'react'
-import FeatureSet from 'esri/rest/support/FeatureSet'
 
 const { useState, useRef, useEffect } = React
 
@@ -160,8 +159,8 @@ export default function ({
   const updateSelection = useCallback(async (): Promise<void> => {
     if (bufferGraphic?.geometry !== undefined) {
       // TODO: BUG? executeSpatialQuery does not work because geometry parameter on QueryParams does not work!
-    //   const r = await executeSpatialQuery(bufferGraphic.geometry, queryableLayerDs.current)
-      const r = await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
+      const r = await executeSpatialQuery(bufferGraphic.geometry, flDs.current)
+      // const r = await executeAttributiveQuery(bufferGraphic.geometry, flDs.current)
       console.log('r', r)
     } else {
       flDs.current.clearSelection()
