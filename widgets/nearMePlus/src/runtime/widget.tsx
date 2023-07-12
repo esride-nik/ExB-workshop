@@ -1,24 +1,5 @@
-/**
-  Licensing
-
-  Copyright 2022 Esri
-
-  Licensed under the Apache License, Version 2.0 (the "License"); You
-  may not use this file except in compliance with the License. You may
-  obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-  implied. See the License for the specific language governing
-  permissions and limitations under the License.
-
-  A copy of the license is available in the repository's
-  LICENSE file.
-*/
 import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource } from 'jimu-core'
-import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
+import { JimuMapViewComponent, JimuMapView, FeatureLayerDataSource } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
@@ -36,14 +17,15 @@ export default function ({
 }: AllWidgetProps<{}>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
+  const distanceNum = useRef<Slider>()
+  const dsManager = useRef<DataSourceManager>()
+  const selectLayerDs = useRef<DataSource>()
+  const [querying, setQuerying] = useState(false)
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
   let featureLayerView: FeatureLayerView = null
-  // let highlightHandle: __esri.Handle = null
-  let dsManager: DataSourceManager = null
-  const selectLayerId = 'Berlin_Verkehrszeichen_1241_1265'
-  let selectLayerDs: DataSource = null
+  const selectLayerId = '1892651cc25-layer-3' // Baumkataster
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
@@ -71,14 +53,14 @@ export default function ({
       getFlView()
 
       console.log('getting instance of DataSourceManager', DataSourceManager)
-      dsManager = DataSourceManager.getInstance()
+      dsManager.current = DataSourceManager.getInstance()
 
       console.log('dsManager', dsManager)
-      const dss = dsManager.getDataSourcesAsArray()
+      const dss = dsManager.current.getDataSourcesAsArray()
       const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
-      console.log('dss', myDs, dss.map((d: DataSource) => [d.jimuChildId, d.id, d]))
-      selectLayerDs = dsManager.getDataSource(myDs[0].id)
-      console.log('selectLayerDs', selectLayerDs)
+      console.log('Data Sources', myDs, dss.map((d: DataSource) => [d.jimuChildId, d.id, d]))
+      selectLayerDs.current = dsManager.current.getDataSource(myDs[0].id)
+      console.log('selectLayerDs', selectLayerDs.current)
 
       return () => {
         if (sketchWidget) {
@@ -87,11 +69,33 @@ export default function ({
         }
       }
     }
-  }, [apiSketchWidgetContainer, apiSliderWidgetContainer, jimuMapView, sketchWidget, sketchGraphicsLayer])
+  }, [jimuMapView])
 
   const getFlView = async () => {
     const fl = jimuMapView.view.map.findLayerById(selectLayerId)
     featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+  }
+
+  const executeAttributiveQuery = async () => {
+    setQuerying(true)
+    const flvResults = await featureLayerView.queryFeatures({
+      geometry: bufferGraphic.geometry,
+      spatialRelationship: 'contains'
+    })
+    setQuerying(false)
+
+    const dsResult = await (selectLayerDs.current as FeatureLayerDataSource).query({
+      where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
+    })
+    console.log('dsResult', dsResult)
+    const records = dsResult?.records
+
+    if (records.length > 0) {
+      selectLayerDs.current.selectRecordsByIds(records.map((r: any) => r.getId()), records)
+    } else {
+      selectLayerDs.current.clearSelection()
+    }
+    console.log('records selected', records)
   }
 
   const initSketch = () => {
@@ -122,6 +126,7 @@ export default function ({
           console.log('CREATE', evt)
           filterGeometry = evt.graphic.geometry as Geometry
           updateBuffer(bufferDistance, 'meters')
+          executeAttributiveQuery()
         }
       })
 
@@ -132,7 +137,7 @@ export default function ({
   const initSlider = () => {
     const container = document.createElement('div')
     apiSliderWidgetContainer.current.appendChild(container)
-    const distanceNum = new Slider({
+    distanceNum.current = new Slider({
       container: apiSliderWidgetContainer.current,
       min: 0,
       max: 1000,
@@ -144,46 +149,20 @@ export default function ({
       }
     })
 
-    distanceNum.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
+    distanceNum.current.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
       if (evt.state === 'stop' && featureLayerView) {
-        const flvResults = await featureLayerView.queryFeatures({
-          geometry: bufferGraphic.geometry,
-          spatialRelationship: 'contains'
-        })
-        // if (highlightHandle) highlightHandle.remove()
-        // highlightHandle = featureLayerView.highlight(flvResults.features)
-        // console.log('highlight', highlightHandle, flvResults)
-
-        const dsResult = await (selectLayerDs as any).query({
-          where: 'objectid =' + flvResults.features.map((r: Graphic) => r.getObjectId()).join(' OR objectid='),
-          geometry: bufferGraphic.geometry,
-          spatialRelationship: 'contains'
-        } as __esri.Query)
-        console.log('dsResult', dsResult)
-        const records = dsResult?.records
-
-        if (records.length > 0) {
-          selectLayerDs.selectRecordsByIds(records.map((r: any) => r.getId()), records)
-        } else {
-          selectLayerDs.clearSelection()
-        }
-        console.log('records selected', records)
+        executeAttributiveQuery()
       }
     })
 
     // get user entered values from distance related options
     const distanceVariablesChanged = (): void => {
-    // unit = distanceUnit.value
-      // setBufferDistance(distanceNum.values[0])
-      bufferDistance = distanceNum.values[0]
-      // geometryRel = spatialRelType.value
+      bufferDistance = distanceNum.current.values[0]
       updateBuffer(bufferDistance, 'meters')
     }
 
     // listen to change and input events on UI components
-    distanceNum.on('thumb-drag', distanceVariablesChanged)
-    // distanceUnit.onchange = distanceVariablesChanged
-    // spatialRelType.onchange = distanceVariablesChanged
+    distanceNum.current.on('thumb-drag', distanceVariablesChanged)
   }
 
   // update the buffer graphic if user is filtering by distance
@@ -239,6 +218,7 @@ export default function ({
     />
 
     <div ref={apiSketchWidgetContainer} />
+    {/* <div>{querying ? 'QUERYING' : 'NOT QUERYING'}</div> */}
     <div ref={apiSliderWidgetContainer} />
   </div>
 }
