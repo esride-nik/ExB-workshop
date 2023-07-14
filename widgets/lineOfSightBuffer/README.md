@@ -1,4 +1,4 @@
-# Legend widget
+# Line of sight buffer widget
 
 This sample demonstrates how to include a widget from the ArcGIS API for JavaScript. 
 

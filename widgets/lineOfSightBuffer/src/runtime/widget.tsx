@@ -123,15 +123,6 @@ export default function Widget (props: AllWidgetProps<{}>) {
       onActiveViewChange={onActiveViewChange}
     />
 
-    <hr />
-    <h4><FormattedMessage id="thisUsesViewModel" defaultMessage={defaultMessages.thisUsesViewModel} /></h4>
-    <div>
-      <FormattedMessage id="features" defaultMessage={defaultMessages.layerTitle} />: {features?.length}
-    </div>
-
-    <hr />
-
-    <h4><FormattedMessage id="thisShowsLegendWidget" defaultMessage={defaultMessages.thisShowsLegendWidget} /></h4>
     <div ref={apiWidgetContainer} />
   </div>
 }
