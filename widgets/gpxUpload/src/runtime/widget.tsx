@@ -12,26 +12,21 @@ import Polygon from 'esri/geometry/Polygon'
 import Polyline from 'esri/geometry/Polyline'
 import Geometry from 'esri/geometry/Geometry'
 import webMercatorUtils from 'esri/geometry/support/webMercatorUtils'
-import Layer from 'esri/layers/Layer'
-import FeatureLayer from 'esri/layers/FeatureLayer'
 
-const { useState, useEffect, useCallback } = React
+const { useCallback } = React
 
 /**
  * This widget will show features from a configured feature layer
  */
-export default function Widget (props: AllWidgetProps<{ Config }>) {
-  const [anzahlGesSum, setAnzahlGesSum] = useState<number>(0)
-
-  useEffect(() => {
-    // queryFunc();
-  }, [])
-
-  let gpxLayer: GraphicsLayer
+// export default function Widget (props: AllWidgetProps<{ Config }>) {
+export default function ({
+  useMapWidgetIds
+}: AllWidgetProps<{}>) {
   let jimuMapView: JimuMapView
+  let gpxLayer: GraphicsLayer
 
   const isConfigured = () => {
-    return props.useMapWidgetIds && props.useMapWidgetIds.length === 1
+    return useMapWidgetIds && useMapWidgetIds.length === 1
   }
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -40,12 +35,6 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
 
       reader.onabort = () => console.log('file reading was aborted')
       reader.onerror = () => console.log('file reading has failed')
-      // reader.onload = () => {
-      //     // Do whatever you want with the file contents
-      //     const binaryStr = reader.result;
-      //     console.log(binaryStr);
-      // };
-      // reader.readAsArrayBuffer(file);
 
       reader.readAsText(file)
       reader.onloadend = () => {
@@ -108,46 +97,13 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
         symbol: polygonSymbol
       })
       gpxLayer.add(bufferGraphic)
-
-      const polygonLayer = findPolygonLayer()
-      if (polygonLayer) {
-        const polyQuery = polygonLayer.createQuery()
-        polyQuery.geometry = oneBuffer
-        const featuresUnderBuffer = await polygonLayer.queryFeatures(polyQuery)
-        console.log('featuresUnderBuffer', featuresUnderBuffer)
-
-        console.log(
-          'fieldNames',
-          featuresUnderBuffer.fields.map((f) => f.alias)
-        )
-        // Valider Feldname: 'anzahl_ges'
-        const anzahlGes = featuresUnderBuffer.features.map((f) => f.attributes.anzahl_ges)
-
-        const reducer = (accumulator, currentValue) => accumulator + currentValue
-        setAnzahlGesSum(anzahlGes.reduce(reducer))
-        console.log('Gesamtanzahl der Coronafälle in durchjoggten Stadtteilen', anzahlGesSum)
-      }
     }
   }
 
-  const findPolygonLayer = (): FeatureLayer => {
-    console.log(
-      'item types',
-      jimuMapView.view.map.allLayers.items.map((item) => item.type)
-    )
-
-    const featureLayers = jimuMapView.view.map.allLayers.items.filter((layer: Layer) => layer.type === 'feature')
-    console.log('featureLayers only', featureLayers)
-
-    const polygonLayers = featureLayers.filter((fl: FeatureLayer) => fl.geometryType === 'polygon')
-    console.log('polygonLayers only', polygonLayers)
-
-    // nehmen wir einfach mal den ersten
-    return polygonLayers[0]
-  }
-
-  const activeViewChangeHandler = (jmv: JimuMapView) => {
-    jimuMapView = jmv
+  const onActiveViewChange = (jmv: JimuMapView) => {
+    if (jmv) {
+      jimuMapView = jmv
+    }
   }
 
   if (!isConfigured()) {
@@ -179,16 +135,10 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
                     )}
             </div>
 
-            <h1>
-                {anzahlGesSum} {defaultMessages.jogTrackResults}
-            </h1>
-
-            {{}.hasOwnProperty.call('useMapWidgetIds') && props.useMapWidgetIds && props.useMapWidgetIds.length === 1 && (
-                <JimuMapViewComponent
-                    useMapWidgetId={props.useMapWidgetIds?.[0]}
-                    onActiveViewChange={activeViewChangeHandler}
-                />
-            )}
+            <JimuMapViewComponent
+              useMapWidgetId={useMapWidgetIds?.[0]}
+              onActiveViewChange={onActiveViewChange}
+            />
         </div>
   )
 }
