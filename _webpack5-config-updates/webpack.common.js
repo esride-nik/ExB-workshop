@@ -389,15 +389,10 @@ exports.getCommon = function (commonOptions = {}) {
   };
   exports.fallback = {
     "os": require.resolve("os-browserify/browser"),
-    "stream": require.resolve("stream-browserify"),
-    "http": require.resolve("stream-http"),
-    "zlib": require.resolve("browserify-zlib"),
-    "url": require.resolve("url/"),
-    "querystring": require.resolve("querystring-es3"),
-    "https": require.resolve("https-browserify"),
     "util": require.resolve("util/"),
-    "assert": require.resolve("assert/"),
-    "buffer": require.resolve("buffer/")
+    "path": require.resolve("path-browserify"),
+    "http": require.resolve("stream-http"),
+    "url": require.resolve("url/"),
   }
 
   exports.externalFunction = function({context, request}, callback) {
