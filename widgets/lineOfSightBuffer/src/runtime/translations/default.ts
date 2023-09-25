@@ -1,8 +1,5 @@
 export default {
   _widgetLabel: 'Line of Sight Buffer',
   pleaseSelectAMap: 'Please select a map.',
-  widgetDemonstrates: 'This widget demonstrates how to use a widget (Legend) from the ArcGIS API for JavaScript.',
-  thisUsesViewModel: 'This uses the ViewModel.',
-  layerTitle: 'Layer title',
-  thisShowsLegendWidget: 'This shows the Legend widget.'
+  widgetDemonstrates: 'Line of Sight Buffer'
 }
