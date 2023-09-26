@@ -1,14 +1,14 @@
-import { React, AllWidgetProps, FormattedMessage, DataSourceManager, DataSource } from 'jimu-core'
-import { JimuMapViewComponent, JimuMapView, FeatureLayerDataSource } from 'jimu-arcgis'
+import { React, type AllWidgetProps, FormattedMessage, DataSourceManager, type DataSource, DataSourceTypes } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import geometryEngine from 'esri/geometry/geometryEngine'
 import Graphic from 'esri/Graphic'
-import { Geometry, Polygon } from 'esri/geometry'
-import { SimpleFillSymbol } from 'esri/symbols'
+import { type Geometry, type Polygon } from 'esri/geometry'
+import { type SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
-import FeatureLayerView from 'esri/views/layers/FeatureLayerView'
+import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
 
 const { useState, useRef, useEffect } = React
 
@@ -20,15 +20,17 @@ export default function ({
   const distanceNum = useRef<Slider>()
   const dsManager = useRef<DataSourceManager>()
   const selectLayerDs = useRef<DataSource>()
+
+  // const selectLayer = '1892651cc25-layer-3' // Baumkataster
+  const [layerDataSourceId, setLayerDataSourceId] = useState(undefined)
+  const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
+  const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
   const [querying, setQuerying] = useState(false)
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
   let featureLayerView: FeatureLayerView = null
-  const selectLayerId = '1892651cc25-layer-3' // Baumkataster
 
-  const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
-  const [sketchWidget, setSketchWidget] = useState<Sketch>(null)
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
   let filterGeometry: Geometry = null
@@ -56,10 +58,16 @@ export default function ({
       dsManager.current = DataSourceManager.getInstance()
 
       console.log('dsManager', dsManager)
+
+      // undocumented method getDataSourcesAsArray() => https://developers.arcgis.com/experience-builder/api-reference/jimu-core/DataSourceManager
       const dss = dsManager.current.getDataSourcesAsArray()
-      const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
-      console.log('Data Sources', myDs, dss.map((d: DataSource) => [d.jimuChildId, d.id, d]))
-      selectLayerDs.current = dsManager.current.getDataSource(myDs[0].id)
+      console.log(dss)
+
+      // breaking change: in 1.11, DataSource had a jimuChildId prop, that could be compared with a static layerId
+      // const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
+
+      // TODO: data sources not ready when useEffect is executed :/
+      selectLayerDs.current = dsManager.current.getDataSource(layerDataSourceId)
       console.log('selectLayerDs', selectLayerDs.current)
 
       return () => {
@@ -72,7 +80,7 @@ export default function ({
   }, [jimuMapView])
 
   const getFlView = async () => {
-    const fl = jimuMapView.view.map.findLayerById(selectLayerId)
+    const fl = jimuMapView.view.map.findLayerById(layerDataSourceId)
     featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
   }
 
@@ -203,7 +211,20 @@ export default function ({
     }
 
     if (jmv) {
+      const jimuLayerViews = jmv.jimuLayerViews
+      // TODO takin first layer
+      const layerDataSourceId = jimuLayerViews[Object.keys(jimuLayerViews)[0]].layerDataSourceId
+
+      if (layerDataSourceId === undefined) {
+        jmv = null
+        return
+      }
+
+      setLayerDataSourceId(layerDataSourceId)
       setJimuMapView(jmv)
+    } else {
+      setLayerDataSourceId(undefined)
+      setJimuMapView(undefined)
     }
   }
 
