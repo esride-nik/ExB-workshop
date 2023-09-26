@@ -67,14 +67,6 @@ export default function (props: AllWidgetProps<unknown>) {
         spatialRelationship: 'contains'
       })
 
-      // TODO: to render selected feature IDs into the DataSourceComponent, uncomment this, comment out the lower part until the else and uncomment the renderData functionality in the return block below
-      // TODO: both blocks don't work together: queryParams affects the featureLayerView, and as soon as the selection is small, it won't get bigger. but it's not passed on to the data source, as it seems
-      // setQueryParams({
-      //   where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`,
-      //   outFields: ['*'],
-      //   pageSize: 10
-      // })
-
       const dsResult = await flDataSource.query({
         where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
       })
@@ -86,7 +78,7 @@ export default function (props: AllWidgetProps<unknown>) {
       } else {
         flDataSource.clearSelection()
       }
-      console.log('records selected', records)      
+      console.log('records selected', records)
     } else {
       console.warn('Data source not available - query inactive')
     }
@@ -227,14 +219,6 @@ export default function (props: AllWidgetProps<unknown>) {
     console.log(ds.id)
   }
 
-  // const dataRender = (ds: DataSource, info: IMDataSourceInfo) => {
-  //   return <div id="dataRender">
-  //   {
-  //     ds && ds.getRecords().map(r => r.getId()).join(', ')
-  //   }
-  //   </div>
-  // }
-
   const dsConfigured = !!((props.useDataSources && props.useDataSources.length > 0))
   const mapConfigured = !!((props.useMapWidgetIds && props.useMapWidgetIds.length > 0))
 
@@ -250,8 +234,6 @@ export default function (props: AllWidgetProps<unknown>) {
       onActiveViewChange={onActiveViewChange}
     />
 
-    <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource}>
-      {/* {dataRender} */}
-    </DataSourceComponent>
+    <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource} />
   </div>
 }
