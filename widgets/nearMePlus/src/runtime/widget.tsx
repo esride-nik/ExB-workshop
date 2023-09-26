@@ -1,5 +1,5 @@
-import { React, type AllWidgetProps, FormattedMessage, type DataSourceManager, type DataSource, DataSourceTypes, type IMDataSourceInfo, DataSourceComponent, type QueryParams } from 'jimu-core'
-import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource, FeatureDataRecord } from 'jimu-arcgis'
+import { React, type AllWidgetProps, FormattedMessage, type DataSource, type IMDataSourceInfo, DataSourceComponent, type FeatureLayerQueryParams } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource, type FeatureDataRecord } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
@@ -9,8 +9,6 @@ import { type Geometry, type Polygon } from 'esri/geometry'
 import { type SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
-import Query from 'esri/rest/support/Query'
-import type FeatureLayer from 'esri/layers/FeatureLayer'
 
 const { useState, useRef, useEffect } = React
 
@@ -18,15 +16,14 @@ export default function (props: AllWidgetProps<unknown>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const distanceNum = useRef<Slider>()
-  const dsManager = useRef<DataSourceManager>()
-  // const selectLayerDs = useRef<DataSource>()
-
-  // const selectLayer = '1892651cc25-layer-3' // Baumkataster
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
-  const [queryParams, setQueryParams] = useState<QueryParams>(undefined)
+  const [queryParams, setQueryParams] = useState<FeatureLayerQueryParams>({
+    where: '1=1',
+    outFields: ['*'],
+    pageSize: 10
+  })
   const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
-  const [querying, setQuerying] = useState(false)
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
@@ -64,31 +61,35 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const executeAttributiveQuery = async () => {
-    console.log('executeAttributiveQuery', bufferGraphic)
-    setQuerying(true)
-    // setQueryParams({
-    //   geometry: bufferGraphic.geometry,
-    //   spatialRelationship: 'contains'
-    // } as QueryParams)
-    const flvResults = await featureLayerView.queryFeatures({
-      geometry: bufferGraphic.geometry,
-      spatialRelationship: 'contains'
-    })
+    if (flDataSource) {
+      const flvResults = await featureLayerView.queryFeatures({
+        geometry: bufferGraphic.geometry,
+        spatialRelationship: 'contains'
+      })
 
-    // const dsResult = await (selectLayerDs.current as FeatureLayerDataSource).query({
-    const dsResult = await flDataSource.query({
-      where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
-    })
-    console.log('dsResult', dsResult)
-    const records = dsResult?.records as FeatureDataRecord[]
+      // TODO: to render selected feature IDs into the DataSourceComponent, uncomment this, comment out the lower part until the else and uncomment the renderData functionality in the return block below
+      // TODO: both blocks don't work together: queryParams affects the featureLayerView, and as soon as the selection is small, it won't get bigger. but it's not passed on to the data source, as it seems
+      // setQueryParams({
+      //   where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`,
+      //   outFields: ['*'],
+      //   pageSize: 10
+      // })
 
-    if (records.length > 0) {
-      flDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
+      const dsResult = await flDataSource.query({
+        where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
+      })
+      console.log('dsResult', dsResult)
+      const records = dsResult?.records as FeatureDataRecord[]
+
+      if (records.length > 0) {
+        flDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
+      } else {
+        flDataSource.clearSelection()
+      }
+      console.log('records selected', records)      
     } else {
-      flDataSource.clearSelection()
+      console.warn('Data source not available - query inactive')
     }
-    console.log('records selected', records)
-    setQuerying(false)
   }
 
   const initSketch = () => {
@@ -116,7 +117,6 @@ export default function (props: AllWidgetProps<unknown>) {
 
       sketch.on('create', (evt: __esri.SketchCreateEvent) => {
         if (evt.state === 'complete') {
-          console.log('CREATE', evt)
           filterGeometry = evt.graphic.geometry as Geometry
           updateBuffer(bufferDistance, 'meters')
           executeAttributiveQuery()
@@ -136,6 +136,9 @@ export default function (props: AllWidgetProps<unknown>) {
     if (!distanceNum.current) {
       const container = document.createElement('div')
       apiSliderWidgetContainer.current.appendChild(container)
+      requestAnimationFrame(() => {
+        apiSliderWidgetContainer.current.style.height = '70px'
+      })
       distanceNum.current = new Slider({
         container: apiSliderWidgetContainer.current,
         min: 0,
@@ -171,7 +174,6 @@ export default function (props: AllWidgetProps<unknown>) {
 
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
-    console.log('UPDATE BUFFER', distance)
     if (distance > 0 && filterGeometry) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
       updateFilter()
@@ -182,7 +184,6 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const updateFilter = () => {
-    console.log('UPDATE FILTER', filterGeometry)
     featureFilter = {
       geometry: filterGeometry,
       spatialRelationship: 'intersects',
@@ -223,15 +224,16 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const setDataSource = (ds: DataSource) => {
     setFlDataSource(ds as FeatureLayerDataSource)
+    console.log(ds.id)
   }
 
-  const dataRender = (ds: DataSource, info: IMDataSourceInfo) => {
-    return <div>
-    {
-      ds && ds.getRecords().map(r => <div>{r.getId()}</div>)
-    }
-    </div>
-  }
+  // const dataRender = (ds: DataSource, info: IMDataSourceInfo) => {
+  //   return <div id="dataRender">
+  //   {
+  //     ds && ds.getRecords().map(r => r.getId()).join(', ')
+  //   }
+  //   </div>
+  // }
 
   const dsConfigured = !!((props.useDataSources && props.useDataSources.length > 0))
   const mapConfigured = !!((props.useMapWidgetIds && props.useMapWidgetIds.length > 0))
@@ -240,17 +242,16 @@ export default function (props: AllWidgetProps<unknown>) {
     {!mapConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
     {!dsConfigured && <h3><FormattedMessage id="pleaseSelectDs" defaultMessage={defaultMessages.pleaseSelectDs} /></h3>}
 
+    <div ref={apiSketchWidgetContainer} />
+    <div ref={apiSliderWidgetContainer} />
+
     <JimuMapViewComponent
       useMapWidgetId={props.useMapWidgetIds?.[0]}
       onActiveViewChange={onActiveViewChange}
     />
 
     <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource}>
-      {dataRender}
+      {/* {dataRender} */}
     </DataSourceComponent>
-
-    <div ref={apiSketchWidgetContainer} />
-    {/* <div>{querying ? 'QUERYING' : 'NOT QUERYING'}</div> */}
-    <div ref={apiSliderWidgetContainer} />
   </div>
 }
