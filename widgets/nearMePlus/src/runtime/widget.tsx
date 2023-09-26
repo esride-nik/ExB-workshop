@@ -1,4 +1,4 @@
-import { React, type AllWidgetProps, FormattedMessage, DataSourceManager, type DataSource, DataSourceTypes } from 'jimu-core'
+import { React, type AllWidgetProps, FormattedMessage, type DataSourceManager, type DataSource, DataSourceTypes, type IMDataSourceInfo, DataSourceComponent, type QueryParams } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -9,12 +9,11 @@ import { type Geometry, type Polygon } from 'esri/geometry'
 import { type SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
+import Query from 'esri/rest/support/Query'
 
 const { useState, useRef, useEffect } = React
 
-export default function ({
-  useMapWidgetIds
-}: AllWidgetProps<{}>) {
+export default function (props: AllWidgetProps<unknown>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const distanceNum = useRef<Slider>()
@@ -25,12 +24,12 @@ export default function ({
   const [layerDataSourceId, setLayerDataSourceId] = useState(undefined)
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
+  const [queryParams, setQueryParams] = useState<QueryParams>(undefined)
   const [querying, setQuerying] = useState(false)
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
   let featureLayerView: FeatureLayerView = null
-
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
   let filterGeometry: Geometry = null
@@ -54,21 +53,21 @@ export default function ({
       initSlider()
       getFlView()
 
-      console.log('getting instance of DataSourceManager', DataSourceManager)
-      dsManager.current = DataSourceManager.getInstance()
+      // console.log('getting instance of DataSourceManager', DataSourceManager)
+      // dsManager.current = DataSourceManager.getInstance()
 
-      console.log('dsManager', dsManager)
+      // console.log('dsManager', dsManager)
 
-      // undocumented method getDataSourcesAsArray() => https://developers.arcgis.com/experience-builder/api-reference/jimu-core/DataSourceManager
-      const dss = dsManager.current.getDataSourcesAsArray()
-      console.log(dss)
+      // // undocumented method getDataSourcesAsArray() => https://developers.arcgis.com/experience-builder/api-reference/jimu-core/DataSourceManager
+      // const dss = dsManager.current.getDataSourcesAsArray()
+      // console.log(dss)
 
-      // breaking change: in 1.11, DataSource had a jimuChildId prop, that could be compared with a static layerId
-      // const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
+      // // breaking change: in 1.11, DataSource had a jimuChildId prop, that could be compared with a static layerId
+      // // const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
 
-      // TODO: data sources not ready when useEffect is executed :/
-      selectLayerDs.current = dsManager.current.getDataSource(layerDataSourceId)
-      console.log('selectLayerDs', selectLayerDs.current)
+      // // TODO: data sources not ready when useEffect is executed :/
+      // selectLayerDs.current = dsManager.current.getDataSource(layerDataSourceId)
+      // console.log('selectLayerDs', selectLayerDs.current)
 
       return () => {
         if (sketchWidget) {
@@ -86,6 +85,10 @@ export default function ({
 
   const executeAttributiveQuery = async () => {
     setQuerying(true)
+    setQueryParams({
+      geometry: bufferGraphic.geometry,
+      spatialRelationship: 'contains'
+    } as QueryParams)
     const flvResults = await featureLayerView.queryFeatures({
       geometry: bufferGraphic.geometry,
       spatialRelationship: 'contains'
@@ -201,42 +204,54 @@ export default function ({
     }
   }
 
-  const onActiveViewChange = (jmv: JimuMapView) => {
-    if (jimuMapView && sketchWidget) {
-      // we have a "previous" map where we added the widget
-      // (ex: case where two Maps in single Experience page and user is switching
-      // between them in the Settings) - we must destroy the old widget in this case.
-      sketchWidget.destroy()
-      setSketchWidget(null)
+  // const onActiveViewChange = (jmv: JimuMapView) => {
+  //   if (jimuMapView && sketchWidget) {
+  //     // we have a "previous" map where we added the widget
+  //     // (ex: case where two Maps in single Experience page and user is switching
+  //     // between them in the Settings) - we must destroy the old widget in this case.
+  //     sketchWidget.destroy()
+  //     setSketchWidget(null)
+  //   }
+
+  //   if (jmv) {
+  //     const jimuLayerViews = jmv.jimuLayerViews
+  //     // TODO takin first layer
+  //     const layerDataSourceId = jimuLayerViews[Object.keys(jimuLayerViews)[0]].layerDataSourceId
+
+  //     if (layerDataSourceId === undefined) {
+  //       jmv = null
+  //       return
+  //     }
+
+  //     setLayerDataSourceId(layerDataSourceId)
+  //     setJimuMapView(jmv)
+  //   } else {
+  //     setLayerDataSourceId(undefined)
+  //     setJimuMapView(undefined)
+  //   }
+  // }
+
+  const dataRender = (ds: DataSource, info: IMDataSourceInfo) => {
+    return <div>
+    {
+      ds && ds.getRecords().map(r => <div>{r.getId()}</div>)
     }
-
-    if (jmv) {
-      const jimuLayerViews = jmv.jimuLayerViews
-      // TODO takin first layer
-      const layerDataSourceId = jimuLayerViews[Object.keys(jimuLayerViews)[0]].layerDataSourceId
-
-      if (layerDataSourceId === undefined) {
-        jmv = null
-        return
-      }
-
-      setLayerDataSourceId(layerDataSourceId)
-      setJimuMapView(jmv)
-    } else {
-      setLayerDataSourceId(undefined)
-      setJimuMapView(undefined)
-    }
+    </div>
   }
 
-  const isConfigured = useMapWidgetIds && useMapWidgetIds.length === 1
+  const isConfigured = !!((props.useDataSources && props.useDataSources.length > 0))
 
   return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
     {!isConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
 
-    <JimuMapViewComponent
+    {/* <JimuMapViewComponent
       useMapWidgetId={useMapWidgetIds?.[0]}
       onActiveViewChange={onActiveViewChange}
-    />
+    /> */}
+
+    <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount>
+      {dataRender}
+    </DataSourceComponent>
 
     <div ref={apiSketchWidgetContainer} />
     {/* <div>{querying ? 'QUERYING' : 'NOT QUERYING'}</div> */}
