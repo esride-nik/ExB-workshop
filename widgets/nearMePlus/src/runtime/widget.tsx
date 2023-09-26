@@ -57,7 +57,9 @@ export default function (props: AllWidgetProps<unknown>) {
   }, [jimuMapView])
 
   const getFlView = async () => {
-    const fl = jimuMapView.view.map.findLayerById(layerDataSourceId)
+    // TODO: bad hack? is there a better way to connect data source and layer?
+    const layerId = props.useDataSources[0].dataSourceId.substring(props.useDataSources[0].rootDataSourceId.length+1);
+    const fl = jimuMapView.view.map.findLayerById(layerId)
     featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
   }
 
