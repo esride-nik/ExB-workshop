@@ -1,5 +1,5 @@
 import { React, type AllWidgetProps, FormattedMessage, type DataSourceManager, type DataSource, DataSourceTypes, type IMDataSourceInfo, DataSourceComponent, type QueryParams } from 'jimu-core'
-import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource } from 'jimu-arcgis'
+import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource, FeatureDataRecord } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
@@ -19,13 +19,13 @@ export default function (props: AllWidgetProps<unknown>) {
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const distanceNum = useRef<Slider>()
   const dsManager = useRef<DataSourceManager>()
-  const selectLayerDs = useRef<DataSource>()
+  // const selectLayerDs = useRef<DataSource>()
 
   // const selectLayer = '1892651cc25-layer-3' // Baumkataster
-  const [layerDataSourceId, setLayerDataSourceId] = useState(undefined)
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
   const [queryParams, setQueryParams] = useState<QueryParams>(undefined)
+  const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
   const [querying, setQuerying] = useState(false)
 
   let bufferDistance = 100
@@ -58,7 +58,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const getFlView = async () => {
     // TODO: bad hack? is there a better way to connect data source and layer?
-    const layerId = props.useDataSources[0].dataSourceId.substring(props.useDataSources[0].rootDataSourceId.length+1);
+    const layerId = props.useDataSources[0].dataSourceId.substring(props.useDataSources[0].rootDataSourceId.length + 1)
     const fl = jimuMapView.view.map.findLayerById(layerId)
     featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
   }
@@ -66,25 +66,26 @@ export default function (props: AllWidgetProps<unknown>) {
   const executeAttributiveQuery = async () => {
     console.log('executeAttributiveQuery', bufferGraphic)
     setQuerying(true)
-    setQueryParams({
-      geometry: bufferGraphic.geometry,
-      spatialRelationship: 'contains'
-    } as QueryParams)
+    // setQueryParams({
+    //   geometry: bufferGraphic.geometry,
+    //   spatialRelationship: 'contains'
+    // } as QueryParams)
     const flvResults = await featureLayerView.queryFeatures({
       geometry: bufferGraphic.geometry,
       spatialRelationship: 'contains'
     })
 
-    const dsResult = await (selectLayerDs.current as FeatureLayerDataSource).query({
+    // const dsResult = await (selectLayerDs.current as FeatureLayerDataSource).query({
+    const dsResult = await flDataSource.query({
       where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
     })
     console.log('dsResult', dsResult)
-    const records = dsResult?.records
+    const records = dsResult?.records as FeatureDataRecord[]
 
     if (records.length > 0) {
-      selectLayerDs.current.selectRecordsByIds(records.map((r: any) => r.getId()), records)
+      flDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
     } else {
-      selectLayerDs.current.clearSelection()
+      flDataSource.clearSelection()
     }
     console.log('records selected', records)
     setQuerying(false)
@@ -220,6 +221,10 @@ export default function (props: AllWidgetProps<unknown>) {
     }
   }
 
+  const setDataSource = (ds: DataSource) => {
+    setFlDataSource(ds as FeatureLayerDataSource)
+  }
+
   const dataRender = (ds: DataSource, info: IMDataSourceInfo) => {
     return <div>
     {
@@ -240,7 +245,7 @@ export default function (props: AllWidgetProps<unknown>) {
       onActiveViewChange={onActiveViewChange}
     />
 
-    <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount>
+    <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource}>
       {dataRender}
     </DataSourceComponent>
 
