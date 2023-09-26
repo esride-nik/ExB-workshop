@@ -19,7 +19,7 @@ The GiHub advisory db says: "[All versions of SheetJS CE through 0.19.2 are vuln
 
 The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-builder-questions/cannot-find-arcgis-maps-sdk-for-javascript-module/m-p/1308587#M7620) does not work for me. I need to remove the ``include`` array from tsconfig.json (no whitelist means including everyting).
 
-Additionally, in ExB 1.12, the TypeScript definition file is mission. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), plade ion ``client/types`` and rename to ``arcgis-js-api.d.ts``.
+Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
 
 ### Polyfills for Node APIs in Experience Builder >= 1.8
 
