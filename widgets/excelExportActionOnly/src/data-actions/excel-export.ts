@@ -1,6 +1,6 @@
-import Graphic from 'esri/Graphic'
-import { AbstractDataAction, DataRecordSet } from 'jimu-core'
-import { JSON2SheetOpts, utils, writeFile } from 'xlsx'
+import type Graphic from 'esri/Graphic'
+import { AbstractDataAction, type DataRecordSet } from 'jimu-core'
+import { type JSON2SheetOpts, utils, writeFile } from 'xlsx'
 import defaultMessages from '../runtime/translations/default'
 
 interface WorksheetObject {
@@ -55,8 +55,7 @@ export default class ExportJson extends AbstractDataAction {
 
   private exportExcelFile (wss: WorksheetObject[], filename: any) {
     const wb = utils.book_new()
-    wss.forEach((wsObject: WorksheetObject) =>
-      utils.book_append_sheet(wb, wsObject.ws, wsObject.wsName.substr(0, 31))
+    wss.forEach((wsObject: WorksheetObject) => { utils.book_append_sheet(wb, wsObject.ws, wsObject.wsName.substr(0, 31)) }
     )
     writeFile(wb, `${filename}.xlsb`)
   }
