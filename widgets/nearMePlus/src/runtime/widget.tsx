@@ -10,6 +10,7 @@ import { type SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
 import Query from 'esri/rest/support/Query'
+import type FeatureLayer from 'esri/layers/FeatureLayer'
 
 const { useState, useRef, useEffect } = React
 
@@ -52,29 +53,6 @@ export default function (props: AllWidgetProps<unknown>) {
       initSketch()
       initSlider()
       getFlView()
-
-      // console.log('getting instance of DataSourceManager', DataSourceManager)
-      // dsManager.current = DataSourceManager.getInstance()
-
-      // console.log('dsManager', dsManager)
-
-      // // undocumented method getDataSourcesAsArray() => https://developers.arcgis.com/experience-builder/api-reference/jimu-core/DataSourceManager
-      // const dss = dsManager.current.getDataSourcesAsArray()
-      // console.log(dss)
-
-      // // breaking change: in 1.11, DataSource had a jimuChildId prop, that could be compared with a static layerId
-      // // const myDs = dss.filter((d: DataSource) => d.jimuChildId === selectLayerId)
-
-      // // TODO: data sources not ready when useEffect is executed :/
-      // selectLayerDs.current = dsManager.current.getDataSource(layerDataSourceId)
-      // console.log('selectLayerDs', selectLayerDs.current)
-
-      return () => {
-        if (sketchWidget) {
-          sketchWidget.destroy()
-          setSketchWidget(null)
-        }
-      }
     }
   }, [jimuMapView])
 
@@ -84,6 +62,7 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const executeAttributiveQuery = async () => {
+    console.log('executeAttributiveQuery', bufferGraphic)
     setQuerying(true)
     setQueryParams({
       geometry: bufferGraphic.geometry,
@@ -93,7 +72,6 @@ export default function (props: AllWidgetProps<unknown>) {
       geometry: bufferGraphic.geometry,
       spatialRelationship: 'contains'
     })
-    setQuerying(false)
 
     const dsResult = await (selectLayerDs.current as FeatureLayerDataSource).query({
       where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
@@ -107,6 +85,7 @@ export default function (props: AllWidgetProps<unknown>) {
       selectLayerDs.current.clearSelection()
     }
     console.log('records selected', records)
+    setQuerying(false)
   }
 
   const initSketch = () => {
@@ -140,44 +119,56 @@ export default function (props: AllWidgetProps<unknown>) {
           executeAttributiveQuery()
         }
       })
+      setSketchWidget(sketch)
 
       jimuMapView.view.map.add(sketchGraphicsLayer)
+    } else {
+      requestAnimationFrame(() => {
+        apiSketchWidgetContainer.current.style.display = ''
+      })
     }
   }
 
   const initSlider = () => {
-    const container = document.createElement('div')
-    apiSliderWidgetContainer.current.appendChild(container)
-    distanceNum.current = new Slider({
-      container: apiSliderWidgetContainer.current,
-      min: 0,
-      max: 1000,
-      values: [bufferDistance],
-      steps: 1,
-      visibleElements: {
-        rangeLabels: true,
-        labels: true
-      }
-    })
+    if (!distanceNum.current) {
+      const container = document.createElement('div')
+      apiSliderWidgetContainer.current.appendChild(container)
+      distanceNum.current = new Slider({
+        container: apiSliderWidgetContainer.current,
+        min: 0,
+        max: 1000,
+        values: [bufferDistance],
+        steps: 1,
+        visibleElements: {
+          rangeLabels: true,
+          labels: true
+        }
+      })
 
-    distanceNum.current.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
-      if (evt.state === 'stop' && featureLayerView) {
-        executeAttributiveQuery()
-      }
-    })
+      distanceNum.current.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
+        if (evt.state === 'stop' && featureLayerView) {
+          executeAttributiveQuery()
+        }
+      })
 
-    // get user entered values from distance related options
-    const distanceVariablesChanged = (): void => {
-      bufferDistance = distanceNum.current.values[0]
-      updateBuffer(bufferDistance, 'meters')
+      // get user entered values from distance related options
+      const distanceVariablesChanged = (): void => {
+        bufferDistance = distanceNum.current.values[0]
+        updateBuffer(bufferDistance, 'meters')
+      }
+
+      // listen to change and input events on UI components
+      distanceNum.current.on('thumb-drag', distanceVariablesChanged)
+    } else {
+      requestAnimationFrame(() => {
+        apiSliderWidgetContainer.current.style.display = ''
+      })
     }
-
-    // listen to change and input events on UI components
-    distanceNum.current.on('thumb-drag', distanceVariablesChanged)
   }
 
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
+    console.log('UPDATE BUFFER', distance)
     if (distance > 0 && filterGeometry) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
       updateFilter()
@@ -188,6 +179,7 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const updateFilter = () => {
+    console.log('UPDATE FILTER', filterGeometry)
     featureFilter = {
       geometry: filterGeometry,
       spatialRelationship: 'intersects',
@@ -204,32 +196,27 @@ export default function (props: AllWidgetProps<unknown>) {
     }
   }
 
-  // const onActiveViewChange = (jmv: JimuMapView) => {
-  //   if (jimuMapView && sketchWidget) {
-  //     // we have a "previous" map where we added the widget
-  //     // (ex: case where two Maps in single Experience page and user is switching
-  //     // between them in the Settings) - we must destroy the old widget in this case.
-  //     sketchWidget.destroy()
-  //     setSketchWidget(null)
-  //   }
+  const onActiveViewChange = (jmv: JimuMapView) => {
+    // we have a "previous" map where we added the widget
+    // (ex: case where two Maps in single Experience page and user is switching
+    // between them in the Settings) - we must destroy the old widget in this case.
+    if (sketchWidget) {
+      requestAnimationFrame(() => {
+        apiSketchWidgetContainer.current.style.display = 'none'
+      })
+    }
+    if (distanceNum.current) {
+      requestAnimationFrame(() => {
+        apiSliderWidgetContainer.current.style.display = 'none'
+      })
+    }
 
-  //   if (jmv) {
-  //     const jimuLayerViews = jmv.jimuLayerViews
-  //     // TODO takin first layer
-  //     const layerDataSourceId = jimuLayerViews[Object.keys(jimuLayerViews)[0]].layerDataSourceId
-
-  //     if (layerDataSourceId === undefined) {
-  //       jmv = null
-  //       return
-  //     }
-
-  //     setLayerDataSourceId(layerDataSourceId)
-  //     setJimuMapView(jmv)
-  //   } else {
-  //     setLayerDataSourceId(undefined)
-  //     setJimuMapView(undefined)
-  //   }
-  // }
+    if (jmv) {
+      setJimuMapView(jmv)
+    } else {
+      setJimuMapView(undefined)
+    }
+  }
 
   const dataRender = (ds: DataSource, info: IMDataSourceInfo) => {
     return <div>
@@ -239,15 +226,17 @@ export default function (props: AllWidgetProps<unknown>) {
     </div>
   }
 
-  const isConfigured = !!((props.useDataSources && props.useDataSources.length > 0))
+  const dsConfigured = !!((props.useDataSources && props.useDataSources.length > 0))
+  const mapConfigured = !!((props.useMapWidgetIds && props.useMapWidgetIds.length > 0))
 
   return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-    {!isConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
+    {!mapConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
+    {!dsConfigured && <h3><FormattedMessage id="pleaseSelectDs" defaultMessage={defaultMessages.pleaseSelectDs} /></h3>}
 
-    {/* <JimuMapViewComponent
-      useMapWidgetId={useMapWidgetIds?.[0]}
+    <JimuMapViewComponent
+      useMapWidgetId={props.useMapWidgetIds?.[0]}
       onActiveViewChange={onActiveViewChange}
-    /> */}
+    />
 
     <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount>
       {dataRender}
