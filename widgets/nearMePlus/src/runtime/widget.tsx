@@ -63,7 +63,7 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const executeAttributiveQuery = async () => {
-    if (flDataSource) {
+    if (flDataSource && featureLayerView) {
       const flvResults = await featureLayerView.queryFeatures({
         geometry: bufferGraphic.geometry,
         spatialRelationship: 'contains'
@@ -82,7 +82,7 @@ export default function (props: AllWidgetProps<unknown>) {
       }
       console.log('records selected', records)
     } else {
-      console.warn('Data source not available - query inactive')
+      console.warn('Data source not available or layer not in map.')
     }
   }
 
