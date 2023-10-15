@@ -49,13 +49,15 @@ export default function (props: AllWidgetProps<unknown>) {
     if (jimuMapView && apiSketchWidgetContainer.current) {
       initSketch()
       initSlider()
-      getFlView()
     }
-  }, [jimuMapView])
 
-  const getFlView = async () => {
-    // TODO: bad hack? is there a better way to connect data source and layer?
-    const layerId = props.useDataSources[0].dataSourceId.substring(props.useDataSources[0].rootDataSourceId.length + 1)
+    if (!featureLayerView && flDataSource && jimuMapView) {
+      const layerId = flDataSource.layer?.id
+      getFlView(layerId)
+    }
+  }, [jimuMapView, flDataSource])
+
+  const getFlView = async (layerId: string) => {
     const fl = jimuMapView.view.map.findLayerById(layerId)
     featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
   }
