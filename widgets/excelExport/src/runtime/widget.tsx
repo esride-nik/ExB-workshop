@@ -1,11 +1,11 @@
-import { React, AllWidgetProps, Immutable, FormattedMessage } from 'jimu-core'
+import { React, type AllWidgetProps, Immutable, FormattedMessage } from 'jimu-core'
 import defaultMessages from './translations/default'
 
-import { JSON2SheetOpts, utils, writeFile } from 'xlsx'
-import Graphic from 'esri/Graphic'
-import FeatureLayer from 'esri/layers/FeatureLayer'
-import { Button, MultiSelect, MultiSelectItem } from 'jimu-ui'
-import Relationship from 'esri/layers/support/Relationship'
+import { type JSON2SheetOpts, utils, writeFile } from 'xlsx'
+import type Graphic from 'esri/Graphic'
+import type FeatureLayer from 'esri/layers/FeatureLayer'
+import { Button, MultiSelect, type MultiSelectItem } from 'jimu-ui'
+import type Relationship from 'esri/layers/support/Relationship'
 
 interface WorksheetObject {
   ws: any
@@ -138,8 +138,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
 
   private exportExcelFile (wss: WorksheetObject[], filename: any) {
     const wb = utils.book_new()
-    wss.forEach((wsObject: WorksheetObject) =>
-      utils.book_append_sheet(wb, wsObject.ws, wsObject.wsName.substr(0, 31))
+    wss.forEach((wsObject: WorksheetObject) => { utils.book_append_sheet(wb, wsObject.ws, wsObject.wsName.substr(0, 31)) }
     )
     writeFile(wb, `${filename}.xlsb`)
   }
