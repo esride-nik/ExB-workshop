@@ -393,6 +393,10 @@ exports.getCommon = function (commonOptions = {}) {
     "path": require.resolve("path-browserify"),
     "http": require.resolve("stream-http"),
     "url": require.resolve("url/"),
+    "stream": require.resolve("stream-browserify"),
+    "https": require.resolve("https-browserify"),
+    "zlib": require.resolve("browserify-zlib"),
+    "assert": require.resolve("assert/")
   }
 
   exports.externalFunction = function({context, request}, callback) {

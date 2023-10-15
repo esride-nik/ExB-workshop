@@ -1,26 +1,6 @@
 # Experience Builder Workshop Extensions Repo
 ## by [Niklas Köhn](https://github.com/esride-nik), Esri Deutschland
 
-Some Widgets and a theme.
-
-## How to use the samples
-Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
-
-### Looking for the what3words widget?
-This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
-
-### Deprecation of NPM package "xlsx"
-
-This package is based on the Excel tool library "SheetJS" and is no longer maintained.
-The GiHub advisory db says: "[All versions of SheetJS CE through 0.19.2 are vulnerable to "Prototype Pollution" when reading specially crafted files. Workflows that do not read arbitrary files (for example, exporting data to spreadsheet files) are unaffected.](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6)" As we're not reading anything, I guess it's not that urgent..
-.. but maybe try out [Mr.Excel](https://www.npmjs.com/package/mr-excel) some day?
-
-### Cannot find ArcGIS Maps SDK for Javascript modules
-
-The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-builder-questions/cannot-find-arcgis-maps-sdk-for-javascript-module/m-p/1308587#M7620) does not work for me. I need to remove the ``include`` array from tsconfig.json (no whitelist means including everyting).
-
-Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
-
 ### Polyfills for Node APIs in Experience Builder >= 1.8
 
 Webpack 5 no longer includes polyfills for node core modules. This manifests in the error message ``BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default``, meaning: Packages that use node.js core modules no longer work natively with webpack 5.
