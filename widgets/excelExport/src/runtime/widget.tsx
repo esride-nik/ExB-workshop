@@ -127,7 +127,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
     this.exportExcelFile(this.wss, this.filename)
   }
 
-  private reduceToSelectedFields (attributes: any, selectedFieldNames: string[]): {} {
+  private reduceToSelectedFields (attributes: any, selectedFieldNames: string[]): unknown {
     return Object.keys(attributes)
       .filter((key) => selectedFieldNames.includes(key))
       .reduce((obj, key) => {

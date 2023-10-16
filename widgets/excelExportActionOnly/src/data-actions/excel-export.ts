@@ -18,8 +18,8 @@ export default class ExportJson extends AbstractDataAction {
     if (dataSet.records.length > 0) {
       const features = dataSet.records.map((r) => (r as any).feature as Graphic)
 
-      const label = (dataSet.records[0].dataSource?.belongToDataSource as any).fetchedSchema?.label.length > 0
-        ? (dataSet.records[0].dataSource?.belongToDataSource as any).fetchedSchema?.label
+      const label = dataSet.records[0].dataSource?.fetchedSchema?.label.length > 0
+        ? dataSet.records[0].dataSource?.fetchedSchema?.label
         : defaultMessages._widgetLabel
       const filename = label.replace(/[^a-z0-9]/gi, '_').toLowerCase()
 
@@ -45,7 +45,7 @@ export default class ExportJson extends AbstractDataAction {
     this.exportExcelFile(wss, filename)
   }
 
-  private reduceToFields (attributes: any): {} {
+  private reduceToFields (attributes: any): unknown {
     return Object.keys(attributes)
       .reduce((obj, key) => {
         obj[key] = attributes[key]

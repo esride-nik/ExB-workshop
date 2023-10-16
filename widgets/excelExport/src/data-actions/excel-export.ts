@@ -12,7 +12,7 @@ export default class ExportJson extends AbstractDataAction {
       const features = dataSet.records.map((r) => (r as any).feature as Graphic)
       MutableStoreManager.getInstance().updateStateValue(this.widgetId, 'results', {
         features: features,
-        label: dataSet.records[0].dataSource?.belongToDataSource?.fetchedSchema?.label
+        label: dataSet.records[0].dataSource?.fetchedSchema?.label
       })
       return true
     }
