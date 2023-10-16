@@ -195,9 +195,8 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
-    // we have a "previous" map where we added the widget
-    // (ex: case where two Maps in single Experience page and user is switching
-    // between them in the Settings) - we must destroy the old widget in this case.
+    // if we have a "previous" map where the widget was already added, we're hiding the old widget until it is shown again from via useEffect with the new settings.
+    // (ex: case where two Maps in single Experience page and user is switching between them in the Settings)
     if (sketchWidget) {
       requestAnimationFrame(() => {
         apiSketchWidgetContainer.current.style.display = 'none'
