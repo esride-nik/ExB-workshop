@@ -1,4 +1,4 @@
-import { React, type AllWidgetProps, FormattedMessage, type DataSource, type IMDataSourceInfo, DataSourceComponent, type FeatureLayerQueryParams } from 'jimu-core'
+import { React, type AllWidgetProps, FormattedMessage, type DataSource, DataSourceComponent, type FeatureLayerQueryParams } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource, type FeatureDataRecord } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -18,12 +18,12 @@ export default function (props: AllWidgetProps<unknown>) {
   const distanceNum = useRef<Slider>()
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
-  const [queryParams, setQueryParams] = useState<FeatureLayerQueryParams>({
+  const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
+  const queryParams = {
     where: '1=1',
     outFields: ['*'],
     pageSize: 10
-  })
-  const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
+  } as FeatureLayerQueryParams
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
@@ -236,6 +236,6 @@ export default function (props: AllWidgetProps<unknown>) {
       onActiveViewChange={onActiveViewChange}
     />
 
-    <DataSourceComponent useDataSource={props.useDataSources[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource} />
+    <DataSourceComponent useDataSource={props.useDataSources?.[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource} />
   </div>
 }

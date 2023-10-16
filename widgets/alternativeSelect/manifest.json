@@ -1,21 +1,14 @@
 {
-  "name": "nearMePlus",
-  "label": "Near Me Plus",
+  "name": "alternativeSelect",
+  "label": "Alternative select",
   "type": "widget",
   "version": "0.1.0",
   "exbVersion": "1.11.0",
   "author": "Esri Deutschland",
-  "description": "This is the widget used in developer documentation",
+  "description": "Alternative selection method",
   "copyright": "",
   "dependency": "jimu-arcgis",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
-  "dataActions": [
-    {
-      "name": "nearMePlus",
-      "label": "Near Me Plus",
-      "uri": "data-actions/near-me-plus"
-    }
-  ],
   "properties": {},
   "translatedLocales": [
     "en"
