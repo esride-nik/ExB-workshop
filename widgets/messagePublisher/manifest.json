@@ -1,0 +1,22 @@
+{
+  "name": "messagePublisher",
+  "label": "Message Publisher",
+  "dependency": "jimu-arcgis",
+  "type": "widget",
+  "version": "0.9.0",
+  "exbVersion": "1.10.0",
+  "author": "Niklas Köhn, Esri Deutschland",
+  "description": "This widget executes a trigger and is capable to connect it to a message action.",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0", 
+  "publishMessages": [
+    "DATA_RECORDS_SELECTION_CHANGE"
+  ],
+  "properties": {
+    "hasConfig": true
+  },
+  "translatedLocales": [
+    "en",
+    "de"
+  ]
+}
