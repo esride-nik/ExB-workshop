@@ -1,7 +1,7 @@
-import { React, AllWidgetProps } from 'jimu-core'
-import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
+import { React, type AllWidgetProps } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import Graphic from 'esri/Graphic'
-import { Point } from 'esri/geometry'
+import { type Point } from 'esri/geometry'
 
 const { useState, useEffect } = React
 

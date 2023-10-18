@@ -1,15 +1,20 @@
-import { AllDataSourceTypes, Immutable, React, type UseDataSource } from 'jimu-core'
-import { MapWidgetSelector } from 'jimu-ui/advanced/setting-components'
-import { type AllWidgetSettingProps } from 'jimu-for-builder'
-import { DataSourceSelector } from 'jimu-ui/advanced/data-source-selector'
+import { React, UseDataSource } from 'jimu-core'
+import { AllWidgetSettingProps } from 'jimu-for-builder'
+import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
+import defaultMessages from './translations/default'
 
-export default function Setting (
-  props: AllWidgetSettingProps<unknown>
-): React.ReactElement {
+export default function Setting (props: AllWidgetSettingProps<{}>) {
+  // const onFieldChange = (allSelectedFields: IMFieldSchema[]) => {
+  //     props.onSettingChange({
+  //         id: props.id,
+  //         useDataSources: [{ ...props.useDataSources[0], ...{ fields: allSelectedFields.map((f) => f.jimuName) } }],
+  //     });
+  // };
+
   const onMapSelected = (useMapWidgetIds: string[]) => {
     props.onSettingChange({
       id: props.id,
-      useMapWidgetIds
+      useMapWidgetIds: useMapWidgetIds
     })
   }
 
@@ -27,16 +32,34 @@ export default function Setting (
     })
   }
 
-  return <div className="sample-js-api-widget-setting p-2">
-    <MapWidgetSelector onSelect={onMapSelected} useMapWidgetIds={props.useMapWidgetIds} />
-
-    <DataSourceSelector
-      types={Immutable([AllDataSourceTypes.FeatureLayer])}
-      useDataSources={props.useDataSources}
-      useDataSourcesEnabled={props.useDataSourcesEnabled}
-      onToggleUseDataEnabled={onToggleUseDataEnabled}
-      onChange={onDataSourceChange}
-      widgetId={props.id}
-    />
-  </div>
+  return (
+        <div className="use-feature-layer-setting p-2">
+            <SettingSection
+                className="map-selector-section"
+                title={props.intl.formatMessage({
+                  id: 'mapWidgetLabel',
+                  defaultMessage: defaultMessages.selectMapWidget
+                })}>
+                <SettingRow>
+                    <MapWidgetSelector onSelect={onMapSelected} useMapWidgetIds={props.useMapWidgetIds} />
+                </SettingRow>
+            </SettingSection>
+            {/* <DataSourceSelector
+                types={Immutable([AllDataSourceTypes.WebMap])}
+                useDataSources={props.useDataSources}
+                useDataSourcesEnabled={props.useDataSourcesEnabled}
+                onToggleUseDataEnabled={onToggleUseDataEnabled}
+                onChange={onDataSourceChange}
+                widgetId={props.id}
+            />
+            {props.useDataSources && props.useDataSources.length > 0 && (
+                <FieldSelector
+                    useDataSources={props.useDataSources}
+                    onChange={onFieldChange}
+                    selectedFields={props.useDataSources[0].fields || Immutable([])}
+                />
+                <JimuMapViewSelector onSelect={onMapSelected} useMapWidgetIds={props.useMapWidgetIds} />
+            )} */}
+        </div>
+  )
 }

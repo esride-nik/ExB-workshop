@@ -1,8 +1,11 @@
-import { type DataRecord, DataRecordsSelectionChangeMessage, MessageManager, React } from 'jimu-core'
+import { React, type AllWidgetProps, type DataRecord, DataRecordsSelectionChangeMessage, MessageManager } from 'jimu-core'
 import { Button } from 'jimu-ui'
 
-export default class Widget extends React.PureComponent<unknown> {
-  publishMessage (e: any) {
+/**
+ * This widget will show features from a configured feature layer
+ */
+export default function Widget (props: AllWidgetProps<{ Config }>) {
+  const publishMessage = (e: any) => {
     const id = 'one'
     const result = {
       records: [] as DataRecord[]
@@ -13,7 +16,5 @@ export default class Widget extends React.PureComponent<unknown> {
     )
   }
 
-  render () {
-    return <Button onClick={this.publishMessage}></Button>
-  }
+  return <Button onClick={publishMessage}>Publish message</Button>
 }
