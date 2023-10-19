@@ -10,11 +10,12 @@
   "copyright": "Esri Deutschland GmbH, 2023",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "defaultSize": {
-    "width": 400,
-    "height": 400
+    "width": 100,
+    "height": 100
   },
   "publishMessages": [
     "DATA_RECORDS_SELECTION_CHANGE"
   ],
+  "messageActions": [],
   "translatedLocales": ["en", "de"]
 }

@@ -33,7 +33,6 @@ export default function (props: AllWidgetProps<unknown>) {
   } as FeatureLayerQueryParams
 
   let bufferDistance = 100
-  let featureFilter: __esri.FeatureFilter = null
   let featureLayerView: FeatureLayerView = null
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
@@ -70,30 +69,12 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const executeAttributiveQuery = async () => {
-    // if (flDataSource && featureLayerView) {
-
     const flvResults = await featureLayerView?.queryFeatures({
       geometry: bufferGraphic.geometry,
       spatialRelationship: 'contains'
     })
 
     featureLayerView?.highlight(flvResults.features)
-
-    //   const dsResult = await flDataSource.query({
-    //     where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
-    //   })
-    //   console.log('dsResult', dsResult)
-    //   const records = dsResult?.records as FeatureDataRecord[]
-
-    //   if (records.length > 0) {
-    //     flDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
-    //   } else {
-    //     flDataSource.clearSelection()
-    //   }
-    //   console.log('records selected', records)
-    // } else {
-    //   console.warn('Data source not available or layer not in map.')
-    // }
   }
 
   const initSketch = () => {
@@ -180,29 +161,10 @@ export default function (props: AllWidgetProps<unknown>) {
   const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
     if (distance > 0 && filterGeometry) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
-      // updateFilter()
     } else {
       bufferGraphic.geometry = null
-      // updateFilter()
     }
   }
-
-  // const updateFilter = () => {
-  //   featureFilter = {
-  //     geometry: filterGeometry,
-  //     spatialRelationship: 'intersects',
-  //     distance: bufferDistance,
-  //     units: 'meters'
-  //   } as unknown as __esri.FeatureFilter
-  //   // set effect on excluded features
-  //   // make them gray and transparent
-  //   if (featureLayerView) {
-  //     featureLayerView.featureEffect = {
-  //       filter: featureFilter,
-  //       excludedEffect: 'grayscale(100%) opacity(30%)'
-  //     } as unknown as __esri.FeatureEffect
-  //   }
-  // }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
     // if we have a "previous" map where the widget was already added, we're hiding the old widget until it is shown again from via useEffect with the new settings.
