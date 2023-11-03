@@ -1,8 +1,8 @@
 /** @jsx jsx */
-import { AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core'
-import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
+import { type AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
-import { IMConfig } from '../config'
+import { type IMConfig } from '../config'
 
 import webMercatorUtils from 'esri/geometry/support/webMercatorUtils'
 import Point from 'esri/geometry/Point'
@@ -10,14 +10,14 @@ import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import Graphic from 'esri/Graphic'
 import Polygon from 'esri/geometry/Polygon'
 import { Button, NumericInput } from 'jimu-ui'
-import { Polyline } from 'esri/geometry'
+import { type Polyline } from 'esri/geometry'
 import geometryEngine from 'esri/geometry/geometryEngine'
 import SpatialReference from 'esri/geometry/SpatialReference'
 import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol'
 import Color from 'esri/Color'
-import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol'
+import type SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol'
 import FeatureLayer from 'esri/layers/FeatureLayer'
-import UniqueValueRenderer from 'esri/renderers/UniqueValueRenderer'
+import type UniqueValueRenderer from 'esri/renderers/UniqueValueRenderer'
 interface State {
   x: number
   y: number
