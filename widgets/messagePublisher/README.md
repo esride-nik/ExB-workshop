@@ -1,4 +1,6 @@
 # Message Publisher
+-- work in progress --
+
 This widget executes a trigger and is capable to connect it to a message action.
 
 ### How to use the sample
