@@ -1,7 +1,7 @@
-import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
+import { React, type AllWidgetProps, FormattedMessage, DataSourceComponent, type FeatureLayerQueryParams, type DataSource } from 'jimu-core'
 import { useDropzone } from 'react-dropzone'
 import { gpx } from '@tmcw/togeojson'
-import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
+import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource } from 'jimu-arcgis'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import Graphic from 'esri/Graphic'
 import geometryEngine from 'esri/geometry/geometryEngine'
@@ -10,15 +10,22 @@ import Polyline from 'esri/geometry/Polyline'
 import type Geometry from 'esri/geometry/Geometry'
 import webMercatorUtils from 'esri/geometry/support/webMercatorUtils'
 import defaultMessages from './translations/default'
+import { useState } from 'react'
 
 const { useCallback } = React
 
-export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
-  let jimuMapView: JimuMapView
+export default function (props: AllWidgetProps<unknown>) {
+  const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
+  const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
   let gpxLayer: GraphicsLayer
+  const queryParams = {
+    where: '1=1',
+    outFields: ['*'],
+    pageSize: 10
+  } as FeatureLayerQueryParams
 
   const isConfigured = () => {
-    return useMapWidgetIds && useMapWidgetIds.length === 1
+    return props.useDataSourcesEnabled && props.useDataSources?.length > 0 && props.useMapWidgetIds?.length > 0
   }
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -38,7 +45,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
         parseGpx(reader.result.toString())
       }
     })
-  }, [])
+  }, [jimuMapView, flDataSource])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
@@ -55,6 +62,14 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
             paths: feature.geometry.coordinates,
             spatialReference: { wkid: 4326 }
           }),
+          symbol: {
+            type: 'simple-line',
+            width: 1,
+            color: [255, 0, 255, 1],
+            style: 'solid',
+            cap: 'round',
+            join: 'round'
+          } as unknown as __esri.SimpleLineSymbol,
           attributes: feature.properties
         })
       })
@@ -63,7 +78,8 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
 
   const addTrackToMap = (esriFeatures: Graphic[]) => {
     gpxLayer = new GraphicsLayer({
-      listMode: 'hide'
+      listMode: 'show',
+      id: 'gpxLineString'
     })
     gpxLayer.addMany(esriFeatures)
     if (jimuMapView) {
@@ -71,7 +87,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
       jimuMapView.view.goTo(esriFeatures)
     }
 
-    // produktiv bitte Array-Inhalt verifizieren
+    // productive version: please verify array contents!
     createBuffer(
       esriFeatures.map((graphic: Graphic) => webMercatorUtils.geographicToWebMercator(graphic.geometry))
     )
@@ -87,7 +103,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
         style: 'solid',
         outline: {
           color: 'white',
-          width: 1
+          width: 0.1
         }
       }
       const bufferGraphic = new Graphic({
@@ -95,17 +111,37 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
         symbol: polygonSymbol
       })
       gpxLayer.add(bufferGraphic)
+
+      const fl = flDataSource.layer
+      const flQuery = fl.createQuery()
+      flQuery.geometry = bufferGraphic.geometry
+      flQuery.spatialRelationship = 'contains'
+      flQuery.outStatistics = [
+        {
+          statisticType: 'count',
+          onStatisticField: 'gattung',
+          outStatisticFieldName: 'gattung_count'
+        } as unknown as __esri.StatisticDefinition
+      ]
+      flQuery.groupByFieldsForStatistics = ['gattung']
+      const flResult = await fl.queryFeatures(flQuery)
+      console.log(flResult, flResult.features.length)
     }
   }
 
-  const onActiveViewChange = (jmv: JimuMapView) => {
+  const onActiveViewChange = async (jmv: JimuMapView) => {
     if (jmv) {
-      jimuMapView = jmv
+      setJimuMapView(jmv)
     }
+  }
+
+  const setDataSource = (ds: DataSource) => {
+    setFlDataSource(ds as FeatureLayerDataSource)
+    console.log(ds.id)
   }
 
   if (!isConfigured()) {
-    return 'Select a map'
+    return <FormattedMessage id="cfgDataSources" defaultMessage={defaultMessages.cfgDataSources} />
   }
   const dropzoneStyle = {
     border: '1px solid #ddd',
@@ -133,7 +169,8 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
                     )}
             </div>
 
-            <JimuMapViewComponent useMapWidgetId={useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
+            <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
+            <DataSourceComponent useDataSource={props.useDataSources?.[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource} />
         </div>
   )
 }
