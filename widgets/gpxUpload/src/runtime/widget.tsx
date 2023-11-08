@@ -1,27 +1,19 @@
-import { React, AllWidgetProps } from 'jimu-core'
+import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { useDropzone } from 'react-dropzone'
 import { gpx } from '@tmcw/togeojson'
-
-import defaultMessages from './translations/default'
-import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
-
+import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import Graphic from 'esri/Graphic'
 import geometryEngine from 'esri/geometry/geometryEngine'
-import Polygon from 'esri/geometry/Polygon'
+import type Polygon from 'esri/geometry/Polygon'
 import Polyline from 'esri/geometry/Polyline'
-import Geometry from 'esri/geometry/Geometry'
+import type Geometry from 'esri/geometry/Geometry'
 import webMercatorUtils from 'esri/geometry/support/webMercatorUtils'
+import defaultMessages from './translations/default'
 
 const { useCallback } = React
 
-/**
- * This widget will show features from a configured feature layer
- */
-// export default function Widget (props: AllWidgetProps<{ Config }>) {
-export default function ({
-  useMapWidgetIds
-}: AllWidgetProps<{}>) {
+export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   let jimuMapView: JimuMapView
   let gpxLayer: GraphicsLayer
 
@@ -33,8 +25,12 @@ export default function ({
     acceptedFiles.forEach((file) => {
       const reader = new FileReader()
 
-      reader.onabort = () => console.log('file reading was aborted')
-      reader.onerror = () => console.log('file reading has failed')
+      reader.onabort = () => {
+        console.log('file reading was aborted')
+      }
+      reader.onerror = () => {
+        console.log('file reading has failed')
+      }
 
       reader.readAsText(file)
       reader.onloadend = () => {
@@ -76,7 +72,9 @@ export default function ({
     }
 
     // produktiv bitte Array-Inhalt verifizieren
-    createBuffer(esriFeatures.map((graphic: Graphic) => webMercatorUtils.geographicToWebMercator(graphic.geometry)))
+    createBuffer(
+      esriFeatures.map((graphic: Graphic) => webMercatorUtils.geographicToWebMercator(graphic.geometry))
+    )
   }
 
   const createBuffer = async (inputGeometries: Geometry[]) => {
@@ -118,7 +116,7 @@ export default function ({
         <div
             className="widget-gpx-upload"
             style={{ width: '100%', height: '100%', maxHeight: '800px', overflow: 'auto' }}>
-            <h3>Drop this</h3>
+            <h3><FormattedMessage id="dropIt" defaultMessage={defaultMessages.dropIt} /></h3>
 
             <div {...getRootProps()}>
                 <input {...getInputProps()} />
@@ -135,10 +133,7 @@ export default function ({
                     )}
             </div>
 
-            <JimuMapViewComponent
-              useMapWidgetId={useMapWidgetIds?.[0]}
-              onActiveViewChange={onActiveViewChange}
-            />
+            <JimuMapViewComponent useMapWidgetId={useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
         </div>
   )
 }

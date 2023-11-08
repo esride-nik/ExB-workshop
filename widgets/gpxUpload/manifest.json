@@ -3,15 +3,15 @@
   "label": "GPX upload and interpretation",
   "type": "widget",
   "dependency": ["jimu-arcgis"],
-  "version": "0.1.0",
-  "exbVersion": "1.7.0",
+  "version": "0.1.1",
+  "exbVersion": "1.12.0",
   "author": "Niklas Köhn, Esri Deutschland GmbH",
-  "description": "Derived from the showextent demo widget, this widget queries the w3w API for a position.",
+  "description": "Parses and displays a GPX LineString.",
   "copyright": "Esri Deutschland GmbH, 2021",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "defaultSize": {
     "width": 400,
-    "height": 400
+    "height": 200
   },
   "translatedLocales": ["en", "de"]
 }
