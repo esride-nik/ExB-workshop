@@ -119,13 +119,14 @@ export default function (props: AllWidgetProps<unknown>) {
       flQuery.outStatistics = [
         {
           statisticType: 'count',
-          onStatisticField: 'gattung',
-          outStatisticFieldName: 'gattung_count'
+          onStatisticField: props.useDataSources[0].fields[0],
+          outStatisticFieldName: props.useDataSources[0].fields[0] + '_count'
         } as unknown as __esri.StatisticDefinition
       ]
-      flQuery.groupByFieldsForStatistics = ['gattung']
+      flQuery.groupByFieldsForStatistics = [props.useDataSources[0].fields[0]]
+      flQuery.orderByFields = [props.useDataSources[0].fields[0] + '_count DESC']
       const flResult = await fl.queryFeatures(flQuery)
-      console.log(flResult, flResult.features.length)
+      console.log(flResult.features.map((f: __esri.Graphic) => f.attributes), flResult.features.length)
     }
   }
 
@@ -141,7 +142,7 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   if (!isConfigured()) {
-    return <FormattedMessage id="cfgDataSources" defaultMessage={defaultMessages.cfgDataSources} />
+    return <h5><FormattedMessage id="cfgDataSources" defaultMessage={defaultMessages.cfgDataSources} /></h5>
   }
   const dropzoneStyle = {
     border: '1px solid #ddd',

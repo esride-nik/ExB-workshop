@@ -1,8 +1,8 @@
-import { AllDataSourceTypes, Immutable, React, type UseDataSource } from 'jimu-core'
+import { AllDataSourceTypes, type IMFieldSchema, Immutable, React, type UseDataSource } from 'jimu-core'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import defaultMessages from './translations/default'
-import { DataSourceSelector } from 'jimu-ui/advanced/data-source-selector'
+import { DataSourceSelector, FieldSelector } from 'jimu-ui/advanced/data-source-selector'
 
 export default function Setting (props: AllWidgetSettingProps<unknown>) {
   const onMapSelected = (useMapWidgetIds: string[]) => {
@@ -23,6 +23,13 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
     props.onSettingChange({
       id: props.id,
       useDataSources: useDataSources
+    })
+  }
+
+  const onFieldChange = (allSelectedFields: IMFieldSchema[]) => {
+    props.onSettingChange({
+      id: props.id,
+      useDataSources: [{ ...props.useDataSources[0], ...{ fields: allSelectedFields.map(f => f.jimuName) } }]
     })
   }
 
@@ -52,6 +59,14 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
                     onChange={onDataSourceChange}
                     widgetId={props.id}
                 />
+                {
+                  props.useDataSources && props.useDataSources.length > 0 &&
+                  <FieldSelector
+                    useDataSources={props.useDataSources}
+                    onChange={onFieldChange}
+                    selectedFields={props.useDataSources[0].fields || Immutable([])}
+                  />
+                }
             </SettingSection>
         </div>
   )
