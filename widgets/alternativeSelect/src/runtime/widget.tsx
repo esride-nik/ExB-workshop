@@ -19,6 +19,7 @@ export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
   const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
+  const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>(undefined)
   const queryParams = {
     where: '1=1',
     outFields: ['*'],
@@ -27,7 +28,6 @@ export default function (props: AllWidgetProps<unknown>) {
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
-  let featureLayerView: FeatureLayerView = null
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
   let filterGeometry: Geometry = null
@@ -59,7 +59,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const getFlView = async (layerId: string) => {
     const fl = jimuMapView.view.map.findLayerById(layerId)
-    featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+    setFeatureLayerView(await jimuMapView.view.whenLayerView(fl) as FeatureLayerView)
   }
 
   const executeAttributiveQuery = async () => {
