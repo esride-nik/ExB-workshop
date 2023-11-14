@@ -1,4 +1,4 @@
-import { React, type AllWidgetProps, FormattedMessage, DataSourceComponent, type FeatureLayerQueryParams, type DataSource } from 'jimu-core'
+import { React, type AllWidgetProps, FormattedMessage, DataSourceComponent, type FeatureLayerQueryParams, DataSourceManager, DataSourceStatus, type DataRecord } from 'jimu-core'
 import { useDropzone } from 'react-dropzone'
 import { gpx } from '@tmcw/togeojson'
 import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource } from 'jimu-arcgis'
@@ -16,13 +16,7 @@ const { useCallback } = React
 
 export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
-  const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
   let gpxLayer: GraphicsLayer
-  const queryParams = {
-    where: '1=1',
-    outFields: ['*'],
-    pageSize: 10
-  } as FeatureLayerQueryParams
 
   const isConfigured = () => {
     return props.useDataSourcesEnabled && props.useDataSources?.length > 0 && props.useMapWidgetIds?.length > 0
@@ -45,7 +39,7 @@ export default function (props: AllWidgetProps<unknown>) {
         parseGpx(reader.result.toString())
       }
     })
-  }, [jimuMapView, flDataSource])
+  }, [jimuMapView])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
@@ -112,21 +106,7 @@ export default function (props: AllWidgetProps<unknown>) {
       })
       gpxLayer.add(bufferGraphic)
 
-      const fl = flDataSource.layer
-      const flQuery = fl.createQuery()
-      flQuery.geometry = bufferGraphic.geometry
-      flQuery.spatialRelationship = 'contains'
-      flQuery.outStatistics = [
-        {
-          statisticType: 'count',
-          onStatisticField: props.useDataSources[0].fields[0],
-          outStatisticFieldName: props.useDataSources[0].fields[0] + '_count'
-        } as unknown as __esri.StatisticDefinition
-      ]
-      flQuery.groupByFieldsForStatistics = [props.useDataSources[0].fields[0]]
-      flQuery.orderByFields = [props.useDataSources[0].fields[0] + '_count DESC']
-      const flResult = await fl.queryFeatures(flQuery)
-      console.log(flResult.features.map((f: __esri.Graphic) => f.attributes), flResult.features.length)
+      setSourceRecordsToOutputDs(bufferGraphic.geometry)
     }
   }
 
@@ -136,9 +116,65 @@ export default function (props: AllWidgetProps<unknown>) {
     }
   }
 
-  const setDataSource = (ds: DataSource) => {
-    setFlDataSource(ds as FeatureLayerDataSource)
-    console.log(ds.id)
+  const onDataSourceCreated = () => {
+    setSourceRecordsToOutputDs()
+  }
+
+  const onCreateDataSourceFailed = () => {
+    setSourceRecordsToOutputDs()
+  }
+
+  const getOutputDataSource = () => {
+    return DataSourceManager.getInstance().getDataSource(props.outputDataSources?.[0])
+  }
+  const getOriginDataSource = () => {
+    return DataSourceManager.getInstance().getDataSource(props.useDataSources?.[0]?.dataSourceId)
+  }
+
+  const setSourceRecordsToOutputDs = async (queryGeometry: Geometry = undefined) => {
+    /**
+     * Just like using other data sources, to use an output data source, widget should use it through `DataSourceComponent`, the framework will create the data source instance on the fly.
+     * No output data source instance means there isn't any widgets using the output data source,
+     * in this case, no need to set source to the output data source.
+     */
+    if (!getOutputDataSource()) {
+      return
+    }
+
+    /**
+     * Need origin data source instance to get source records.
+     * If do not have origin data source instance, set status of output data source to not ready, which indicates output data source is not ready to do query.
+     */
+    if (!getOriginDataSource()) {
+      getOutputDataSource().setStatus(DataSourceStatus.NotReady)
+      getOutputDataSource().setCountStatus(DataSourceStatus.NotReady)
+      return
+    }
+
+    let dataRecords: DataRecord[] = []
+    if (queryGeometry) {
+      const flQP: FeatureLayerQueryParams = {
+        geometry: queryGeometry,
+        spatialRel: 'esriSpatialRelContains'
+      }
+
+      const featureLayerDs = getOriginDataSource() as FeatureLayerDataSource
+      const res = await featureLayerDs.query(flQP)
+      dataRecords = res.records
+    }
+
+    /**
+       * Set source to the output data source.
+       * Output data source can use the source to do query, to load records and so on.
+       * If use the source to load records,
+       * will save the loaded records to output data source instance and widget can get these records by `outputDs.getRecords()`.
+       */
+    getOutputDataSource()?.setSourceRecords(dataRecords)
+    /**
+       * Status of output data source is not ready by default, set it to unloaded to let other widgets know output data source is ready to do query.
+       */
+    getOutputDataSource()?.setStatus(DataSourceStatus.Unloaded)
+    getOutputDataSource()?.setCountStatus(DataSourceStatus.Unloaded)
   }
 
   if (!isConfigured()) {
@@ -171,7 +207,13 @@ export default function (props: AllWidgetProps<unknown>) {
             </div>
 
             <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
-            <DataSourceComponent useDataSource={props.useDataSources?.[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource} />
+
+            <DataSourceComponent
+              useDataSource={props.useDataSources[0]}
+              widgetId={props.id}
+              onDataSourceCreated={onDataSourceCreated}
+              onCreateDataSourceFailed={onCreateDataSourceFailed}
+            />
         </div>
   )
 }

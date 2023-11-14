@@ -1,4 +1,4 @@
-import { AllDataSourceTypes, type IMFieldSchema, Immutable, React, type UseDataSource } from 'jimu-core'
+import { AllDataSourceTypes, type IMFieldSchema, Immutable, React, type UseDataSource, DataSourceManager, type DataSourceJson, DataSourceTypes } from 'jimu-core'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import defaultMessages from './translations/default'
@@ -20,10 +20,21 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
   }
 
   const onDataSourceChange = (useDataSources: UseDataSource[]) => {
+    const originDsId = useDataSources[0]?.dataSourceId
+    const originDs = DataSourceManager.getInstance().getDataSource(originDsId)
+    const outputDsJsons: DataSourceJson[] = [{
+      id: `${props.id}-ouput`,
+      type: DataSourceTypes.FeatureLayer,
+      label: `${props.manifest.name}-output-data-source`,
+      geometryType: originDs.getDataSourceJson().geometryType,
+      originDataSources: [useDataSources[0]],
+      isDataInDataSourceInstance: true
+    }]
+
     props.onSettingChange({
       id: props.id,
       useDataSources: useDataSources
-    })
+    }, outputDsJsons)
   }
 
   const onFieldChange = (allSelectedFields: IMFieldSchema[]) => {
