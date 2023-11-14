@@ -18,8 +18,11 @@ export default function (props: AllWidgetProps<unknown>) {
   const distanceNum = useRef<Slider>()
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
-  const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
-  const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>(undefined)
+  // const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
+  let flDataSource: FeatureLayerDataSource
+  // const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>(undefined)
+  let featureLayerView: FeatureLayerView
+
   const queryParams = {
     where: '1=1',
     outFields: ['*'],
@@ -59,7 +62,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const getFlView = async (layerId: string) => {
     const fl = jimuMapView.view.map.findLayerById(layerId)
-    setFeatureLayerView(await jimuMapView.view.whenLayerView(fl) as FeatureLayerView)
+    featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
   }
 
   const executeAttributiveQuery = async () => {
@@ -216,7 +219,8 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const setDataSource = (ds: DataSource) => {
-    setFlDataSource(ds as FeatureLayerDataSource)
+    // setFlDataSource(ds as FeatureLayerDataSource)
+    flDataSource = ds as FeatureLayerDataSource
     console.log(ds.id)
   }
 
