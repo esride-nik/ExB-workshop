@@ -1,9 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const webpack = require('webpack');
 var os = require('os');
 var ignore = require('ignore');
-const fsExtra = require('fs-extra');
 
 const translatedLocales = [
   'en', 'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'de', 'el', 'es', 'et', 'fi', 'fr', 'he', 'hr', 'hu', 'id', 'it', 'ja', 'ko', 'lt', 'lv',
@@ -11,6 +9,7 @@ const translatedLocales = [
 ]
 
 const webpackCommon = require('./webpack.common').getCommon();
+const configOverrideFunc = require('./widget-webpack-override')
 
 exports.isIgnore = isIgnore
 
@@ -43,7 +42,7 @@ function getOneWidgetToBeCopiedFiles(rootFolder, widgetFolder){
     }},
   ];
 
-  if(process.env.NODE_ENV === 'production' && /^widgets/.test(rPath)){
+  if(process.env.NODE_ENV === 'production' && /^widgets/.test(rPath) && webpackCommon.isDevEdition){
     files.push({ from: `${widgetFolder}/src`, to: `${rPath}/src`});
     fs.existsSync(`${widgetFolder}/tests`) && files.push({ from: `${widgetFolder}/tests`, to: `${rPath}/tests`});
   }
@@ -55,6 +54,13 @@ function getOneWidgetToBeCopiedFiles(rootFolder, widgetFolder){
   fs.existsSync(`${widgetFolder}/src/setting/translations`) && files.push({ from: `${widgetFolder}/src/setting/translations`, to: `${rPath}/dist/setting/translations`});
   fs.existsSync(`${widgetFolder}/src/setting/assets`) && files.push({ from: `${widgetFolder}/src/setting/assets`, to: `${rPath}/dist/setting/assets`});
 
+  const customCopyFiles = `${widgetFolder}/copy-files.json`
+  if (fs.existsSync(customCopyFiles)) {
+    const copyFilesJson = JSON.parse(fs.readFileSync(customCopyFiles, 'utf8'))
+    copyFilesJson.forEach(copyFile => {
+      files.push({ from: `${widgetFolder}/${copyFile.from}`, to: `${rPath}/${copyFile.to}`})
+    })
+  }
   return files;
 }
 
@@ -100,6 +106,17 @@ function getOneWidgetEntries(rootFolder, widgetFolder){
   //data actions
   if(manifestJson.dataActions){
     manifestJson.dataActions.forEach(action => {
+      entries[`${rPath}/dist/${action.uri}`] = `${widgetFolder}/src/${action.uri}.ts`;
+
+      if (action.settingUri) {
+        entries[`${rPath}/dist/${action.settingUri}`] = `${widgetFolder}/src/${action.settingUri}.tsx`;
+      }
+    });
+  }
+
+  //batch data actions
+  if(manifestJson.batchDataActions){
+    manifestJson.batchDataActions.forEach(action => {
       entries[`${rPath}/dist/${action.uri}`] = `${widgetFolder}/src/${action.uri}.ts`;
 
       if (action.settingUri) {
@@ -174,19 +191,26 @@ function getWidgetsInfoForWebpack(widgetsFolder){
   let widgetOrder = {
     1: {
       'arcgis-map': 1,
-      legend: 2,
-      'map-layers': 3,
-      'floor-filter': 4,
-      'utility-network-trace': 5,
-      bookmark: 6,
-      draw: 7,
-      directions: 8,
-      'fly-controller': 9,
-      'coordinate-conversion': 10,
-      'oriented-imagery': 11,
-      'elevation-profile': 12,
-      'suitability-modeler': 13,
-      'ba-infographic': 14
+      'basemap-gallery': 2,
+      'coordinates': 3,
+      legend: 4,
+      'map-layers': 5,
+      swipe: 6,
+      '3d-toolbox': 7,
+      'floor-filter': 8,
+      bookmark: 9,
+      draw: 10,
+      directions: 11,
+      print: 12,
+      'fly-controller': 13,
+      'coordinate-conversion': 14,
+      'near-me': 15,
+      'analysis': 16,
+      'oriented-imagery': 17,
+      'elevation-profile': 18,
+      'suitability-modeler': 19,
+      'utility-network-trace': 20,
+      'ba-infographic': 21
     },
 
     2: {
@@ -198,8 +222,10 @@ function getWidgetsInfoForWebpack(widgetsFolder){
       'feature-info': 205,
       search: 206,
       edit: 207,
-      'branch-version-management': 208,
-      survey123: 209,
+      timeline: 208,
+      'add-data': 209,
+      'branch-version-management': 210,
+      survey123: 211,
     },
 
     3: {
@@ -224,7 +250,8 @@ function getWidgetsInfoForWebpack(widgetsFolder){
       fixed: 800,
       sidebar: 801,
       row: 802,
-      column: 803
+      column: 803,
+      grid: 804
     },
 
     // group 9 is section and nav
@@ -248,9 +275,25 @@ function getWidgetsInfoForWebpack(widgetsFolder){
       return;
     }
 
-    Object.assign(entries, getOneWidgetEntries(path.resolve(widgetsFolder, '..'), widgetFolder));
+    const oneWidgetEntry = getOneWidgetEntries(path.resolve(widgetsFolder, '..'), widgetFolder)
+    const oneWidgetToBeCopiedFiles = getOneWidgetToBeCopiedFiles(path.resolve(widgetsFolder, '..'), widgetFolder)
 
-    files = files.concat(getOneWidgetToBeCopiedFiles(path.resolve(widgetsFolder, '..'), widgetFolder));
+    // If multiple widgets create the same entry, we'll remove the duplicated ones.
+    Object.keys(oneWidgetEntry).forEach(e => {
+      const ePath = path.resolve(e)
+      if (Object.keys(entries).find(e => path.resolve(e) === ePath)) {
+        return
+      }
+      entries[e] = oneWidgetEntry[e]
+    })
+
+    // If multiple widgets copy the same file, we'll remove the duplicated ones.
+    oneWidgetToBeCopiedFiles.forEach(f => {
+      if (files.find(_f => _f.from === f.from && _f.to === f.to)){
+        return
+      }
+      files.push(f)
+    })
 
     infos.push(getOneWidgetInfo(path.resolve(widgetsFolder, '..'), widgetFolder));
   });
@@ -507,6 +550,7 @@ function getValueFromTranslation(translationContent, key){
   if(lastChar === ','){
     label = label.substring(0, label.length - 1) // remove last comma
   }
+  label = label.replace(/\\"/g, '"').replace(/\\'/g, "'") // remove the \' and \"
   label = label.substring(1, label.length - 1) // remove heading and trailing quotation
   return label
   // if(label.indexOf('"') > -1){
@@ -635,7 +679,7 @@ function getOneTemplateInfo(templateFolder, templatesFolder){
   if(manifestJson.templateType === 'app'){
     info.isMultiplePage = manifestJson.isMultiplePage,
     info.isMapAware = manifestJson.isMapAware,
-    info.isNewTemplate = manifestJson.isNewTemplate
+    info.templateCreateVersion = manifestJson.templateCreateVersion
     info.tags = manifestJson.tags
   }
 
@@ -710,7 +754,8 @@ function getWidgetsWebpackConfig(entries, toBeCopiedFiles, toBeCleanFiles){
   if(process.env.STAT){
     config.optimization = {concatenateModules: false}
   }
-  return config
+
+  return configOverrideFunc(config)
 }
 
 exports.getThemesWebpackConfig = getThemesWebpackConfig;

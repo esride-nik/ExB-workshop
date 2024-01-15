@@ -1,9 +1,9 @@
 exports.getCommon = function (commonOptions = {}) {
   const path = require('path');
   const fs = require('fs');
+  const fsExtra = require('fs-extra')
 
   const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-  const HappyPack = require('happypack');
   // remove unnecessary js files when entries are css
   const CssEntryPlugin = require('./css-entry-plugin');
   const {CleanWebpackPlugin} = require('clean-webpack-plugin');
@@ -32,7 +32,15 @@ exports.getCommon = function (commonOptions = {}) {
 
   // portal and DE build do not use buildNumber
   const buildNumber = (isInPortal || isDevEdition) ? '' : (process.env.BUILD_NUMBER || '');
-  const jsApiUrl = process.env.ARCGIS_JSAPI_URL || 'https://js.arcgis.com/4.23/';
+  const jsApiUrl = process.env.ARCGIS_JSAPI_URL || 'https://js.arcgis.com/4.28/';
+
+  const cspWhiteList = [
+    '*.arcgis.com',
+    '*.esri.com',
+    'https://cdn.jsdelivr.net/npm/@esri/arcgis-html-sanitizer@2.9.0/dist/umd/arcgis-html-sanitizer.min.js',
+    'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'
+  ].join(' ')
+  const cspMetaTag = (isInPortal || isDevEdition) ? '' : `<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' blob: ${cspWhiteList}">`
 
   const extractThemeStylePlugin = new MiniCssExtractPlugin({
     filename: '[name].css'
@@ -94,31 +102,24 @@ exports.getCommon = function (commonOptions = {}) {
 
   let isThemeStyle = (styleFile) => /themes\/(.)+\/style\.(scss|css)$/.test(styleFile) ||
     /jimu-ui\/lib\/styles\/(.)+\.(scss|css)/.test(styleFile) || /jimu-theme\/lib\/base\/(.)+\.(scss|css)/.test(styleFile);
-  let tsLoader = {loader: 'happypack/loader', options: {id: 'happy-ts'}};
+  const tsLoader = { loader: 'thread-loader', options: { workers: require('os').cpus().length - 1 } }
   let bundleAnalyzerPluginPorts = {
-    'jimu-arcgis': 9001,
-    'jimu-core': 9002,
+    'jimu-core': 9001,
+    'jimu-ui': 9002,
     'jimu-layouts': 9003,
-    'themes': 9004,
-    'experience': 9005,
-    'widgets': 9006,
-    'jimu-ui': 9007,
-    'jimu-for-builder': 9009,
-    'builder': 9000,
-    'site': 8001
-  };
-  let commonPlugins = [new HappyPack({
-    id: tsLoader.options.id,
-    threads: require('os').cpus().length - 1,
-    verbose: false,
-    loaders: [{
-      loader: 'ts-loader',
-      options: {
-        happyPackMode: true,
-        configFile: commonOptions.tsConfigPath || undefined
-      }
-    }]
-  })];
+    'jimu-arcgis': 9004,
+    'jimu-for-builder': 9005,
+    'jimu-theme': 9006,
+    'arcgis-charts': 9007,
+    'builder': 9008,
+    'calcite-components': 9009,
+    'experience': 9010,
+    'widgets': 9011,
+    'themes': 9012,
+    'templates': 9013,
+    'site': 9014
+  }
+  const commonPlugins = []
 
   exports.commonPlugins = commonPlugins;
   exports.extractThemeStylePlugin = extractThemeStylePlugin;
@@ -127,6 +128,7 @@ exports.getCommon = function (commonOptions = {}) {
   exports.cssLoaders = cssLoaders;
   exports.htmlLoader = htmlLoader;
   exports.urlLoader = urlLoader;
+  exports.cspMetaTag = cspMetaTag
 
   exports.arcgisJsApiUrl = jsApiUrl;
   exports.useStructuralUrl = isInPortal ? false : true;
@@ -202,7 +204,8 @@ exports.getCommon = function (commonOptions = {}) {
         /jimu-ui[\\/](.*)lib[\\/](.*)icons/,
         /jimu-icons[\\/](.*)svg[\\/]/,
         /widgets[\\/](.*)[\\/]assets[\\/]icon/,
-        /widgets[\\/](.*)[\\/]assets[\\/]icons/
+        /widgets[\\/](.*)[\\/]assets[\\/]icons/,
+        /widgets[\\/](.*)[\\/]icon\.svg/
       ],
       use: urlLoader
     }, {
@@ -211,7 +214,8 @@ exports.getCommon = function (commonOptions = {}) {
         /jimu-ui[\\/](.*)lib[\\/](.*)icons/,
         /jimu-icons[\\/](.*)svg[\\/]/,
         /widgets[\\/](.*)[\\/]assets[\\/]icon/,
-        /widgets[\\/](.*)[\\/]assets[\\/]icons/
+        /widgets[\\/](.*)[\\/]assets[\\/]icons/,
+        /widgets[\\/](.*)[\\/]icon\.svg/
       ],
       use: [{
         loader: 'svg-inline-loader'
@@ -252,14 +256,31 @@ exports.getCommon = function (commonOptions = {}) {
           }
         }
       }]);
-    }else{
+    } else {
       moduleRules = commonRule.concat([{
         test: file => {
           return /\.tsx?$/.test(file)
         },
         exclude: /node_modules/,
-        use: tsLoader
-      }]);
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              happyPackMode: true
+            }
+          },
+          tsLoader
+        ]
+      }, {
+        test: [
+          /widgets[\\/](.)+[\\/]widget\.tsx/,
+          /widgets[\\/](.)+[\\/]setting\.tsx/,
+        ],
+        use: [{
+          loader: path.join(__dirname, 'update-webpack-public-path-loader.js')
+        }]
+      }])
     }
 
     return moduleRules;
@@ -288,7 +309,7 @@ exports.getCommon = function (commonOptions = {}) {
           ...((toBeCopiedFiles || []).length ? [new CopyWebpackPlugin({ patterns: toBeCopiedFiles })] : [])
         ]);
       }
-      if(process.env.TSCHECK){
+      if(process.env.TSCHECK && fs.existsSync(path.join(__dirname, `../tsconfig/tsconfig-${chunkName}.json`))){
         plugins = plugins.concat([
           new ForkTsCheckerWebpackPlugin({
             async: true,
@@ -307,13 +328,15 @@ exports.getCommon = function (commonOptions = {}) {
   }
 
   function createStatsWriterPlugin(chunkName){
-    const filename = getStatReportsPath(chunkName);
+    const reportFolder = getStatReportsFolder(chunkName);
+    const entryDepsFilePath = path.join(reportFolder, 'entry-dependency.json');
     return new StatsWriterPlugin({
-      filename: filename,
+      filename: compilation => path.join(path.relative(compilation.outputOptions.path, reportFolder), `${chunkName}.json`),
       stats: stats,
       transform: (data, options) => {
         const d = {
           entrypoints: {},
+          chunks: {}, // widget shared chunks, see `getWidgetsWebpackConfig` in webpack-extensions.common
           errors: data.errors,
           warnings: data.warnings,
           outputPath: data.outputPath,
@@ -338,6 +361,44 @@ exports.getCommon = function (commonOptions = {}) {
           })
         }
 
+        const findEntryDependencies = entryName => {
+          const dependencies = []
+          data.entrypoints[entryName].chunks.forEach(chunkId => {
+            const chunk = data.chunks.find(c => c.id === chunkId)
+            chunk.modules.forEach(module => {
+              if(/^external \".*\"$/.test(module.name)){
+                let name = module.name.split(' ')[1]
+                name = name.substring(1, name.length - 1)
+                if (!name.includes('/')) {
+                  name = `${name}/index`
+                }
+                if (name !== entryName) {
+                  dependencies.push(name)
+                }
+              }
+            })
+          })
+          return dependencies
+        }
+
+        /**
+         * The format of entries:
+         * {
+         *    nodes: [{
+         *      name: 'jimu-core',
+         *      size: 100
+         *    }],
+         *    links: [{
+         *      source: 'jimu-core',
+         *      target: 'jimu-arcgis'
+         *    }]
+         * }
+         */
+        let entryDeps = { nodes: [], links: [] }
+        if (fs.existsSync(entryDepsFilePath)) {
+          entryDeps = JSON.parse(fs.readFileSync(entryDepsFilePath), 'utf-8')
+        }
+
         Object.keys(data.entrypoints).forEach(entryName => {
           if(!d.entrypoints[entryName]){
             d.entrypoints[entryName] = {};
@@ -357,8 +418,40 @@ exports.getCommon = function (commonOptions = {}) {
             }
           });
 
+          if (!entryDeps.nodes.find(n => n.name === entryName)) {
+            const chunkId = data.entrypoints[entryName].chunks[0]
+            const chunk = data.chunks.find(c => c.id === chunkId);
+            entryDeps.nodes.push({
+              name: entryName,
+              size: chunk.size
+            })
+          }
+          const dependencies = findEntryDependencies(entryName)
+          dependencies.forEach(dName => {
+            if (entryDeps.links.find(link => link.source === entryName && link.target === dName)) {
+              return
+            }
+            entryDeps.links.push({
+              source: entryName,
+              target: dName
+            })
+          })
         });
 
+        d.chunks = data.chunks.filter(c => c.files[0].startsWith('widgets/chunks')).map(chunck => {
+          const modules = []
+          addModuleNamesToArray(chunck.modules, modules)
+          return {
+            fileName: chunck.files[0],
+            modules: modules
+          }
+        })
+
+        // statsCount ++
+        // entryDependencies.push(entryDeps)
+
+        fsExtra.ensureDirSync(reportFolder)
+        fs.writeFileSync(entryDepsFilePath, JSON.stringify(entryDeps, null, 2), 'utf-8')
         return JSON.stringify(d, null, 2);
       }
     })
@@ -373,7 +466,7 @@ exports.getCommon = function (commonOptions = {}) {
       chunks: true,
     }
   };
-  exports.sourceMapOption = process.env.NODE_ENV === 'production'? false: 'eval-cheap-module-source-map';
+  exports.sourceMapOption = process.env.NODE_ENV === 'production'? false: 'inline-source-map';
   exports.moduleAlias = {
     'jimu-core': path.resolve(__dirname, '../jimu-core'),
     'jimu-theme': path.resolve(__dirname, '../jimu-theme'),
@@ -384,26 +477,40 @@ exports.getCommon = function (commonOptions = {}) {
     'builder': path.resolve(__dirname, '../builder'),
     'jimu-for-test': path.resolve(__dirname, '../jimu-for-test'),
     'jimu-layouts': path.resolve(__dirname, '../jimu-layouts'),
-    'arcgis-charts': path.resolve(__dirname, '../jimu-ui/arcgis-charts'),
     'calcite-components': path.resolve(__dirname, '../jimu-ui/calcite-components'),
   };
   exports.fallback = {
     "os": require.resolve("os-browserify/browser"),
     "util": require.resolve("util/"),
-    "path": require.resolve("path-browserify"),
     "http": require.resolve("stream-http"),
     "url": require.resolve("url/"),
     "stream": require.resolve("stream-browserify"),
     "https": require.resolve("https-browserify"),
     "zlib": require.resolve("browserify-zlib"),
-    "assert": require.resolve("assert/")
+    "assert": require.resolve("assert/"),
+    "buffer": require.resolve("buffer/"),
   }
 
   exports.externalFunction = function({context, request}, callback) {
     if (isRequestExternal(request)) {
       if(['react', 'react-dom', 'react-dom/server'].indexOf(request) > -1){
         callback(null, 'system jimu-core/' + request);
-      }else{
+      } else if (request.startsWith('@arcgis')) {
+        if (request.startsWith('@arcgis/core')) {
+          // for JSAPI ESM, we always use AMD, esri/xxx
+          const segs = request.split('/')
+          let moduleSegs = segs.slice(2, segs.length)
+          moduleSegs.unshift('esri')
+          const moduleName = moduleSegs.join('/')
+          callback(null, 'system ' + moduleName);
+        } else {
+          // for other @arcgis packages, we use AMD format.
+          const moduleName = request.replace('@arcgis/', 'arcgis-amd-packages/arcgis-')
+          callback(null, 'system ' + moduleName);
+        }
+      } else if (['analysis-components', 'analysis-core', 'analysis-shared-utils', 'analysis-tool-app'].includes(request)) {
+        callback(null, 'system ' + `arcgis-amd-packages/${request}`);
+      } else {
         callback(null, 'system ' + request);
       }
     }else{
@@ -413,7 +520,7 @@ exports.getCommon = function (commonOptions = {}) {
 
 
   function isRequestExternal(request){
-    const partialMatchPackages = ['dojo/', 'dijit/', 'dojox/', 'esri/', 'moment', 'dgrid', 'dstore'];
+    const partialMatchPackages = ['dojo/', 'dijit/', 'dojox/', 'esri/', 'moment', 'dgrid', 'dstore', '@arcgis/core'];
 
     const fullMatchPackages = [
       'react', 'react-dom', 'react-dom/server',
@@ -430,11 +537,15 @@ exports.getCommon = function (commonOptions = {}) {
       'jimu-ui',
 
       'jimu-ui/basic/date-picker', 'jimu-ui/basic/sql-expression-runtime', 'jimu-ui/basic/qr-code', 'jimu-ui/basic/color-picker',
-      'jimu-ui/basic/item-selector', 'jimu-ui/basic/file-uploader', 'jimu-ui/basic/imagecrop', 'jimu-ui/basic/guide', 'jimu-ui/basic/list-tree',
+      'jimu-ui/basic/item-selector', 'jimu-ui/basic/file-uploader', 'jimu-ui/basic/imagecrop', 'jimu-ui/basic/guide', 'jimu-ui/basic/list-tree', 'jimu-ui/basic/copy-button',
 
       'jimu-ui/advanced/data-source-selector', 'jimu-ui/advanced/dynamic-url-editor', 'jimu-ui/advanced/expression-builder', 'jimu-ui/advanced/setting-components', 'jimu-ui/advanced/sql-expression-builder',
-      'jimu-ui/advanced/style-setting-components', 'jimu-ui/advanced/rich-text-editor', 'jimu-ui/advanced/setting-components', 'jimu-ui/advanced/resource-selector',
-      'jimu-ui/advanced/theme-components', 'jimu-ui/advanced/map', 'jimu-ui/advanced/chart', 'arcgis-charts', 'calcite-components'
+      'jimu-ui/advanced/utility-selector', 'jimu-ui/advanced/style-setting-components', 'jimu-ui/advanced/rich-text-editor', 'jimu-ui/advanced/setting-components', 'jimu-ui/advanced/resource-selector',
+      'jimu-ui/advanced/map', 'jimu-ui/advanced/chart', 'jimu-ui/advanced/coordinate-control', 'arcgis-charts', 'calcite-components', 'jimu-ui/advanced/chart-engine',
+
+      '@arcgis/charts-components', '@arcgis/charts-js', '@arcgis/charts-shared-utils',
+
+      'analysis-components', 'analysis-core', 'analysis-shared-utils', 'analysis-tool-app'
     ].filter(commonOptions.filterExternals || (() => true));
     return partialMatchPackages.filter(p => request.substring(0, p.length) === p).length > 0 || fullMatchPackages.filter(p => request === p).length > 0;
   }
@@ -482,9 +593,8 @@ exports.getCommon = function (commonOptions = {}) {
     return fullPath.substring(rootPath.length);
   }
 
-  function getStatReportsPath(chunkName){
-    const absolutePath = path.resolve(__dirname, `../dist-report/build-report/${chunkName}.json`);
-    return path.relative(getOutputPath(), absolutePath);
+  function getStatReportsFolder(){
+    return path.resolve(__dirname, `../dist-report/build-report`);
   }
 
   function getOutputPath(){
