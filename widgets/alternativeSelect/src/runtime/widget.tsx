@@ -31,15 +31,20 @@ export default function (props: AllWidgetProps<unknown>) {
 
   useEffect(() => {
     console.log('initUi', jimuMapView, featureLayerDataSource, featureLayerView)
-
-    if (jimuMapView && featureLayerDataSource) {
+    if (!featureLayerView && featureLayerDataSource) {
+      // featureLayerView has to be set first, because it's used in updateFilter(), which is called from updateBuffer(), which is called from initSketch()
+      const getFlView = async (layerId: string) => {
+        const fl = jimuMapView.view.map.findLayerById(layerId)
+        const flView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+        console.log('setFeatureLayerView')
+        setFeatureLayerView(flView) // this will trigger useEffect again, but this time with featureLayerView set
+      }
+      const layerId = featureLayerDataSource.layer?.id
+      getFlView(layerId)
+    } else if (jimuMapView && featureLayerDataSource) {
+      // we have a featureLayerView and the other dependencies, so we can initialize the UI
       initSketch()
       initSlider()
-
-      if (!featureLayerView) {
-        const layerId = featureLayerDataSource.layer?.id
-        getFlView(layerId)
-      }
     }
 
     // if (jimuMapView && apiSketchWidgetContainer.current && !sketchWidget) {
@@ -53,7 +58,7 @@ export default function (props: AllWidgetProps<unknown>) {
     //   const layerId = featureLayerDataSource.layer?.id
     //   getFlView(layerId)
     // }
-  }, [jimuMapView, featureLayerDataSource])
+  }, [jimuMapView, featureLayerDataSource, featureLayerView])
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
   let filterGeometry: Geometry = null
@@ -70,12 +75,6 @@ export default function (props: AllWidgetProps<unknown>) {
     } as unknown as SimpleFillSymbol
   })
   sketchGraphicsLayer.add(bufferGraphic)
-
-  const getFlView = async (layerId: string) => {
-    const fl = jimuMapView.view.map.findLayerById(layerId)
-    const flView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
-    setFeatureLayerView(flView)
-  }
 
   const executeAttributiveQuery = async () => {
     console.log('executeAttributiveQuery')
@@ -163,25 +162,14 @@ export default function (props: AllWidgetProps<unknown>) {
       }
     })
 
+    // listen to change and input events on UI components
     distanceNum.current.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
+      bufferDistance = distanceNum.current.values[0]
+      updateBuffer(bufferDistance, 'meters')
       if (evt.state === 'stop') {
         executeAttributiveQuery()
       }
     })
-
-    // get user entered values from distance related options
-    const distanceVariablesChanged = (): void => {
-      bufferDistance = distanceNum.current.values[0]
-      updateBuffer(bufferDistance, 'meters')
-    }
-
-    // listen to change and input events on UI components
-    distanceNum.current.on('thumb-drag', distanceVariablesChanged)
-    // } else {
-    //   requestAnimationFrame(() => {
-    //     apiSliderWidgetContainer.current.style.display = ''
-    //   })
-    // }
   }
 
   // update the buffer graphic if user is filtering by distance
@@ -196,6 +184,7 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const updateFilter = () => {
+    console.log('updateFilter')
     featureFilter = {
       geometry: filterGeometry,
       spatialRelationship: 'intersects',
