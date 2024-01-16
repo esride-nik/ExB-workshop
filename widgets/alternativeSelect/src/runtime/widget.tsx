@@ -16,10 +16,10 @@ export default function (props: AllWidgetProps<unknown>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const distanceNum = useRef<Slider>()
-  const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
-  const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
-  const [flDataSource, setFlDataSource] = useState<FeatureLayerDataSource>(undefined)
-  const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>(undefined)
+  const [featureLayerDataSource, setFeatureLayerDataSource] = useState<FeatureLayerDataSource>()
+  const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>()
+  const [jimuMapView, setJimuMapView] = useState<JimuMapView>()
+  const [sketchWidget, setSketchWidget] = useState<Sketch>()
   const queryParams = {
     where: '1=1',
     outFields: ['*'],
@@ -28,6 +28,32 @@ export default function (props: AllWidgetProps<unknown>) {
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
+
+  useEffect(() => {
+    console.log('initUi', jimuMapView, featureLayerDataSource, featureLayerView)
+
+    if (jimuMapView && featureLayerDataSource) {
+      initSketch()
+      initSlider()
+
+      if (!featureLayerView) {
+        const layerId = featureLayerDataSource.layer?.id
+        getFlView(layerId)
+      }
+    }
+
+    // if (jimuMapView && apiSketchWidgetContainer.current && !sketchWidget) {
+    //   initSketch()
+    // }
+    // if (!distanceNum.current) {
+    //   initSlider()
+    // }
+
+    // if (!featureLayerView && featureLayerDataSource && jimuMapView) {
+    //   const layerId = featureLayerDataSource.layer?.id
+    //   getFlView(layerId)
+    // }
+  }, [jimuMapView, featureLayerDataSource])
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
   let filterGeometry: Geometry = null
@@ -45,125 +71,117 @@ export default function (props: AllWidgetProps<unknown>) {
   })
   sketchGraphicsLayer.add(bufferGraphic)
 
-  useEffect(() => {
-    if (jimuMapView && apiSketchWidgetContainer.current) {
-      initSketch()
-      initSlider()
-    }
-
-    if (!featureLayerView && flDataSource && jimuMapView) {
-      const layerId = flDataSource.layer?.id
-      getFlView(layerId)
-    }
-  }, [jimuMapView, flDataSource])
-
   const getFlView = async (layerId: string) => {
     const fl = jimuMapView.view.map.findLayerById(layerId)
-    setFeatureLayerView(await jimuMapView.view.whenLayerView(fl) as FeatureLayerView)
+    const flView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+    setFeatureLayerView(flView)
   }
 
   const executeAttributiveQuery = async () => {
-    if (flDataSource && featureLayerView) {
-      const flvResults = await featureLayerView.queryFeatures({
-        geometry: bufferGraphic.geometry,
-        spatialRelationship: 'contains'
-      })
+    console.log('executeAttributiveQuery')
+    // if (flDataSource && featureLayerView) {
+    const fl = jimuMapView.view.map.findLayerById('18d0de1c6e2-layer-2')
+    const featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+    const flvResults = await featureLayerView.queryFeatures({
+      geometry: bufferGraphic.geometry,
+      spatialRelationship: 'contains'
+    })
 
-      const dsResult = await flDataSource.query({
-        where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
-      })
-      console.log('dsResult', dsResult)
-      const records = dsResult?.records as FeatureDataRecord[]
+    const dsResult = await featureLayerDataSource.query({
+      where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
+    })
+    console.log('dsResult', dsResult)
+    const records = dsResult?.records as FeatureDataRecord[]
 
-      if (records.length > 0) {
-        flDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
-      } else {
-        flDataSource.clearSelection()
-      }
-      console.log('records selected', records)
+    if (records.length > 0) {
+      featureLayerDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
     } else {
-      console.warn('Data source not available or layer not in map.')
+      featureLayerDataSource.clearSelection()
     }
+    console.log('records selected', records)
+    // } else {
+    //   console.warn('Data source not available or layer not in map.')
+    // }
   }
 
   const initSketch = () => {
-    if (!sketchWidget) {
-      const container = document.createElement('div')
-      apiSketchWidgetContainer.current.appendChild(container)
+    // if (!sketchWidget) {
+    const container = document.createElement('div')
+    apiSketchWidgetContainer.current.appendChild(container)
 
-      const sketch = new Sketch({
-        layer: sketchGraphicsLayer,
-        view: jimuMapView.view,
-        container: container,
-        // graphic will be selected as soon as it is created
-        creationMode: 'update',
-        availableCreateTools: ['point', 'polyline'],
-        visibleElements: {
-          undoRedoMenu: false,
-          selectionTools: {
-            'lasso-selection': false,
-            'rectangle-selection': false
-          },
-          settingsMenu: false,
-          snappingControls: false
-        }
-      })
+    const sketch = new Sketch({
+      layer: sketchGraphicsLayer,
+      view: jimuMapView.view,
+      container: container,
+      // graphic will be selected as soon as it is created
+      creationMode: 'update',
+      availableCreateTools: ['point', 'polyline'],
+      visibleElements: {
+        undoRedoMenu: false,
+        selectionTools: {
+          'lasso-selection': false,
+          'rectangle-selection': false
+        },
+        settingsMenu: false,
+        snappingControls: false
+      }
+    })
 
-      sketch.on('create', (evt: __esri.SketchCreateEvent) => {
-        if (evt.state === 'complete') {
-          filterGeometry = evt.graphic.geometry as Geometry
-          updateBuffer(bufferDistance, 'meters')
-          executeAttributiveQuery()
-        }
-      })
-      setSketchWidget(sketch)
+    sketch.on('create', (evt: __esri.SketchCreateEvent) => {
+      if (evt.state === 'complete') {
+        filterGeometry = evt.graphic.geometry as Geometry
+        updateBuffer(bufferDistance, 'meters')
+        executeAttributiveQuery()
+      }
+    })
+    setSketchWidget(sketch)
 
-      jimuMapView.view.map.add(sketchGraphicsLayer)
-    } else {
-      requestAnimationFrame(() => {
-        apiSketchWidgetContainer.current.style.display = ''
-      })
-    }
+    jimuMapView.view.map.add(sketchGraphicsLayer)
+    // } else {
+    //   requestAnimationFrame(() => {
+    //     apiSketchWidgetContainer.current.style.display = ''
+    //   })
+    // }
   }
 
   const initSlider = () => {
-    if (!distanceNum.current) {
-      const container = document.createElement('div')
-      apiSliderWidgetContainer.current.appendChild(container)
-      requestAnimationFrame(() => {
-        apiSliderWidgetContainer.current.style.height = '70px'
-      })
-      distanceNum.current = new Slider({
-        container: apiSliderWidgetContainer.current,
-        min: 0,
-        max: 1000,
-        values: [bufferDistance],
-        steps: 1,
-        visibleElements: {
-          rangeLabels: true,
-          labels: true
-        }
-      })
-
-      distanceNum.current.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
-        if (evt.state === 'stop' && featureLayerView) {
-          executeAttributiveQuery()
-        }
-      })
-
-      // get user entered values from distance related options
-      const distanceVariablesChanged = (): void => {
-        bufferDistance = distanceNum.current.values[0]
-        updateBuffer(bufferDistance, 'meters')
+    // if (!distanceNum.current) {
+    const container = document.createElement('div')
+    apiSliderWidgetContainer.current.appendChild(container)
+    requestAnimationFrame(() => {
+      apiSliderWidgetContainer.current.style.height = '70px'
+    })
+    distanceNum.current = new Slider({
+      container: apiSliderWidgetContainer.current,
+      min: 0,
+      max: 1000,
+      values: [bufferDistance],
+      steps: 1,
+      visibleElements: {
+        rangeLabels: true,
+        labels: true
       }
+    })
 
-      // listen to change and input events on UI components
-      distanceNum.current.on('thumb-drag', distanceVariablesChanged)
-    } else {
-      requestAnimationFrame(() => {
-        apiSliderWidgetContainer.current.style.display = ''
-      })
+    distanceNum.current.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
+      if (evt.state === 'stop') {
+        executeAttributiveQuery()
+      }
+    })
+
+    // get user entered values from distance related options
+    const distanceVariablesChanged = (): void => {
+      bufferDistance = distanceNum.current.values[0]
+      updateBuffer(bufferDistance, 'meters')
     }
+
+    // listen to change and input events on UI components
+    distanceNum.current.on('thumb-drag', distanceVariablesChanged)
+    // } else {
+    //   requestAnimationFrame(() => {
+    //     apiSliderWidgetContainer.current.style.display = ''
+    //   })
+    // }
   }
 
   // update the buffer graphic if user is filtering by distance
@@ -208,16 +226,11 @@ export default function (props: AllWidgetProps<unknown>) {
       })
     }
 
-    if (jmv) {
-      setJimuMapView(jmv)
-    } else {
-      setJimuMapView(undefined)
-    }
+    setJimuMapView(jmv)
   }
 
-  const setDataSource = (ds: DataSource) => {
-    setFlDataSource(ds as FeatureLayerDataSource)
-    console.log(ds.id)
+  const onDataSourceCreated = (ds: DataSource) => {
+    setFeatureLayerDataSource(ds as FeatureLayerDataSource)
   }
 
   const dsConfigured = !!((props.useDataSources && props.useDataSources.length > 0))
@@ -235,6 +248,6 @@ export default function (props: AllWidgetProps<unknown>) {
       onActiveViewChange={onActiveViewChange}
     />
 
-    <DataSourceComponent useDataSource={props.useDataSources?.[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={setDataSource} />
+    <DataSourceComponent useDataSource={props.useDataSources?.[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={onDataSourceCreated} />
   </div>
 }
