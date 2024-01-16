@@ -30,7 +30,6 @@ export default function (props: AllWidgetProps<unknown>) {
   let featureFilter: __esri.FeatureFilter = null
 
   useEffect(() => {
-    console.log('initUi', jimuMapView, featureLayerDataSource, featureLayerView)
     if (!featureLayerView && featureLayerDataSource) {
       // featureLayerView has to be set first, because it's used in updateFilter(), which is called from updateBuffer(), which is called from initSketch()
       const getFlView = async (layerId: string) => {
@@ -46,18 +45,6 @@ export default function (props: AllWidgetProps<unknown>) {
       initSketch()
       initSlider()
     }
-
-    // if (jimuMapView && apiSketchWidgetContainer.current && !sketchWidget) {
-    //   initSketch()
-    // }
-    // if (!distanceNum.current) {
-    //   initSlider()
-    // }
-
-    // if (!featureLayerView && featureLayerDataSource && jimuMapView) {
-    //   const layerId = featureLayerDataSource.layer?.id
-    //   getFlView(layerId)
-    // }
   }, [jimuMapView, featureLayerDataSource, featureLayerView])
 
   const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
@@ -77,8 +64,6 @@ export default function (props: AllWidgetProps<unknown>) {
   sketchGraphicsLayer.add(bufferGraphic)
 
   const executeAttributiveQuery = async () => {
-    console.log('executeAttributiveQuery')
-    // if (flDataSource && featureLayerView) {
     const fl = jimuMapView.view.map.findLayerById('18d0de1c6e2-layer-2')
     const featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
     const flvResults = await featureLayerView.queryFeatures({
@@ -98,13 +83,9 @@ export default function (props: AllWidgetProps<unknown>) {
       featureLayerDataSource.clearSelection()
     }
     console.log('records selected', records)
-    // } else {
-    //   console.warn('Data source not available or layer not in map.')
-    // }
   }
 
   const initSketch = () => {
-    // if (!sketchWidget) {
     const container = document.createElement('div')
     apiSketchWidgetContainer.current.appendChild(container)
 
@@ -136,15 +117,9 @@ export default function (props: AllWidgetProps<unknown>) {
     setSketchWidget(sketch)
 
     jimuMapView.view.map.add(sketchGraphicsLayer)
-    // } else {
-    //   requestAnimationFrame(() => {
-    //     apiSketchWidgetContainer.current.style.display = ''
-    //   })
-    // }
   }
 
   const initSlider = () => {
-    // if (!distanceNum.current) {
     const container = document.createElement('div')
     apiSliderWidgetContainer.current.appendChild(container)
     requestAnimationFrame(() => {
@@ -174,6 +149,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
+    // TODO: clean up buffer when removing the Sketch graphic
     if (distance > 0 && filterGeometry) {
       bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
       updateFilter()
@@ -202,6 +178,7 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
+    // TODO: try this out with multiple maps on the same page
     // if we have a "previous" map where the widget was already added, we're hiding the old widget until it is shown again from via useEffect with the new settings.
     // (ex: case where two Maps in single Experience page and user is switching between them in the Settings)
     if (sketchWidget) {
