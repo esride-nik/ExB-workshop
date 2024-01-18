@@ -16,10 +16,10 @@ export default function (props: AllWidgetProps<unknown>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const distanceNum = useRef<Slider>()
-  const [featureLayerDataSource, setFeatureLayerDataSource] = useState<FeatureLayerDataSource>()
-  const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>()
-  const [jimuMapView, setJimuMapView] = useState<JimuMapView>()
-  const [sketchWidget, setSketchWidget] = useState<Sketch>()
+  const [featureLayerDataSource, setFeatureLayerDataSource] = useState<FeatureLayerDataSource>(undefined)
+  const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>(undefined)
+  const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
+  const [sketchWidget, setSketchWidget] = useState<Sketch>(undefined)
   const queryParams = {
     where: '1=1',
     outFields: ['*'],
@@ -37,7 +37,7 @@ export default function (props: AllWidgetProps<unknown>) {
         const flView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
         console.log('setFeatureLayerView')
         setFeatureLayerView(flView) // this will trigger useEffect again, but this time with featureLayerView set
-      }
+      } 
       const layerId = featureLayerDataSource.layer?.id
       getFlView(layerId)
     } else if (jimuMapView && featureLayerDataSource) {
@@ -160,7 +160,6 @@ export default function (props: AllWidgetProps<unknown>) {
   }
 
   const updateFilter = () => {
-    console.log('updateFilter')
     featureFilter = {
       geometry: filterGeometry,
       spatialRelationship: 'intersects',
