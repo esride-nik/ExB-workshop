@@ -9,6 +9,11 @@ Clone the sample repo into your Experience Builder Client root folder and restar
 ## Looking for the what3words widget?
 This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
 
+## Using 3rd party NPM packages in your widgets
+
+It's a good practice to ``npm init`` within the widget folder and install dependencies there. During development, it will work also with a central ``package.json`` file containing the dependencies for all your widgets (resulting in one single ``node_modules`` folder outside ``widgets``), but fails to resolve dependencies for production use.
+For example, when following [this guide](https://doc.arcgis.com/de/experience-builder/11.0/configure-widgets/add-custom-widgets.htm), the ``npm run build:prod`` will not find the installed packages after copying only the subfolder with your widget into ``your-extensions/widgets``.
+
 ## Deprecation of NPM package "xlsx"
 
 This package is based on the Excel tool library "SheetJS" and is no longer maintained.
