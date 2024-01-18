@@ -1,0 +1,14 @@
+{
+  "name": "gpxupload",
+  "version": "0.2.0",
+  "description": "This widget provides an upload functionality for GPX files",
+  "main": "manifest.json",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Niklas Köhn, Esri Deutschland",
+  "license": "ISC",
+  "dependencies": {
+    "react-dropzone": "^14.2.3"
+  }
+}
