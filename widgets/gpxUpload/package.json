@@ -9,6 +9,7 @@
   "author": "Niklas Köhn, Esri Deutschland",
   "license": "ISC",
   "dependencies": {
+    "@tmcw/togeojson": "^5.8.1",
     "react-dropzone": "^14.2.3"
   }
 }
