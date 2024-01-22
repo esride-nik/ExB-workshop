@@ -1,6 +1,6 @@
 {
-  "name": "map-layers",
-  "label": "Map Layers",
+  "name": "mamamaplyrext",
+  "label": "Map Layers Extended",
   "type": "widget",
   "version": "1.13.0",
   "exbVersion": "1.13.0",

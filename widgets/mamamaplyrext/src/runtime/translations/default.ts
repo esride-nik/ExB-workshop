@@ -1,5 +1,5 @@
 export default {
-  _widgetLabel: 'Map Layers',
+  _widgetLabel: 'Map Layers Extended',
   goto: 'Zoom to',
   information: 'Details',
   increaseOpacity: 'Increase opacity',
