@@ -19,6 +19,7 @@ import Information from './actions/information'
 import defaultMessages from './translations/default'
 import layerListIcon from '../../icon.svg'
 import { versionManager } from '../version-manager'
+import LayerFx from './actions/layerfx'
 
 export enum LoadStatus {
   Pending = 'Pending',
@@ -347,6 +348,7 @@ WidgetState
       this.configLayerList()
 
       this.layerList.on('trigger-action', (event) => {
+        // console.log('trigger-action', event)
         this.onLayerListActionsTriggered(event)
       })
     })
@@ -354,6 +356,10 @@ WidgetState
 
   registerLayerListActions () {
     this.layerListActions = [
+      new LayerFx(
+        this,
+        this.translate('layerfx')
+      ),
       new Goto(
         this,
         this.translate('goto')
