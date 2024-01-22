@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"שכבות מפה",goto:"התמקדות",information:"פרטים",increaseOpacity:"הגדל שקיפות",decreaseOpacity:"הפחת שקיפות",increaseTransparency:"הגדל את השקיפות",decreaseTransparency:"הקטן את השקיפות",showLabels:"הצג תוויות",hideLabels:"הסתר תוויות",emptyListTip:"אין כעת פריטים לצפייה"})}}}));
