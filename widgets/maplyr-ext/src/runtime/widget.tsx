@@ -20,6 +20,7 @@ import defaultMessages from './translations/default'
 import layerListIcon from '../../icon.svg'
 import { versionManager } from '../version-manager'
 import LayerFx from './actions/layerfx'
+import Spyglass from './actions/spyglass'
 
 export enum LoadStatus {
   Pending = 'Pending',
@@ -356,6 +357,10 @@ WidgetState
 
   registerLayerListActions () {
     this.layerListActions = [
+      new Spyglass(
+        this,
+        this.translate('spyglass')
+      ),
       new LayerFx(
         this,
         this.translate('layerfx')

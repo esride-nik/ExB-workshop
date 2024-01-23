@@ -1,5 +1,6 @@
 export default {
   _widgetLabel: 'Map Layers Extended',
+  spyglass: 'Spyglass',
   layerfx: 'Layer Effects',
   goto: 'Zoom to',
   information: 'Details',
