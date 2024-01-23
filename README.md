@@ -9,6 +9,9 @@ Clone the sample repo into your Experience Builder Client root folder and restar
 ## Looking for the what3words widget?
 This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
 
+## Extending built-in widgets
+As an example, ``widgets/maplyr-ext`` adds a custom action to the standard ``map-layers`` widget.
+
 ## Using 3rd party NPM packages in your widgets
 
 It's a good practice to ``npm init`` within the widget folder and install dependencies there. During development, it will work also with a central ``package.json`` file containing the dependencies for all your widgets (resulting in one single ``node_modules`` folder outside ``widgets``), but fails to resolve dependencies for production use.
