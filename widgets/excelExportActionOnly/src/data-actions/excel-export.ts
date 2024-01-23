@@ -1,5 +1,5 @@
 import type Graphic from 'esri/Graphic'
-import { AbstractDataAction, type DataRecordSet } from 'jimu-core'
+import { AbstractDataAction, type DataLevel, type DataRecord, type DataRecordSet } from 'jimu-core'
 import { type JSON2SheetOpts, utils, writeFile } from 'xlsx'
 import defaultMessages from '../runtime/translations/default'
 
@@ -9,17 +9,20 @@ interface WorksheetObject {
 }
 
 export default class ExportJson extends AbstractDataAction {
-  async isSupported (dataSet: DataRecordSet): Promise<boolean> {
-    return dataSet.records?.length > 0
+  // changed according to breaking changes in ExB 1.13: https://developers.arcgis.com/experience-builder/guide/whats-new/#data-action [2024-01-23]
+  async isSupported (dataSets: DataRecordSet[], dataLevel: DataLevel, widgetId: string): Promise<boolean> {
+    console.log('ExportJson.isSupported', dataSets, dataLevel, widgetId)
+    return dataSets.length > 0
   }
 
   // TODO: Hidden columns are exported as well. Can we see which ones are hidden in the datasource?
-  async onExecute (dataSet: DataRecordSet, actionConfig: any): Promise<boolean> {
-    if (dataSet.records.length > 0) {
-      const features = dataSet.records.map((r) => (r as any).feature as Graphic)
-
-      const label = dataSet.records[0].dataSource?.fetchedSchema?.label.length > 0
-        ? dataSet.records[0].dataSource?.fetchedSchema?.label
+  async onExecute (dataSets: DataRecordSet[], dataLevel: DataLevel, widgetId: string): Promise<boolean> {
+    console.log('ExportJson.onExecute', dataSets, dataLevel, widgetId)
+    if (dataSets.length > 0) {
+      // TODO: The following "as any" casts are due to insufficient typings in ExB 1.13. Re-check in future versions.
+      const features = dataSets.map((drs: DataRecordSet) => drs.records.map((r: DataRecord) => (r as any).feature as Graphic)).flat()
+      const label = (dataSets[0].dataSource as any)?.fetchedSchema?.label.length > 0
+        ? (dataSets[0].dataSource as any)?.fetchedSchema?.label
         : defaultMessages._widgetLabel
       const filename = label.replace(/[^a-z0-9]/gi, '_').toLowerCase()
 
