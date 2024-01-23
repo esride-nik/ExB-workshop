@@ -3,11 +3,8 @@
   "version": "1.1.0",
   "description": "themes + widgets in root, own package.json",
   "main": "",
-  "scripts": {},
-  "author": "",
-  "dependencies": {
-    "axios": "^1.5.0",
-    "dojox": "^1.17.3",
-    "xlsx": "^0.18.5"
-  }
+  "scripts": {
+    "install-subfolders": "node npm-install-subfolders.js"
+  },
+  "author": ""
 }
