@@ -12,7 +12,8 @@
     {
       "name": "excelExport",
       "label": "Excel Export",
-      "uri": "data-actions/excel-export"
+      "uri": "data-actions/excel-export",
+      "icon": "runtime/assets/icons/excel.svg"
     }
   ],
   "translatedLocales": [
