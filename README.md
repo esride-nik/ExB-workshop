@@ -4,7 +4,8 @@
 Some Widgets and a theme.
 
 ## How to use the samples
-Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
+* Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
+* Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
 
 ## Looking for the what3words widget?
 This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
