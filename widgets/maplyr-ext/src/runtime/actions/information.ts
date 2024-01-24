@@ -1,6 +1,6 @@
 import { portalUrlUtils } from 'jimu-core'
 import Action from './action'
-import type { Widget } from '../widget'
+import type Widget from '../widget'
 
 export default class Information extends Action {
   constructor (widget: Widget, title: string) {

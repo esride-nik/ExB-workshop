@@ -1,5 +1,5 @@
 import { /* getAppStore, */ type MessageType } from 'jimu-core'
-import type { Widget } from '../widget'
+import type Widget from '../widget'
 
 export default class Action {
   id: string = 'id'

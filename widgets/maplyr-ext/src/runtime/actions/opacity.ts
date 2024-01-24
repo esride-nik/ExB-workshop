@@ -1,5 +1,5 @@
 import Action from './action'
-import type { Widget } from '../widget'
+import type Widget from '../widget'
 
 export default class Opacity extends Action {
   private readonly isIncreaseOpacity: boolean

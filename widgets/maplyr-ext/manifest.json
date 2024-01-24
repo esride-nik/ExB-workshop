@@ -2,6 +2,7 @@
   "name": "maplyr-ext",
   "label": "Map Layers Extended",
   "type": "widget",
+  "dependency": "jimu-arcgis",
   "version": "1.13.0",
   "exbVersion": "1.13.0",
   "author": "Esri R&D Center Beijing",

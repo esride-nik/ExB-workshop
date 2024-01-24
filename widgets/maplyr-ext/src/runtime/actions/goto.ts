@@ -1,6 +1,6 @@
 // import {MessageManager, ExtentChangeMessage, MessageType} from 'jimu-core';
 import Action from './action'
-import type { Widget } from '../widget'
+import type Widget from '../widget'
 import { zoomToUtils } from 'jimu-arcgis'
 
 export default class Goto extends Action {
