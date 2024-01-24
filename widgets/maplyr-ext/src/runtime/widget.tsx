@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import DownAction from './actions/downAction'
+import LayerFx from './actions/layerfx'
 import { Widget as MapLayers } from './map-layers'
 export default class Widget extends MapLayers {
   constructor (props) {
@@ -11,6 +12,7 @@ export default class Widget extends MapLayers {
     console.log('Extended: registerLayerListActions')
     super.registerLayerListActions()
     this.layerListActions.push(new DownAction(this, 'Nach unten verschieben'))
+    this.layerListActions.push(new LayerFx(this, 'Layer Effects'))
     console.log(this.layerListActions)
   }
 
