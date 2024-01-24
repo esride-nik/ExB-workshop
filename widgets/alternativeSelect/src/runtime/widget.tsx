@@ -37,7 +37,7 @@ export default function (props: AllWidgetProps<unknown>) {
         const flView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
         console.log('setFeatureLayerView')
         setFeatureLayerView(flView) // this will trigger useEffect again, but this time with featureLayerView set
-      } 
+      }
       const layerId = featureLayerDataSource.layer?.id
       getFlView(layerId)
     } else if (jimuMapView && featureLayerDataSource) {
