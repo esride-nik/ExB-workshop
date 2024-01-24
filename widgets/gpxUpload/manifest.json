@@ -3,7 +3,7 @@
   "label": "GPX upload and interpretation",
   "type": "widget",
   "dependency": ["jimu-arcgis"],
-  "version": "0.2",
+  "version": "0.3.0",
   "exbVersion": "1.13.0",
   "author": "Niklas Köhn, Esri Deutschland GmbH",
   "description": "Parses and displays a GPX LineString.",
