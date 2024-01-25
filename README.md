@@ -10,8 +10,15 @@ Some Widgets and a theme.
 ## Looking for the what3words widget?
 This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
 
-## Extending built-in widgets
-As an example, ``widgets/maplyr-ext`` adds a custom action to the standard ``map-layers`` widget.
+## Extending built-in widgets by inheritance
+As an example, ``widgets/maplyr-ext`` adds custom actions to the standard ``map-layers`` widget.
+Steps:
+* copy the original class-based widget from ``dist/arcgis`` into ``<your repo folder>/widgets`` or ``your-extensions/widgets``
+* rename ``widget.tsx`` to ``<widget-name>.tsx``, e.g. ``map-layers.tsx``, in there:
+  * create a new empty ``widget.tsx`` in the ``runtime`` folder, next to the renamed original file
+  * import original widget with alias name: ``import { Widget as <Widget-Name> } from '<widget-name>.tsx``
+  * create your own derived widget class: ``export default class Widget extends <Widget-Name>``
+  * overwrite methods as needed, but call ``super.<method>()`` to keep the functionality of the base class
 
 ## Using 3rd party NPM packages in your widgets
 
