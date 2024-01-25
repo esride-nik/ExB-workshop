@@ -6,3 +6,4 @@ webpack
 __mocks__
 package-lock.json
 */package-lock.json
+.vscode
