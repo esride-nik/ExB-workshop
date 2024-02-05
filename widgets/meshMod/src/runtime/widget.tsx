@@ -20,11 +20,13 @@
 import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 
-import Legend from 'esri/widgets/Legend'
-import LegendVM from 'esri/widgets/Legend/LegendViewModel'
-import type ActiveLayerInfo from 'esri/widgets/Legend/support/ActiveLayerInfo'
-
 import defaultMessages from './translations/default'
+import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
+import type SceneView from '@arcgis/core/views/SceneView'
+import SketchViewModel from '@arcgis/core/widgets/Sketch/SketchViewModel'
+import reactiveUtils from '@arcgis/core/core/reactiveUtils'
+import SceneModification from '@arcgis/core/layers/support/SceneModification.js'
+import SceneModifications from '@arcgis/core/layers/support/SceneModifications.js'
 
 const { useState, useRef, useEffect } = React
 
@@ -33,46 +35,27 @@ export default function ({
 }: AllWidgetProps<unknown>) {
   const apiWidgetContainer = useRef<HTMLDivElement>()
 
-  const [layerInfo, setLayerInfo] = useState<ActiveLayerInfo>(null)
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
-  const [legendWidget, setLegendWidget] = useState<Legend>(null)
+  const [view, setSceneView] = useState<SceneView>(null)
+  const [sketchViewModel, setSketchViewModel] = useState<SketchViewModel>(null)
+  const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer>(null)
+  const [modificationSymbol, setModificationSymbol] = useState(null)
+  const [modificationType, setModificationType] = useState(null)
+  const [imLayer, setImLayer] = useState(null)
 
   useEffect(() => {
     if (jimuMapView && apiWidgetContainer.current) {
-      if (!legendWidget) {
-        // since the widget replaces the container, we must create a new DOM node
-        // so when we destroy we will not remove the "ref" DOM node
-        const container = document.createElement('div')
-        apiWidgetContainer.current.appendChild(container)
-
-        const legend = new Legend({
-          view: jimuMapView.view,
-          container: container
-        })
-        setLegendWidget(legend)
-      }
-
-      const vm = new LegendVM({
-        view: jimuMapView.view
-      })
-
-      setLayerInfo(vm.activeLayerInfos.getItemAt(0))
-    }
-
-    return () => {
-      if (legendWidget) {
-        legendWidget.destroy()
-        setLegendWidget(null)
+      if (view) {
+        initMeshMod()
       }
     }
-  }, [apiWidgetContainer, jimuMapView])
+  }, [apiWidgetContainer, jimuMapView, view])
 
   const initMeshMod = () => {
-    let imLayer
-
     // Create graphicsLayer to store modifications and add to the map
     const graphicsLayer = new GraphicsLayer()
     view.map.add(graphicsLayer)
+    setGraphicsLayer(graphicsLayer)
 
     // polygon symbol used for sketching the modifications
     const sketchSymbol = {
@@ -104,6 +87,7 @@ export default function ({
         }
       ]
     }
+    setModificationSymbol(modificationSymbol)
 
     /*
      * define the SketchViewModel and pass in the symbol for sketching polygon
@@ -121,6 +105,7 @@ export default function ({
         mode: 'click'
       }
     })
+    setSketchViewModel(sketchViewModel)
 
     // Add click event to the button to start sketch a polygon
     const createModificationButton = document.getElementById('createModification')
@@ -134,6 +119,7 @@ export default function ({
     for (let i = 0, length = modificationType.length; i < length; i++) {
       modificationType[i].onclick = modificationTypeChanged
     }
+    setModificationType(modificationType)
 
     /*
      * listen on sketch-create
@@ -148,7 +134,7 @@ export default function ({
         updateModificationType(event.graphic, getSelectedModificationType())
         updateIntegratedMesh()
         sketchViewModel.update(event.graphic, {
-          enableZ: getSelectedModificationType() == 'replace'
+          enableZ: getSelectedModificationType() === 'replace'
         })
       }
     })
@@ -169,10 +155,11 @@ export default function ({
     sketchViewModel.on('delete', updateIntegratedMesh)
 
     view.when(() => {
-      // get the IntegratedMesh-Layer from the WebScene
-      imLayer = webscene.layers.find((layer) => {
+      // get the IntegratedMesh-Layer from the Map (or WebScene)
+      const imLayer = view.map.layers.find((layer) => {
         return layer.type === 'integrated-mesh'
       })
+      setImLayer(imLayer)
 
       // listen to click events to detect if the user would like to update a graphic
       view.on('click', (event) => {
@@ -216,7 +203,7 @@ export default function ({
       if (hitTestResult.results.length > 0) {
         const graphicToModify = hitTestResult.results[0].graphic
         sketchViewModel.update(graphicToModify, {
-          enableZ: graphicToModify.attributes.modificationType == 'replace'
+          enableZ: graphicToModify.attributes.modificationType === 'replace'
         })
       }
     }
@@ -238,7 +225,7 @@ export default function ({
       try {
         updateModificationType(item, this.value)
         sketchViewModel.update(item, {
-          enableZ: this.value == 'replace'
+          enableZ: this.value === 'replace'
         })
         updateIntegratedMesh()
       } catch (error) {
@@ -276,16 +263,11 @@ export default function ({
   }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
-    if (jimuMapView && legendWidget) {
-      // we have a "previous" map where we added the widget
-      // (ex: case where two Maps in single Experience page and user is switching
-      // between them in the Settings) - we must destroy the old widget in this case.
-      legendWidget.destroy()
-      setLegendWidget(null)
-    }
-
     if (jmv) {
       setJimuMapView(jmv)
+      if (jmv.view.type === '3d') {
+        setSceneView(jmv.view)
+      }
     }
   }
 
@@ -293,24 +275,12 @@ export default function ({
 
   return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
     {!isConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
-    <h3>
-      <FormattedMessage id="widgetDemonstrates" defaultMessage={defaultMessages.widgetDemonstrates} />
-    </h3>
 
     <JimuMapViewComponent
       useMapWidgetId={useMapWidgetIds?.[0]}
       onActiveViewChange={onActiveViewChange}
     />
 
-    <hr />
-    <h4><FormattedMessage id="thisUsesViewModel" defaultMessage={defaultMessages.thisUsesViewModel} /></h4>
-    <div>
-      <FormattedMessage id="layerTitle" defaultMessage={defaultMessages.layerTitle} />: {layerInfo && layerInfo.title}
-    </div>
-
-    <hr />
-
-    <h4><FormattedMessage id="thisShowsLegendWidget" defaultMessage={defaultMessages.thisShowsLegendWidget} /></h4>
     <div ref={apiWidgetContainer} />
   </div>
 }
