@@ -19,6 +19,7 @@
 */
 import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
+import { Button } from 'jimu-ui'
 
 import defaultMessages from './translations/default'
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
@@ -107,13 +108,6 @@ export default function ({
     })
     setSketchViewModel(sketchViewModel)
 
-    // Add click event to the button to start sketch a polygon
-    const createModificationButton = document.getElementById('createModification')
-    createModificationButton.addEventListener('click', (event) => {
-      event.target.classList.add('esri-button--secondary')
-      sketchViewModel.create('polygon')
-    })
-
     // listen to changes on the modificationType
     const modificationType = document.getElementsByName('modificationType')
     for (let i = 0, length = modificationType.length; i < length; i++) {
@@ -190,6 +184,11 @@ export default function ({
         )
       })
     })
+  }
+
+  const onCreateModificationClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+    (event.target as HTMLElement).classList.add('esri-button--secondary')
+    sketchViewModel.create('polygon')
   }
 
   /*
@@ -275,6 +274,13 @@ export default function ({
 
   return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
     {!isConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
+    <Button
+      onClick={onCreateModificationClicked}
+      size="default"
+      id='createModification'
+    >
+      Button
+    </Button>
 
     <JimuMapViewComponent
       useMapWidgetId={useMapWidgetIds?.[0]}
