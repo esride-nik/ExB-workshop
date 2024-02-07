@@ -31,6 +31,7 @@ import SketchViewModel from '@arcgis/core/widgets/Sketch/SketchViewModel'
 import SceneModification from '@arcgis/core/layers/support/SceneModification.js'
 import SceneModifications from '@arcgis/core/layers/support/SceneModifications.js'
 import { convertSymbolColorToColorPickerValue } from 'jimu-ui/advanced/lib/map/components/symbol-selector/components/symbol-list/utils/symbol-utils'
+import reactiveUtils from '@arcgis/core/core/reactiveUtils'
 
 const { useState, useRef, useEffect } = React
 
@@ -54,6 +55,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   const [imLayer, setImLayer] = useState(null)
   const [layerView, setLayerView] = useState(null)
   const [hitTestResult, setHitTestResult] = useState(null)
+  const [lyrViewIsUpdating, setLyrViewIsUpdating] = useState(false)
 
   useEffect(() => {
     if (jimuMapView && apiWidgetContainer.current) {
@@ -204,6 +206,16 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
 
       view.whenLayerView(imLayer).then((lyrView) => {
         setLayerView(lyrView)
+        reactiveUtils.watch(
+          () => lyrView.updating,
+          (updating) => {
+            if (updating) {
+              setLyrViewIsUpdating(true)
+            } else {
+              setLyrViewIsUpdating(false)
+            }
+          }
+        )
       })
 
       // listen to click events to detect if the user would like to update a graphic
@@ -213,27 +225,6 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
           exclude: [view.map.ground]
         }).then(setHitTestResult)
       })
-
-      // TODO: build UI for the tools
-      // // add the ui
-      // view.ui.add('tools', 'top-right')
-      // document.getElementById('tools').style.display = 'block'
-
-      // TODO: add loader
-      // display the rendering status of the IntegratedMeshLayer
-      // const calciteLoader = document.getElementById('calciteLoader')
-      // view.whenLayerView(imLayer).then((lyrView) => {
-      //   reactiveUtils.watch(
-      //     () => lyrView.updating,
-      //     (updating) => {
-      //       if (updating) {
-      //         calciteLoader.style.display = 'block'
-      //       } else {
-      //         calciteLoader.style.display = 'none'
-      //       }
-      //     }
-      //   )
-      // })
     })
   }
 
@@ -336,10 +327,10 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
                 <Label css={radioReplace} for="modification-replace"><b>&nbsp;Replace </b></Label> - flattens selected area
             </div>
             <Button onClick={onCreateModificationClicked} size="default" id="createModification">
-                Button
+                Create
             </Button>
 
-            {layerView?.updating && (
+            {lyrViewIsUpdating && (
                 <div
                     style={{
                       height: '80px',
@@ -347,10 +338,9 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
                       width: '200px'
                     }}>
                     <Loading />
+                    Mesh is being updated
                 </div>
             )}
-
-            <div>{layerView?.updating ? 'Updating' : 'Not updating'}</div>
 
             <JimuMapViewComponent useMapWidgetId={useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
 
