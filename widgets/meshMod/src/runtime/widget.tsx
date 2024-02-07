@@ -309,7 +309,6 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
                     aria-label="Clip"
                     checked={modificationType === ModificationType.Clip}
                     onChange={(event, checked) => {
-                      console.log('Radio clip', event, checked)
                       setModificationType(ModificationType.Clip)
                     }}
                 />
@@ -320,7 +319,6 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
                     aria-label="Mask"
                     checked={modificationType === ModificationType.Mask}
                     onChange={(event, checked) => {
-                      console.log('Radio mask', event, checked)
                       setModificationType(ModificationType.Mask)
                     }}
                 />
@@ -331,7 +329,6 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
                     aria-label="Replace"
                     checked={modificationType === ModificationType.Replace}
                     onChange={(event, checked) => {
-                      console.log('Radio replace', event, checked)
                       setModificationType(ModificationType.Replace)
                     }}
                 />
