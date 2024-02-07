@@ -167,12 +167,12 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
       }
     })
 
-    // listen to sketch-update and update the IntegratedMesh modifications
+    // listen to sketch-update and update the IntegratedMesh modifications // no access to state in JSSDK event handlers
     sketchViewModel.on('update', () => {
       setSketchUpdated(true)
     })
 
-    // listen to sketch-delete and update the IntegratedMesh modifications
+    // listen to sketch-delete and update the IntegratedMesh modifications // no access to state in JSSDK event handlers
     sketchViewModel.on('delete', () => {
       setSketchUpdated(true)
     })
