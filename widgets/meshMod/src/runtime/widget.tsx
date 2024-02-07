@@ -31,6 +31,7 @@ import SketchViewModel from '@arcgis/core/widgets/Sketch/SketchViewModel'
 import reactiveUtils from '@arcgis/core/core/reactiveUtils'
 import SceneModification from '@arcgis/core/layers/support/SceneModification.js'
 import SceneModifications from '@arcgis/core/layers/support/SceneModifications.js'
+import { set } from 'seamless-immutable'
 
 const { useState, useRef, useEffect } = React
 
@@ -46,6 +47,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
   const [view, setSceneView] = useState<SceneView>(null)
   const [sketchViewModel, setSketchViewModel] = useState<SketchViewModel>(null)
+  const [sketchCompleteGraphic, setSketchCompleteGraphic] = useState(null)
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer>(null)
   const [modificationSymbol, setModificationSymbol] = useState(null)
   const [modificationType, setModificationType] = useState<ModificationType>(ModificationType.Clip)
@@ -65,7 +67,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
     const item = sketchViewModel?.updateGraphics?.items[0]
     if (item) {
       try {
-        updateModificationType(item, this.value)
+        updateModificationType(item)
         sketchViewModel.update(item, {
           enableZ: this.value === 'replace'
         })
@@ -74,7 +76,18 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
         console.log(error)
       }
     }
-  }, [modificationType])
+  }, [modificationType, modificationSymbol])
+
+  useEffect(() => {
+    if (sketchCompleteGraphic !== null) {
+      updateModificationType(sketchCompleteGraphic)
+      updateIntegratedMesh()
+      sketchViewModel.update(sketchCompleteGraphic, {
+        enableZ: modificationType === ModificationType.Replace
+      })
+      setSketchCompleteGraphic(null)
+    }
+  }, [sketchCompleteGraphic])
 
   const initMeshMod = () => {
     // Create graphicsLayer to store modifications and add to the map
@@ -141,12 +154,12 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
          */
     sketchViewModel.on('create', (event) => {
       if (event.state === 'complete') {
-        // createModificationButton.classList.remove('esri-button--secondary')
-        updateModificationType(event.graphic, modificationType)
-        updateIntegratedMesh()
-        sketchViewModel.update(event.graphic, {
-          enableZ: modificationType === ModificationType.Replace
-        })
+        setSketchCompleteGraphic(event.graphic)
+        // updateModificationType(event.graphic)
+        // updateIntegratedMesh()
+        // sketchViewModel.update(event.graphic, {
+        //   enableZ: modificationType === ModificationType.Replace
+        // })
       }
     })
 
@@ -230,15 +243,17 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   }
 
   // update/add the modificationType as attribute information and change the symbolization accordingly
-  const updateModificationType = (graphic, modificationType: ModificationType) => {
+  const updateModificationType = (graphic) => {
     graphic.attributes = { modificationType: modificationType }
     const colors = {
       clip: [252, 173, 88],
       mask: [157, 219, 129],
       replace: [133, 148, 209]
     }
-    modificationSymbol.symbolLayers[0].material.color = colors[modificationType]
     graphic.symbol = modificationSymbol
+    if (graphic?.symbol?.symbolLayers?.items?.length > 0) {
+      graphic.symbol.symbolLayers.items[0].material.color = colors[modificationType]
+    }
   }
 
   // update the IntegratedMesh with the modifications
