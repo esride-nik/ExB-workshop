@@ -1,7 +1,7 @@
 /**
   Licensing
 
-  Copyright 2022 Esri
+  Copyright 2023 Esri Deutschland
 
   Licensed under the Apache License, Version 2.0 (the "License"); You
   may not use this file except in compliance with the License. You may
@@ -17,9 +17,12 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
+
+/** @jsx jsx */ // <-- make sure to include the jsx pragma
+
+import { React, type AllWidgetProps, FormattedMessage, AnimationComponent, css, jsx } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
-import { Button } from 'jimu-ui'
+import { Button, Label, Loading, Radio } from 'jimu-ui'
 
 import defaultMessages from './translations/default'
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
@@ -31,9 +34,13 @@ import SceneModifications from '@arcgis/core/layers/support/SceneModifications.j
 
 const { useState, useRef, useEffect } = React
 
-export default function ({
-  useMapWidgetIds
-}: AllWidgetProps<unknown>) {
+enum ModificationType {
+  Clip = 'clip',
+  Mask = 'mask',
+  Replace = 'replace',
+}
+
+export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   const apiWidgetContainer = useRef<HTMLDivElement>()
 
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(null)
@@ -41,8 +48,9 @@ export default function ({
   const [sketchViewModel, setSketchViewModel] = useState<SketchViewModel>(null)
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer>(null)
   const [modificationSymbol, setModificationSymbol] = useState(null)
-  const [modificationType, setModificationType] = useState(null)
+  const [modificationType, setModificationType] = useState<ModificationType>(ModificationType.Clip)
   const [imLayer, setImLayer] = useState(null)
+  const [layerView, setLayerView] = useState(null)
 
   useEffect(() => {
     if (jimuMapView && apiWidgetContainer.current) {
@@ -51,6 +59,22 @@ export default function ({
       }
     }
   }, [apiWidgetContainer, jimuMapView, view])
+
+  // update the attribute and modification on radio-button click
+  useEffect(() => {
+    const item = sketchViewModel?.updateGraphics?.items[0]
+    if (item) {
+      try {
+        updateModificationType(item, this.value)
+        sketchViewModel.update(item, {
+          enableZ: this.value === 'replace'
+        })
+        updateIntegratedMesh()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }, [modificationType])
 
   const initMeshMod = () => {
     // Create graphicsLayer to store modifications and add to the map
@@ -91,12 +115,12 @@ export default function ({
     setModificationSymbol(modificationSymbol)
 
     /*
-     * define the SketchViewModel and pass in the symbol for sketching polygon
-     * set updateOnGraphicClick to false to be able to start the update process
-     * depending on the defined modification.
-     * clip, mask --> z-value is not used
-     * replace --> z-value is used to define the flatten height
-     */
+         * define the SketchViewModel and pass in the symbol for sketching polygon
+         * set updateOnGraphicClick to false to be able to start the update process
+         * depending on the defined modification.
+         * clip, mask --> z-value is not used
+         * replace --> z-value is used to define the flatten height
+         */
     const sketchViewModel = new SketchViewModel({
       layer: graphicsLayer,
       view: view,
@@ -108,36 +132,29 @@ export default function ({
     })
     setSketchViewModel(sketchViewModel)
 
-    // listen to changes on the modificationType
-    const modificationType = document.getElementsByName('modificationType')
-    for (let i = 0, length = modificationType.length; i < length; i++) {
-      modificationType[i].onclick = modificationTypeChanged
-    }
-    setModificationType(modificationType)
-
     /*
-     * listen on sketch-create
-     * - indicate on the button that the create operation is finished
-     * - add the modificationType as attribute
-     * - update the IntegratedMesh with the modifications
-     * - start the update graphic and enable the Z only on type "replace"
-     */
+         * listen on sketch-create
+         * - indicate on the button that the create operation is finished
+         * - add the modificationType as attribute
+         * - update the IntegratedMesh with the modifications
+         * - start the update graphic and enable the Z only on type "replace"
+         */
     sketchViewModel.on('create', (event) => {
       if (event.state === 'complete') {
-        createModificationButton.classList.remove('esri-button--secondary')
-        updateModificationType(event.graphic, getSelectedModificationType())
+        // createModificationButton.classList.remove('esri-button--secondary')
+        updateModificationType(event.graphic, modificationType)
         updateIntegratedMesh()
         sketchViewModel.update(event.graphic, {
-          enableZ: getSelectedModificationType() === 'replace'
+          enableZ: modificationType === ModificationType.Replace
         })
       }
     })
 
     /*
-     * listen on sketch-update
-     * - set the radio-button-modification-type accordingly to the attribute
-     * - when the graphic update process is completed update the IntegratedMesh modifications
-     */
+         * listen on sketch-update
+         * - set the radio-button-modification-type accordingly to the attribute
+         * - when the graphic update process is completed update the IntegratedMesh modifications
+         */
     sketchViewModel.on('update', (event) => {
       if (event.state === 'start') {
         document.getElementById('modification-' + event.graphics[0].attributes.modificationType).checked = true
@@ -155,34 +172,38 @@ export default function ({
       })
       setImLayer(imLayer)
 
+      view.whenLayerView(imLayer).then((lyrView) => {
+        setLayerView(lyrView)
+      })
+
       // listen to click events to detect if the user would like to update a graphic
       view.on('click', (event) => {
-        view
-          .hitTest(event, {
-            include: [graphicsLayer],
-            exclude: [view.map.ground]
-          })
-          .then(processSelectedGraphic)
+        view.hitTest(event, {
+          include: [graphicsLayer],
+          exclude: [view.map.ground]
+        }).then(processSelectedGraphic)
       })
 
-      // add the ui
-      view.ui.add('tools', 'top-right')
-      document.getElementById('tools').style.display = 'block'
+      // TODO: build UI for the tools
+      // // add the ui
+      // view.ui.add('tools', 'top-right')
+      // document.getElementById('tools').style.display = 'block'
 
+      // TODO: add loader
       // display the rendering status of the IntegratedMeshLayer
-      const calciteLoader = document.getElementById('calciteLoader')
-      view.whenLayerView(imLayer).then((lyrView) => {
-        reactiveUtils.watch(
-          () => lyrView.updating,
-          (updating) => {
-            if (updating) {
-              calciteLoader.style.display = 'block'
-            } else {
-              calciteLoader.style.display = 'none'
-            }
-          }
-        )
-      })
+      // const calciteLoader = document.getElementById('calciteLoader')
+      // view.whenLayerView(imLayer).then((lyrView) => {
+      //   reactiveUtils.watch(
+      //     () => lyrView.updating,
+      //     (updating) => {
+      //       if (updating) {
+      //         calciteLoader.style.display = 'block'
+      //       } else {
+      //         calciteLoader.style.display = 'none'
+      //       }
+      //     }
+      //   )
+      // })
     })
   }
 
@@ -208,33 +229,8 @@ export default function ({
     }
   }
 
-  // Get the selected modificationType from radio-button-ui
-  const getSelectedModificationType = () => {
-    for (let i = 0; i < modificationType.length; i++) {
-      if (modificationType[i].checked) {
-        return modificationType[i].value
-      }
-    }
-  }
-
-  // update the attribute and modification on radio-button click
-  const modificationTypeChanged = () => {
-    const item = sketchViewModel.updateGraphics.items[0]
-    if (item) {
-      try {
-        updateModificationType(item, this.value)
-        sketchViewModel.update(item, {
-          enableZ: this.value === 'replace'
-        })
-        updateIntegratedMesh()
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }
-
   // update/add the modificationType as attribute information and change the symbolization accordingly
-  const updateModificationType = (graphic, modificationType) => {
+  const updateModificationType = (graphic, modificationType: ModificationType) => {
     graphic.attributes = { modificationType: modificationType }
     const colors = {
       clip: [252, 173, 88],
@@ -270,23 +266,80 @@ export default function ({
     }
   }
 
+  const menuItem = css`
+    display: block;
+    margin:10px;
+  `
+  const radioClip = css`
+    border-bottom: 3px solid rgb(252, 173, 88);
+  `
+  const radioMask = css`
+    border-bottom: 3px solid rgb(157, 219, 129);
+  `
+  const radioReplace = css`
+    border-bottom: 3px solid rgb(133, 148, 209);
+  `
+
   const isConfigured = useMapWidgetIds && useMapWidgetIds.length === 1
 
   return <div className="widget-use-map-view" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-    {!isConfigured && <h3><FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} /></h3>}
-    <Button
-      onClick={onCreateModificationClicked}
-      size="default"
-      id='createModification'
-    >
-      Button
-    </Button>
+            {!isConfigured && (
+                <h3>
+                    <FormattedMessage id="pleaseSelectMap" defaultMessage={defaultMessages.pleaseSelectAMap} />
+                </h3>
+            )}
+            <div css={menuItem}>
+                <Radio
+                    aria-label="Clip"
+                    checked={modificationType === ModificationType.Clip}
+                    onChange={(event, checked) => {
+                      console.log('Radio clip', event, checked)
+                      setModificationType(ModificationType.Clip)
+                    }}
+                />
+                <Label css={radioClip} for="modification-clip"><b>&nbsp;Clip </b></Label> - removes selected area
+            </div>
+            <div css={menuItem}>
+                <Radio
+                    aria-label="Mask"
+                    checked={modificationType === ModificationType.Mask}
+                    onChange={(event, checked) => {
+                      console.log('Radio mask', event, checked)
+                      setModificationType(ModificationType.Mask)
+                    }}
+                />
+                <Label css={radioMask} for="modification-mask"><b>&nbsp;Mask </b></Label> - displays only selected area
+            </div>
+            <div css={menuItem}>
+                <Radio
+                    aria-label="Replace"
+                    checked={modificationType === ModificationType.Replace}
+                    onChange={(event, checked) => {
+                      console.log('Radio replace', event, checked)
+                      setModificationType(ModificationType.Replace)
+                    }}
+                />
+                <Label css={radioReplace} for="modification-replace"><b>&nbsp;Replace </b></Label> - flattens selected area
+            </div>
+            <Button onClick={onCreateModificationClicked} size="default" id="createModification">
+                Button
+            </Button>
 
-    <JimuMapViewComponent
-      useMapWidgetId={useMapWidgetIds?.[0]}
-      onActiveViewChange={onActiveViewChange}
-    />
+            {layerView?.updating && (
+                <div
+                    style={{
+                      height: '80px',
+                      position: 'relative',
+                      width: '200px'
+                    }}>
+                    <Loading />
+                </div>
+            )}
 
-    <div ref={apiWidgetContainer} />
-  </div>
+            <div>{layerView?.updating ? 'Updating' : 'Not updating'}</div>
+
+            <JimuMapViewComponent useMapWidgetId={useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
+
+            <div ref={apiWidgetContainer} />
+        </div>
 }
