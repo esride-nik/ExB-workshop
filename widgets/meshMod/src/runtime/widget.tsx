@@ -30,6 +30,7 @@ import type SceneView from '@arcgis/core/views/SceneView'
 import SketchViewModel from '@arcgis/core/widgets/Sketch/SketchViewModel'
 import SceneModification from '@arcgis/core/layers/support/SceneModification.js'
 import SceneModifications from '@arcgis/core/layers/support/SceneModifications.js'
+import { convertSymbolColorToColorPickerValue } from 'jimu-ui/advanced/lib/map/components/symbol-selector/components/symbol-list/utils/symbol-utils'
 
 const { useState, useRef, useEffect } = React
 
@@ -90,10 +91,8 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   }, [sketchCompleteGraphic])
 
   useEffect(() => {
-    if (sketchUpdated) {
-      updateIntegratedMesh()
-      setSketchUpdated(false)
-    }
+    updateIntegratedMesh()
+    setSketchUpdated(false)
   }, [sketchUpdated])
 
   /*
@@ -259,18 +258,20 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
 
   // update the IntegratedMesh with the modifications
   const updateIntegratedMesh = () => {
+    if (graphicsLayer && graphicsLayer.graphics.length > 0) {
     // create the modification collection with the geometry and attribute from the graphicsLayer
-    const modifications = new SceneModifications(
-      graphicsLayer.graphics.toArray().map((graphic) => {
-        return new SceneModification({
-          geometry: graphic.geometry,
-          type: graphic.attributes.modificationType
+      const modifications = new SceneModifications(
+        graphicsLayer.graphics.toArray().map((graphic) => {
+          return new SceneModification({
+            geometry: graphic.geometry,
+            type: graphic.attributes.modificationType
+          })
         })
-      })
-    )
+      )
 
-    // add the modifications to the IntegratedMesh
-    imLayer.modifications = modifications
+      // add the modifications to the IntegratedMesh
+      imLayer.modifications = modifications
+    }
   }
 
   const onActiveViewChange = (jmv: JimuMapView) => {
