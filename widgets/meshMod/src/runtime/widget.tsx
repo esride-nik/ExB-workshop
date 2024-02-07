@@ -64,12 +64,12 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
 
   // update the attribute and modification on radio-button click
   useEffect(() => {
-    const item = (sketchViewModel?.updateGraphics as any).items[0]
-    if (item) {
+    if (sketchViewModel?.updateGraphics && (sketchViewModel?.updateGraphics as any).items?.length > 0) {
+      const item = (sketchViewModel?.updateGraphics as any).items[0]
       try {
         updateModificationType(item)
         sketchViewModel.update(item, {
-          enableZ: this.value === 'replace'
+          enableZ: modificationType === ModificationType.Replace
         })
         updateIntegratedMesh()
       } catch (error) {
