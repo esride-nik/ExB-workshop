@@ -54,6 +54,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   const [modificationType, setModificationType] = useState<ModificationType>(ModificationType.Clip)
   const [imLayer, setImLayer] = useState(null)
   const [layerView, setLayerView] = useState(null)
+  const [hitTestResult, setHitTestResult] = useState(null)
 
   useEffect(() => {
     if (jimuMapView && apiWidgetContainer.current) {
@@ -80,7 +81,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   }, [modificationType, modificationSymbol])
 
   useEffect(() => {
-    if (sketchCompleteGraphic !== null) {
+    if (sketchCompleteGraphic) {
       updateModificationType(sketchCompleteGraphic)
       updateIntegratedMesh()
       sketchViewModel.update(sketchCompleteGraphic, {
@@ -96,6 +97,26 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
       setSketchUpdated(false)
     }
   }, [sketchUpdated])
+
+  /*
+  * listen to click events to detect if the user would like to update a graphic
+  * - with hittest get the selected graphic
+  * - only if there is no create or update ongoing
+  * - start the update process dependent on the modificationType -> "replace" with enableZ
+  */
+  useEffect(() => {
+    if (hitTestResult) {
+      if (!sketchViewModel.activeTool) {
+        if (hitTestResult.results.length > 0) {
+          const graphicToModify = hitTestResult.results[0].graphic
+          sketchViewModel.update(graphicToModify, {
+            enableZ: graphicToModify.attributes.modificationType === 'replace'
+          })
+        }
+      }
+    }
+    setHitTestResult(null)
+  }, [hitTestResult])
 
   const initMeshMod = () => {
     // Create graphicsLayer to store modifications and add to the map
@@ -193,7 +214,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
         view.hitTest(event, {
           include: [graphicsLayer],
           exclude: [view.map.ground]
-        }).then(processSelectedGraphic)
+        }).then(setHitTestResult)
       })
 
       // TODO: build UI for the tools
@@ -222,23 +243,6 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   const onCreateModificationClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
     (event.target as HTMLElement).classList.add('esri-button--secondary')
     sketchViewModel.create('polygon')
-  }
-
-  /*
-     * listen to click events to detect if the user would like to update a graphic
-     * - with hittest get the selected graphic
-     * - only if there is no create or update ongoing
-     * - start the update process dependent on the modificationType -> "replace" with enableZ
-     */
-  const processSelectedGraphic = (hitTestResult) => {
-    if (!sketchViewModel.activeTool) {
-      if (hitTestResult.results.length > 0) {
-        const graphicToModify = hitTestResult.results[0].graphic
-        sketchViewModel.update(graphicToModify, {
-          enableZ: graphicToModify.attributes.modificationType === 'replace'
-        })
-      }
-    }
   }
 
   // update/add the modificationType as attribute information and change the symbolization accordingly
