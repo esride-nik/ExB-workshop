@@ -30,7 +30,6 @@ import type SceneView from '@arcgis/core/views/SceneView'
 import SketchViewModel from '@arcgis/core/widgets/Sketch/SketchViewModel'
 import SceneModification from '@arcgis/core/layers/support/SceneModification.js'
 import SceneModifications from '@arcgis/core/layers/support/SceneModifications.js'
-import { convertSymbolColorToColorPickerValue } from 'jimu-ui/advanced/lib/map/components/symbol-selector/components/symbol-list/utils/symbol-utils'
 import reactiveUtils from '@arcgis/core/core/reactiveUtils'
 
 const { useState, useRef, useEffect } = React
@@ -53,7 +52,6 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   const [modificationSymbol, setModificationSymbol] = useState(null)
   const [modificationType, setModificationType] = useState<ModificationType>(ModificationType.Clip)
   const [imLayer, setImLayer] = useState(null)
-  const [layerView, setLayerView] = useState(null)
   const [hitTestResult, setHitTestResult] = useState(null)
   const [lyrViewIsUpdating, setLyrViewIsUpdating] = useState(false)
 
@@ -205,7 +203,6 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
       setImLayer(imLayer)
 
       view.whenLayerView(imLayer).then((lyrView) => {
-        setLayerView(lyrView)
         reactiveUtils.watch(
           () => lyrView.updating,
           (updating) => {
