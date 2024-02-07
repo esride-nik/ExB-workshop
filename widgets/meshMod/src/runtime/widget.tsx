@@ -48,6 +48,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
   const [view, setSceneView] = useState<SceneView>(null)
   const [sketchViewModel, setSketchViewModel] = useState<SketchViewModel>(null)
   const [sketchCompleteGraphic, setSketchCompleteGraphic] = useState(null)
+  const [sketchUpdated, setSketchUpdated] = useState(false)
   const [graphicsLayer, setGraphicsLayer] = useState<GraphicsLayer>(null)
   const [modificationSymbol, setModificationSymbol] = useState(null)
   const [modificationType, setModificationType] = useState<ModificationType>(ModificationType.Clip)
@@ -88,6 +89,13 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
       setSketchCompleteGraphic(null)
     }
   }, [sketchCompleteGraphic])
+
+  useEffect(() => {
+    if (sketchUpdated) {
+      updateIntegratedMesh()
+      setSketchUpdated(false)
+    }
+  }, [sketchUpdated])
 
   const initMeshMod = () => {
     // Create graphicsLayer to store modifications and add to the map
@@ -154,29 +162,20 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
          */
     sketchViewModel.on('create', (event) => {
       if (event.state === 'complete') {
+        // no access to state in JSSDK event handlers
         setSketchCompleteGraphic(event.graphic)
-        // updateModificationType(event.graphic)
-        // updateIntegratedMesh()
-        // sketchViewModel.update(event.graphic, {
-        //   enableZ: modificationType === ModificationType.Replace
-        // })
       }
     })
 
-    /*
-         * listen on sketch-update
-         * - set the radio-button-modification-type accordingly to the attribute
-         * - when the graphic update process is completed update the IntegratedMesh modifications
-         */
-    sketchViewModel.on('update', (event) => {
-      if (event.state === 'start') {
-        document.getElementById('modification-' + event.graphics[0].attributes.modificationType).checked = true
-      }
-      updateIntegratedMesh()
+    // listen to sketch-update and update the IntegratedMesh modifications
+    sketchViewModel.on('update', () => {
+      setSketchUpdated(true)
     })
 
     // listen to sketch-delete and update the IntegratedMesh modifications
-    sketchViewModel.on('delete', updateIntegratedMesh)
+    sketchViewModel.on('delete', () => {
+      setSketchUpdated(true)
+    })
 
     view.when(() => {
       // get the IntegratedMesh-Layer from the Map (or WebScene)
