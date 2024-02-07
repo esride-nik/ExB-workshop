@@ -20,7 +20,7 @@
 
 /** @jsx jsx */ // <-- make sure to include the jsx pragma
 
-import { React, type AllWidgetProps, FormattedMessage, AnimationComponent, css, jsx } from 'jimu-core'
+import { React, type AllWidgetProps, FormattedMessage, css, jsx } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import { Button, Label, Loading, Radio } from 'jimu-ui'
 
@@ -28,10 +28,8 @@ import defaultMessages from './translations/default'
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer'
 import type SceneView from '@arcgis/core/views/SceneView'
 import SketchViewModel from '@arcgis/core/widgets/Sketch/SketchViewModel'
-import reactiveUtils from '@arcgis/core/core/reactiveUtils'
 import SceneModification from '@arcgis/core/layers/support/SceneModification.js'
 import SceneModifications from '@arcgis/core/layers/support/SceneModifications.js'
-import { set } from 'seamless-immutable'
 
 const { useState, useRef, useEffect } = React
 
@@ -66,7 +64,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
 
   // update the attribute and modification on radio-button click
   useEffect(() => {
-    const item = sketchViewModel?.updateGraphics?.items[0]
+    const item = (sketchViewModel?.updateGraphics as any).items[0]
     if (item) {
       try {
         updateModificationType(item)
@@ -139,7 +137,7 @@ export default function ({ useMapWidgetIds }: AllWidgetProps<unknown>) {
           }
         }
       ]
-    }
+    } as unknown as __esri.PolygonSymbol3D
 
     // polygon symbol to symbolize the modifications
     const modificationSymbol = {
