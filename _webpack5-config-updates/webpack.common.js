@@ -489,6 +489,7 @@ exports.getCommon = function (commonOptions = {}) {
     "zlib": require.resolve("browserify-zlib"),
     "assert": require.resolve("assert/"),
     "buffer": require.resolve("buffer/"),
+    "querystring": require.resolve("querystring-es3"),
   }
 
   exports.externalFunction = function({context, request}, callback) {
