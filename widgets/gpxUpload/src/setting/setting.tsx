@@ -62,22 +62,24 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
                   id: 'selectDs',
                   defaultMessage: defaultMessages.selectDs
                 })}>
-                <DataSourceSelector
-                    types={Immutable([AllDataSourceTypes.FeatureLayer])}
-                    useDataSources={props.useDataSources}
-                    useDataSourcesEnabled={props.useDataSourcesEnabled}
-                    onToggleUseDataEnabled={onToggleUseDataEnabled}
-                    onChange={onDataSourceChange}
-                    widgetId={props.id}
-                />
-                {
-                  props.useDataSources && props.useDataSources.length > 0 &&
-                  <FieldSelector
-                    useDataSources={props.useDataSources}
-                    onChange={onFieldChange}
-                    selectedFields={props.useDataSources[0].fields || Immutable([])}
+                <SettingRow>
+                  <DataSourceSelector
+                      types={Immutable([AllDataSourceTypes.FeatureLayer])}
+                      useDataSources={props.useDataSources}
+                      useDataSourcesEnabled={props.useDataSourcesEnabled}
+                      onToggleUseDataEnabled={onToggleUseDataEnabled}
+                      onChange={onDataSourceChange}
+                      widgetId={props.id}
                   />
-                }
+                  {
+                    props.useDataSources && props.useDataSources.length > 0 &&
+                    <FieldSelector
+                      useDataSources={props.useDataSources}
+                      onChange={onFieldChange}
+                      selectedFields={props.useDataSources[0].fields || Immutable([])}
+                    />
+                  }
+                </SettingRow>
             </SettingSection>
         </div>
   )
