@@ -32,7 +32,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
   const getStats = async () => {
     const field = (props.useDataSources?.[0].fields as unknown as string[])[0]
 
-    // this is a completely random query, asking for the 3 last alphabetical string values of the field.
+    // this is a completely random query, asking for the 3 largest / last values of the field.
     // using 'pageSize' and 'page' is a hack, because FeatureLayerDataSource.query doesn't support 'num' parameter (or something like 'maxRecordCount')
     // Reference: https://developers.arcgis.com/experience-builder/api-reference/jimu-core/FeatureLayerQueryParams/
     const dsResult = await featureLayerDataSource.query({
