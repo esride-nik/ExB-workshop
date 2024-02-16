@@ -14,7 +14,8 @@
     "height": 100
   },
   "publishMessages": [
-    "DATA_RECORDS_SELECTION_CHANGE"
+    "DATA_RECORDS_SELECTION_CHANGE",
+    "DATA_RECORD_SET_CHANGE"
   ],
   "messageActions": [],
   "translatedLocales": ["en", "de"]

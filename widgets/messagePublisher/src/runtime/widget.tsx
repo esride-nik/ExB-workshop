@@ -1,4 +1,4 @@
-import { React, type AllWidgetProps, type DataRecord, DataRecordSetChangeMessage, MessageManager, RecordSetChangeType, DataSourceComponent, type DataSource, type FeatureLayerDataSource, type FeatureLayerQueryParams, FeatureDataRecord, DataRecordsSelectionChangeMessage } from 'jimu-core'
+import { React, type AllWidgetProps, DataRecordSetChangeMessage, MessageManager, RecordSetChangeType, DataSourceComponent, type DataSource, type FeatureLayerDataSource, type FeatureLayerQueryParams, type FeatureDataRecord, DataRecordsSelectionChangeMessage, type DataRecordSet } from 'jimu-core'
 import { Button } from 'jimu-ui'
 import { useState } from 'react'
 const queryParams = {
@@ -13,10 +13,24 @@ const queryParams = {
 export default function Widget (props: AllWidgetProps<{ Config }>) {
   const [featureLayerDataSource, setFeatureLayerDataSource] = useState<FeatureLayerDataSource>(undefined)
 
-  const publishMessage = (widgetId: string, data: any) => {
+  const publishMessage = (widgetId: string, records: FeatureDataRecord[]) => {
+    // "DATA_RECORDS_SELECTION_CHANGE"
+    // Reference: https://developers.arcgis.com/experience-builder/api-reference/jimu-core/DataRecordsSelectionChangeMessage/
     MessageManager.getInstance().publishMessage(
-      new DataRecordsSelectionChangeMessage(widgetId, data)
-      // new DataRecordSetChangeMessage(widgetId, RecordSetChangeType.CreateUpdate, data)
+      new DataRecordsSelectionChangeMessage(widgetId, records)
+    )
+
+    // "DATA_RECORD_SET_CHANGE"
+    // Reference: https://developers.arcgis.com/experience-builder/api-reference/jimu-core/DataRecordSetChangeMessage/
+    const data = [{
+      dataSource: records[0].dataSource,
+      fields: records[0].dataSource.layer.fields.map(f => f.name),
+      name: records[0].dataSource.id,
+      records: records,
+      type: 'loaded'
+    } as unknown as DataRecordSet]
+    MessageManager.getInstance().publishMessage(
+      new DataRecordSetChangeMessage(widgetId, RecordSetChangeType.CreateUpdate, data)
     )
   }
 
