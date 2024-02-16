@@ -1,11 +1,6 @@
 import { React, type AllWidgetProps, DataRecordSetChangeMessage, MessageManager, RecordSetChangeType, DataSourceComponent, type DataSource, type FeatureLayerDataSource, type FeatureLayerQueryParams, type FeatureDataRecord, DataRecordsSelectionChangeMessage, type DataRecordSet } from 'jimu-core'
 import { Button } from 'jimu-ui'
 import { useState } from 'react'
-const queryParams = {
-  where: '1=1',
-  outFields: ['*'],
-  pageSize: 10
-} as FeatureLayerQueryParams
 
 /**
  * This widget will show features from a configured feature layer
@@ -57,13 +52,9 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
     setFeatureLayerDataSource(ds as FeatureLayerDataSource)
   }
 
-  // queryParams.groupByFieldsForStatistics = props.useDataSources?.[0].fields as unknown as string[]
-  // queryParams.outStatistics = [{ statisticType: 'max', onStatisticField: queryParams.groupByFieldsForStatistics[0], outStatisticFieldName: 'max' }]
-
   return <>
     <Button onClick={() => { getStats() }}>Publish message</Button>
 
     <DataSourceComponent useDataSource={props.useDataSources?.[0]} widgetId={props.id} queryCount onDataSourceCreated={onDataSourceCreated} />
-    {/* <DataSourceComponent useDataSource={props.useDataSources?.[0]} query={queryParams} widgetId={props.id} queryCount onDataSourceCreated={onDataSourceCreated} /> */}
   </>
 }
