@@ -35,26 +35,19 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
   }
 
   const getStats = async () => {
-    const fl = featureLayerDataSource.layer
     const field = (props.useDataSources?.[0].fields as unknown as string[])[0]
 
-    const query = fl.createQuery()
-    query.where = '1=1'
-    query.outFields = [field]
-    query.orderByFields = [`${field} DESC`]
-    query.returnGeometry = true
-    query.num = 3
-
-    const flResults = await fl.queryFeatures(query)
-    const flResultObjectIds = flResults.features.map(f => f.attributes.OBJECTID)
-    console.log(flResults, featureLayerDataSource)
-
+    // this is a completely random query, asking for the 3 last alphabetical string values of the field.
+    // using 'pageSize' and 'page' is a hack, because FeatureLayerDataSource.query doesn't support 'num' parameter (or something like 'maxRecordCount')
+    // Reference: https://developers.arcgis.com/experience-builder/api-reference/jimu-core/FeatureLayerQueryParams/
     const dsResult = await featureLayerDataSource.query({
-      where: `objectid in (${flResultObjectIds.join(',')})`,
-      outFields: ['*'],
+      where: '1=1',
+      outFields: [field],
+      orderByFields: [`${field} DESC`],
+      pageSize: 3,
+      page: 1,
       returnGeometry: true
     })
-    console.log('dsResult', dsResult)
     const records = dsResult?.records as FeatureDataRecord[]
 
     publishMessage(props.id, records)
