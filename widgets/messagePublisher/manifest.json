@@ -4,7 +4,7 @@
   "type": "widget",
   "dependency": ["jimu-arcgis"],
   "version": "0.1.0",
-  "exbVersion": "1.12.0",
+  "exbVersion": "1.13.0",
   "author": "Niklas Köhn, Esri Deutschland",
   "description": "This widget executes a trigger and is capable to connect it to message actions.",
   "copyright": "Esri Deutschland GmbH, 2024",
