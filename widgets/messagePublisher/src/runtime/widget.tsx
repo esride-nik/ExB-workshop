@@ -1,4 +1,4 @@
-import { React, type AllWidgetProps, DataRecordSetChangeMessage, MessageManager, RecordSetChangeType, DataSourceComponent, type DataSource, type FeatureLayerDataSource, type FeatureLayerQueryParams, type FeatureDataRecord, DataRecordsSelectionChangeMessage, type DataRecordSet } from 'jimu-core'
+import { React, type AllWidgetProps, DataRecordSetChangeMessage, MessageManager, RecordSetChangeType, DataSourceComponent, type DataSource, type FeatureLayerDataSource, type FeatureDataRecord, DataRecordsSelectionChangeMessage, type DataRecordSet } from 'jimu-core'
 import { Button } from 'jimu-ui'
 import { useState } from 'react'
 
