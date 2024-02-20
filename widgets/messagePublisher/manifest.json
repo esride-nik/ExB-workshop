@@ -21,6 +21,10 @@
     {
       "messageType": "DATA_RECORD_SET_CHANGE",
       "messageCarryData": "USE_DATA_SOURCE"
+    },
+    {
+      "messageType": "INDIVIDUAL_RECORD_CHANGE",
+      "messageCarryData": "USE_DATA_SOURCE"
     }
   ],
   "messageActions": [],

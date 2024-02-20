@@ -1,6 +1,14 @@
-import { React, type AllWidgetProps, DataRecordSetChangeMessage, MessageManager, RecordSetChangeType, DataSourceComponent, type DataSource, type FeatureLayerDataSource, type FeatureDataRecord, DataRecordsSelectionChangeMessage, type DataRecordSet } from 'jimu-core'
+import { React, type AllWidgetProps, DataRecordSetChangeMessage, MessageManager, RecordSetChangeType, DataSourceComponent, type DataSource, type FeatureLayerDataSource, type FeatureDataRecord, DataRecordsSelectionChangeMessage, type DataRecordSet, type Message, type MessageType, type DataRecord } from 'jimu-core'
 import { Button } from 'jimu-ui'
 import { useState } from 'react'
+
+export declare class IndividualRecordChangeMessage implements Message {
+  type: MessageType
+  widgetId: string
+  /** The selected records. To cancel selection, use an empty array. */
+  records: DataRecord[]
+  constructor (widgetId: string, records: DataRecord[])
+}
 
 /**
  * This widget will show features from a configured feature layer
@@ -9,6 +17,11 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
   const [featureLayerDataSource, setFeatureLayerDataSource] = useState<FeatureLayerDataSource>(undefined)
 
   const publishMessage = (widgetId: string, records: FeatureDataRecord[]) => {
+    // "INDIVIDUAL_RECORD_CHANGE"
+    MessageManager.getInstance().publishMessage(
+      new IndividualRecordChangeMessage(widgetId, records)
+    )
+
     // "DATA_RECORDS_SELECTION_CHANGE"
     // Reference: https://developers.arcgis.com/experience-builder/api-reference/jimu-core/DataRecordsSelectionChangeMessage/
     MessageManager.getInstance().publishMessage(

@@ -1,0 +1,26 @@
+{
+  "name": "messageSubscriber",
+  "label": "Individual Msg Subscriber",
+  "dependency": "jimu-arcgis",
+  "type": "widget",
+  "version": "1.13.0",
+  "exbVersion": "1.13.0",
+  "author": "Niklas Köhn, Esri Deutschland",
+  "description": "This is the widget used in developer guide, extended with an individual trigger type.",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "messageActions": [
+    {
+      "name": "query",
+      "label": "query",
+      "uri": "actions/query-action",
+      "settingUri": "actions/query-action-setting"
+    }
+  ],
+  "properties": {
+    "hasConfig": true
+  },
+  "translatedLocales": [
+    "en"
+  ]
+}
