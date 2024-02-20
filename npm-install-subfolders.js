@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 const { readdirSync, statSync } = require('fs');
 const { join, resolve } = require('path');
 
-const rootDir = resolve('./widgets'); // Ensure rootDir is an absolute path
+
 const initialDir = process.cwd(); // Store the initial working directory
 
 function findDirectSubfolders(dir) {
@@ -37,7 +37,12 @@ function installInSubfolders(subfolders) {
     });
 }
 
+const rootDir = process.argv.length>2 ? resolve(process.argv[2]) : resolve('./widgets'); // Ensure rootDir is an absolute path
+console.log(`Searching for widget folders in rootDir '${rootDir}'`);
+
 const subfolders = findDirectSubfolders(rootDir);
+console.log('Widget folders found:', subfolders);
+
 installInSubfolders(subfolders);
 
 console.log('npm install completed in all direct subfolders.');
