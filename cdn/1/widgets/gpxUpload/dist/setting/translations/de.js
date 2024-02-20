@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({selectMapWidget:"Karten-Widget wählen",selectDs:"Datenquelle wählen"})}}}));

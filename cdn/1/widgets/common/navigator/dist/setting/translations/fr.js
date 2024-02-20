@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Navigateur de vues",tabStyle:"Style de l’onglet",navBtnStyle:"Style du bouton de navigation",stepTips:"Fonctionne uniquement lorsqu’une animation de transition est définie pour le widget Section correspondant.",paginationStyle:"Style de pagination"})}}}));

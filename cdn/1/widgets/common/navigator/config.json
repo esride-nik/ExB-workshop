@@ -1,0 +1,21 @@
+{
+  "data": {
+    "type": "AUTO",
+    "section": "",
+    "views": []
+  },
+  "display": {
+    "advanced": false,
+    "vertical": false,
+    "type": "nav",
+    "navStyle": "default",
+    "standard": {
+      "scrollable": true,
+      "textAlign": "center",
+      "gap": "0px",
+      "showText": true,
+      "showIcon": false,
+      "iconPosition": "start"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({shareType:"共有タイプ",popup:"ポップアップ",inline:"インライン",popupDes:"URL と共有オプションをポップアップで表示します。",inlineDes:"共有オプションを 1 列に並べて表示します。",shareOption:"共有オプション",design:"デザイン",iconColor:"アイコンの色",hideMedia:"メディアのラベルを非表示",showMedia:"メディアのラベルを表示",size:"サイズ",white:"白",black:"黒",includeOrgName:"共有リンクに組織のショート ネームを含めます。"})}}}));

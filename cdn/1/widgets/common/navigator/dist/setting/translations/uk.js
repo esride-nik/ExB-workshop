@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"Навігація по видах",tabStyle:"Стиль вкладки",navBtnStyle:"Стиль кнопки навігації",stepTips:"Працює тільки якщо для відповідного віджету «Секція» задана анімація переходу.",paginationStyle:"Стиль розбиття на сторінки"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Навігація по видах",widgetPlaceholder:"Додайте розділ, щоб використовувати цей віджет.",tabDefault:"Вкладка за замовчуванням",tabUnderline:"Підкреслення вкладки",tabPills:"Пігулки вкладки",arrow1:"Стрілка 1",arrow2:"Стрілка 2",arrow3:"Стрілка 3"})}}}));

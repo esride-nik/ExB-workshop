@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Viser Navigation",widgetPlaceholder:"Tilføj et afsnit for at bruge denne widget.",tabDefault:"Fanestandard",tabUnderline:"Faneunderstregnnig",tabPills:"Fanepiller",arrow1:"Pil 1",arrow2:"Pil 2",arrow3:"Pil 3"})}}}));

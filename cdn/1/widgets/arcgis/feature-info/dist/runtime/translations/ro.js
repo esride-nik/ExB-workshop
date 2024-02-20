@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informații despre obiectele spațiale",noDeataMessageDefaultText:"Nu au fost găsite date.",featureNumbers:"{index} de {count}",featureInfoDataActionLabel:"Înregistrare curentă informații obiect spațial {layer}"})}}}));

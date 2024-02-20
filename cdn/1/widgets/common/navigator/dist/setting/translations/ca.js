@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Navegació per les visualitzacions",tabStyle:"Estil de pestanya",navBtnStyle:"Estil de botó de navegació",stepTips:"Només funciona quan s'ha definit una animació de transició per al widget de secció corresponent.",paginationStyle:"Estil de paginació"})}}}));

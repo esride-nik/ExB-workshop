@@ -1,0 +1,37 @@
+{
+  "uiMode": "POPUP",
+  "popup": {
+    "icon": "",
+    "items": [
+      { "id": "embed", "enable": true },
+      { "id": "qrcode", "enable": true },
+      { "id": "email", "enable": true },
+      { "id": "facebook", "enable": true },
+      { "id": "twitter", "enable": true },
+      { "id": "pinterest", "enable": true },
+      { "id": "linkedin", "enable": true }
+    ],
+    "tooltip": ""
+  },
+  "inline": {
+    "items": [
+      { "id": "facebook", "enable": true },
+      { "id": "twitter", "enable": true },
+      { "id": "pinterest", "enable": true },
+      { "id": "linkedin", "enable": true },
+      { "id": "embed", "enable": true },
+      { "id": "qrcode", "enable": true },
+      { "id": "email", "enable": true },
+      { "id": "sharelink", "enable": true }
+    ],
+    "design": {
+      "direction": "HORIZONTAL",
+      "hideLabel": false,
+      "btnRad": 0,
+      "btnColor": "",
+      "iconColor": "",
+      "size": "default",
+      "labelColor": "var(--dark)"
+    }
+  }
+}

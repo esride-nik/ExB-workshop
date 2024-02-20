@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Ansichtsnavigation",tabStyle:"Registerkarten-Style",navBtnStyle:"Style der Navigationsschaltfläche",stepTips:"Funktioniert nur, wenn eine Übergangsanimation für das betreffende Abschnitts-Widget festgelegt ist.",paginationStyle:"Seitennummerierungs-Style"})}}}));

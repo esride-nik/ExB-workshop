@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"การนำทางมุมมอง",tabStyle:"สไตล์ของแท็บ",navBtnStyle:"สไตล์ปุ่มการนำทาง",stepTips:"ใช้ได้เฉพาะเมื่อตั้งค่าภาพเคลื่อนไหวการเปลี่ยนสำหรับวิดเจ็ตส่วนที่ตรงกัน",paginationStyle:"สไตล์การให้เลขหน้า"})}}}));

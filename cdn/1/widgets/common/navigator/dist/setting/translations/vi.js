@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"Chế độ xem Điều hướng",tabStyle:"Kiểu tab",navBtnStyle:"Kiểu nút điều hướng",stepTips:"Chỉ hoạt động khi hoạt ảnh chuyển tiếp được thiết lập cho tiện ích Phần tương ứng.",paginationStyle:"Kiểu phân trang"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Πληροφορίες για το στοιχείο",noDeataMessageDefaultText:"Δεν βρέθηκαν δεδομένα.",featureNumbers:"{index} από {count}",featureInfoDataActionLabel:"{layer}τρέχουσα εγγραφή πληροφοριών στοιχείου"})}}}));

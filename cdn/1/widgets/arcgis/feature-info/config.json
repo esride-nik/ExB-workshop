@@ -1,0 +1,20 @@
+{
+  "limitGraphics": false,
+  "maxGraphics": 0,
+  "title": true,
+  "fields": true,
+  "media": true,
+  "attachments": true,
+  "lastEditInfo": true,
+  "noDataMessage": "",
+  "styleType": "usePopupDefined",
+  "style": {
+    "textColor": "",
+    "fontSizeType": "auto",
+    "fontSize": {
+      "distance": 14,
+      "unit": "px"
+    },
+    "backgroundColor": ""
+  }
+}

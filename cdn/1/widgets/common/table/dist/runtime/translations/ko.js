@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"테이블",_widgetDescription:"대화형 테이블 위젯입니다.",options:"옵션",showAllRecords:"모든 레코드 표시",refresh:"새로 고침",showHideCols:"열 표시/숨기기",toggleSelect:"선택 항목/모두 표시",_action_viewInTable_label:"테이블에서 보기",tableDataActionLabel:"{layer} 테이블 선택",tableCount:"총: {total}개 | 선택: {selected}개"})}}}));

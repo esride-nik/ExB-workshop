@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informations sur l’entité",noDeataMessageDefaultText:"Aucune donnée trouvée.",featureNumbers:"{index} sur {count}",featureInfoDataActionLabel:"{layer} Information sur l’entité pour l’enregistrement actuel"})}}}));

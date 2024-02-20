@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"视图导航",tabStyle:"选项卡样式",navBtnStyle:"导航按钮样式",stepTips:"仅当为相应的“部分”微件设置了过渡动画时才可用。",paginationStyle:"分页样式"})}}}));

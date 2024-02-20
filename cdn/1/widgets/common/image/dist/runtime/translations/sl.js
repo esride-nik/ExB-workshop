@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Slika",imageChooseShape:"Oblika",imageCrop:"Obreži"})}}}));

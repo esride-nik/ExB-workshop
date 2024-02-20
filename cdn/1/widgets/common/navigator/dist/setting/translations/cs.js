@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Navigace zobrazení",tabStyle:"Styl karty",navBtnStyle:"Styl tlačítka navigace",stepTips:"Funguje pouze v případě, že je pro příslušný widget Sekce nastavena přechodová animace.",paginationStyle:"Styl stránkování"})}}}));

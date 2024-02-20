@@ -1,0 +1,1 @@
+System.register([],(function(a){return{execute:function(){a({_widgetLabel:"Navigacija prikaza",tabStyle:"Stil kartice",navBtnStyle:"Stil dugmeta za navigaciju",stepTips:"Radi samo kada se animacija tranzicije postavi za odgovarajući vidžet Odeljak.",paginationStyle:"Stil paginacije"})}}}));

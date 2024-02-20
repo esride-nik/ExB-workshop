@@ -1,0 +1,1 @@
+System.register([],(function(a){return{execute:function(){a({_widgetLabel:"Vaadete navigeerimine",tabStyle:"Vahekaardi laad",navBtnStyle:"Navigeerimisnupu laad",stepTips:"Töötab ainult siis, kui üleminekuanimatsioon määratud vastava jaotisevidina jaoks.",paginationStyle:"Leheküljestamise laad"})}}}));

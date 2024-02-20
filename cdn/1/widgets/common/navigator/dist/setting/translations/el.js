@@ -1,0 +1,1 @@
+System.register([],(function(t){return{execute:function(){t({_widgetLabel:"Πλοήγηση στις προβολές",tabStyle:"Στιλ στηλοθέτησης",navBtnStyle:"Στιλ κουμπιού πλοήγησης",stepTips:'Λειτουργεί μόνο όταν έχει οριστεί μια κίνηση μετάβασης για το αντίστοιχο widget "Ενότητα".',paginationStyle:"Στιλ σελιδοποίησης"})}}}));

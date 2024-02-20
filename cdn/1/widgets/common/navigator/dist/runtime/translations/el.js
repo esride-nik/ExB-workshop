@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Πλοήγηση στις προβολές",widgetPlaceholder:"Προσθέστε μια ενότητα για να μπορέσετε να χρησιμοποιήσετε αυτό το widget.",tabDefault:"Προεπιλεγμένη ρύθμιση στηλοθέτησης",tabUnderline:"Υπογράμμιση στηλοθέτησης",tabPills:"Στήλες στηλοθέτησης",arrow1:"Βέλος 1",arrow2:"Βέλος 2",arrow3:"Βέλος 3"})}}}));

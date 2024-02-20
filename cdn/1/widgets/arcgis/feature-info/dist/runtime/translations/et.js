@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Objekti teave",noDeataMessageDefaultText:"Andmeid ei leitud.",featureNumbers:"{index} / {count}",featureInfoDataActionLabel:"Kihi {layer} objektiteabe praegune kirje"})}}}));

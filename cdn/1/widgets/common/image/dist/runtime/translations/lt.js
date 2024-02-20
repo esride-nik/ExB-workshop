@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Atvaizdas",imageChooseShape:"Forma",imageCrop:"Apkarpyti"})}}}));

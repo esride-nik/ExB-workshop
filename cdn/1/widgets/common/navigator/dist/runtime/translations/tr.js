@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Gezintiyi Görüntüler",widgetPlaceholder:"Bu aracı kullanmak için lütfen bir Bölüm ekleyin.",tabDefault:"Varsayılana dokun",tabUnderline:"Alt çizgiye dokun",tabPills:"Haplara dokun",arrow1:"Ok 1",arrow2:"Ok 2",arrow3:"Ok 3"})}}}));

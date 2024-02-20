@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informação da Feição",noDeataMessageDefaultText:"Nenhum dado localizado.",featureNumbers:"{index} de {count}",featureInfoDataActionLabel:"registro atual de informações da feição de {layer}"})}}}));
