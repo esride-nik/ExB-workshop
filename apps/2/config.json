@@ -251,7 +251,6 @@
       "type": "COLUMN",
       "order": [
         "4",
-        "5",
         "6",
         "7"
       ],
@@ -261,23 +260,15 @@
           "widgetId": "widget_204",
           "bbox": {
             "width": "267px",
-            "height": 135
-          }
-        },
-        "5": {
-          "type": "WIDGET",
-          "widgetId": "widget_205",
-          "bbox": {
-            "width": "267px",
-            "height": 61
+            "height": 148
           }
         },
         "6": {
           "type": "WIDGET",
           "widgetId": "widget_206",
           "bbox": {
-            "width": "261px",
-            "height": 212
+            "width": "250px",
+            "height": 501
           }
         },
         "7": {
@@ -285,7 +276,7 @@
           "widgetId": "widget_209",
           "bbox": {
             "width": "267px",
-            "height": 278
+            "height": 40
           }
         }
       },
@@ -2779,19 +2770,6 @@
         }
       ]
     },
-    "widget_205": {
-      "uri": "widgets/get-map-coordinates-function/",
-      "version": "1.13.0",
-      "label": "Get Map Coordinates (Function)",
-      "config": {
-        "showScale": true,
-        "showZoom": true
-      },
-      "id": "widget_205",
-      "useMapWidgetIds": [
-        "widget_198"
-      ]
-    },
     "widget_206": {
       "uri": "widgets/excelExport/",
       "version": "0.9.1",
@@ -2900,10 +2878,14 @@
       ]
     },
     "widget_209": {
-      "uri": "widgets/message-subscriber/",
-      "version": "1.13.0",
-      "label": "Message Subscriber",
-      "config": {},
+      "uri": "widgets/messagePublisher/",
+      "version": "0.1.0",
+      "label": "Message Publisher",
+      "config": {
+        "w3wApiKey": "",
+        "w3wOnMap": false,
+        "showW3wSquare": false
+      },
       "id": "widget_209",
       "useDataSourcesEnabled": true,
       "useDataSources": [
@@ -2912,7 +2894,7 @@
           "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
           "rootDataSourceId": "dataSource_2",
           "fields": [
-            "namenr"
+            "baumid"
           ]
         }
       ]
@@ -2998,26 +2980,6 @@
       "messageType": "DATA_RECORDS_SELECTION_CHANGE",
       "actions": [
         {
-          "actionId": "widget_209-query-1706793392997",
-          "widgetId": "widget_209",
-          "messageWidgetId": "widget_208",
-          "actionName": "query",
-          "description": null,
-          "config": {
-            "useDataSource": {
-              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
-              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
-              "rootDataSourceId": "dataSource_2",
-              "fields": [
-                "pflanzjahr"
-              ]
-            },
-            "fieldName": "pflanzjahr"
-          },
-          "version": "1.13.0",
-          "useDataSources": []
-        },
-        {
           "actionId": "widget_198-zoomToFeature-1706793741667",
           "widgetId": "widget_198",
           "messageWidgetId": "widget_208",
@@ -3066,6 +3028,174 @@
           ]
         }
       ]
+    },
+    "messageConfig_3": {
+      "id": "messageConfig_3",
+      "widgetId": "widget_209",
+      "messageType": "DATA_RECORDS_SELECTION_CHANGE",
+      "actions": [
+        {
+          "actionId": "widget_198-filter-1708444663619",
+          "widgetId": "widget_198",
+          "messageWidgetId": "widget_209",
+          "actionName": "filter",
+          "description": null,
+          "config": {
+            "messageUseDataSource": {
+              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "rootDataSourceId": "dataSource_2"
+            },
+            "actionUseDataSource": {
+              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "rootDataSourceId": "dataSource_2"
+            },
+            "sqlExprObj": null,
+            "enabledDataRelationShip": true
+          },
+          "version": "1.13.0",
+          "useDataSources": [
+            {
+              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "rootDataSourceId": "dataSource_2"
+            },
+            {
+              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "rootDataSourceId": "dataSource_2",
+              "fields": []
+            }
+          ]
+        },
+        {
+          "actionId": "widget_198-flash-1708444695426",
+          "widgetId": "widget_198",
+          "messageWidgetId": "widget_209",
+          "actionName": "flash",
+          "description": null,
+          "config": {
+            "messageUseDataSource": {
+              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "rootDataSourceId": "dataSource_2"
+            },
+            "actionUseDataSource": null,
+            "sqlExprObj": null,
+            "enabledDataRelationShip": true
+          },
+          "version": "1.13.0",
+          "useDataSources": [
+            {
+              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "rootDataSourceId": "dataSource_2"
+            }
+          ]
+        }
+      ]
+    },
+    "messageConfig_4": {
+      "id": "messageConfig_4",
+      "widgetId": "widget_209",
+      "messageType": "DATA_RECORD_SET_CHANGE",
+      "actions": [
+        {
+          "actionId": "widget_198-zoomToFeature-1708444689330",
+          "widgetId": "widget_198",
+          "messageWidgetId": "widget_209",
+          "actionName": "zoomToFeature",
+          "description": null,
+          "config": {
+            "useDataSource": {
+              "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+              "rootDataSourceId": "dataSource_2"
+            },
+            "useDataSources": [
+              {
+                "dataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+                "mainDataSourceId": "dataSource_2-18d0de1c6e2-layer-2",
+                "rootDataSourceId": "dataSource_2"
+              }
+            ]
+          },
+          "version": "1.13.0",
+          "useDataSources": []
+        },
+        {
+          "actionId": "widget_198-showOnMap-1708444700187",
+          "widgetId": "widget_198",
+          "messageWidgetId": "widget_209",
+          "actionName": "showOnMap",
+          "description": null,
+          "config": {
+            "isUseCustomSymbol": true,
+            "symbolOption": {
+              "pointSymbol": {
+                "type": "esriSMS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "angle": 0,
+                "xoffset": 0,
+                "yoffset": 0,
+                "size": 12,
+                "style": "esriSMSCircle",
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                }
+              },
+              "polylineSymbol": {
+                "type": "esriSLS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "width": 0.75,
+                "style": "esriSLSSolid"
+              },
+              "polygonSymbol": {
+                "type": "esriSFS",
+                "color": [
+                  239,
+                  132,
+                  38,
+                  255
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    184,
+                    115,
+                    59,
+                    255
+                  ],
+                  "width": 1.5,
+                  "style": "esriSLSSolid"
+                },
+                "style": "esriSFSSolid"
+              }
+            }
+          },
+          "version": "1.13.0",
+          "useDataSources": []
+        }
+      ]
     }
   },
   "pageStructure": [
@@ -3073,7 +3203,7 @@
       "page_0": []
     }
   ],
-  "timestamp": 1706793751450,
+  "timestamp": 1708444712442,
   "header": {
     "layout": {
       "LARGE": "layout_24",
