@@ -36,7 +36,8 @@ jobs:
         run: npm run build:prod
         working-directory: arcgis-experience-builder-1.13/ArcGISExperienceBuilder/client
       - name: Run download script
-        run: node -e "require('./server/src/middlewares/dev/apps/app-download.js').zipApp('2', 'app.zip')"
+        # include clientId of the app, as explained here: https://community.esri.com/t5/arcgis-experience-builder-blog/experience-builder-devops-generating-the-app/ba-p/1112247
+        run: node -e "require('./server/src/middlewares/dev/apps/app-download.js').zipApp('2', 'app.zip', 'pSM9aNISD0wgzyXA')"
         working-directory: arcgis-experience-builder-1.13/ArcGISExperienceBuilder
         env:
           NODE_ENV: production
