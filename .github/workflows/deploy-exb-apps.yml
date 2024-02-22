@@ -49,10 +49,11 @@ jobs:
         id: modify-file-content
         uses: jaywcjlove/github-action-modify-file-content@main
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: apps/2/download-times.json
-          body: "$INCREMENTED_DT"
+          body: "{{$INCREMENTED_DT}}"
           overwrite: true
-          message: "Increment download times to $INCREMENTED_DT"
+          message: "Increment download times to {{$INCREMENTED_DT}}"
           branch: master
 
       - name: Echo modified apps/2/download-times.json
