@@ -39,7 +39,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
       where: '1=1',
       outFields: [field],
       orderByFields: [`${field} DESC`],
-      pageSize: 3,
+      pageSize: 5,
       page: 1,
       returnGeometry: true
     })
