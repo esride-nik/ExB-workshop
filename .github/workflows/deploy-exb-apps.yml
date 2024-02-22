@@ -37,7 +37,9 @@ jobs:
       - name: Echo download-times-app-2
         run: echo "${{ steps.download-times-app-2.outputs.content }}"
       - name: Echo download-times-app-2-1
-        run: echo $((steps.download-times-app-2.outputs.content + 1))
+        # the next line generate the error invalid arithmetic operator
+        # run: echo $((steps.download-times-app-2.outputs.content + 1))
+        run: echo $(( parseInt("${steps.download-times-app-2.outputs.content}") + 1 ))
 
 
       - name: Output download-times-app-2
