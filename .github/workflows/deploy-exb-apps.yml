@@ -31,9 +31,9 @@ jobs:
       - name: Create App directory
         run: mkdir public && cd public && mkdir apps && cd apps
         working-directory: arcgis-experience-builder-1.13/ArcGISExperienceBuilder/server
-
       - name: Copy apps
         run: cp -r apps/* arcgis-experience-builder-1.13/ArcGISExperienceBuilder/server/public/apps
+
       - name: Read apps/2/download-times.json
         id: download-times-app-2
         uses: jaywcjlove/github-action-read-file@main
@@ -42,13 +42,6 @@ jobs:
 
       - name: Set env variable
         run: echo "INCREMENTED_DT=$((${{ steps.download-times-app-2.outputs.content }} + 1))" >> $GITHUB_ENV
-
-      - name: Increment and echo
-        run: |
-          content=$(echo "${{ steps.download-times-app-2.outputs.content }}" | tr -d '\n')
-          echo $((content + 1))
-        shell: bash
-
       - name: Echo INCREMENTED_DT
         run: echo "$INCREMENTED_DT"
 
@@ -57,21 +50,13 @@ jobs:
         uses: jaywcjlove/github-action-modify-file-content@main
         with:
           path: apps/2/download-times.json
-          body: $INCREMENTED_DT
+          body: "$INCREMENTED_DT"
           overwrite: true
-          message: "Increment download times"
+          message: "Increment download times to $INCREMENTED_DT"
           branch: master
 
       - name: Echo modified apps/2/download-times.json
         run: echo "${{steps.modify-file-content.outputs.content}}"
-
-      # - name: Commit & Push
-      #   uses: actions-js/push@master
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     branch: main
-      #     force: true
-      #     message: 'Overwritten by Github Actions - ${date}'
 
       - name: NPM install client folder
         run: npm ci
