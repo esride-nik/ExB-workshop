@@ -4,6 +4,12 @@ on:
     branches:
       - master
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  
 jobs:
   Deploy-Experience-Builder-Apps:
     runs-on: ubuntu-latest
@@ -52,12 +58,13 @@ jobs:
           path: apps/2/download-times.json
           body: "$INCREMENTED_DT"
 
-      # commit change to master branch
-      - name: Commit changes
-        run: |
-          git add .
-          git commit -m "Increment apps/2/download-times"
-          git push
+      - name: Commit & Push
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          force: true
+          message: 'Overwritten by Github Actions - ${date}'
 
       - name: NPM install client folder
         run: npm ci
