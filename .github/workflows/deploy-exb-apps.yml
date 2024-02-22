@@ -17,6 +17,7 @@ jobs:
           ARCGIS_LIB_DOWNLOADER_PASSWORD: ${{ secrets.ARCGIS_LIB_DOWNLOADER_PASSWORD }}
       - name: Unzip Experience Builder
         run: unzip -q arcgis-experience-builder-1.13.zip -d arcgis-experience-builder-1.13
+
       - name: Copy Custom Widgets
         run: cp -r widgets/* arcgis-experience-builder-1.13/ArcGISExperienceBuilder/client/your-extensions/widgets
       - name: Install Custom Widgets dependencies
@@ -24,8 +25,24 @@ jobs:
       - name: Create App directory
         run: mkdir public && cd public && mkdir apps && cd apps
         working-directory: arcgis-experience-builder-1.13/ArcGISExperienceBuilder/server
+
       - name: Copy apps
         run: cp -r apps/* arcgis-experience-builder-1.13/ArcGISExperienceBuilder/server/public/apps
+      - name: Read apps/2/download-times.json
+        id: download-times-app-2
+        uses: jaywcjlove/github-action-read-file@main
+        with:
+          path: apps/2/download-times.json
+      - name: Echo download-times-app-2
+        run: echo "download-times ${{ steps.download-times-app-2 }}"
+      - name: Echo modified download-times-app-2
+        run: echo "modified download-times parseInt("${{ steps.download-times-app-2 }}") + 1
+      - name: Modify apps/2/download-times.json
+        uses: jaywcjlove/github-action-modify-file-content@main
+        with:
+          path: apps/2/download-times.json
+          body: parseInt("${{ steps.download-times-app-2 }}") + 1
+
       - name: NPM install client folder
         run: npm ci
         working-directory: arcgis-experience-builder-1.13/ArcGISExperienceBuilder/client
