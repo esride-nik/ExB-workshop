@@ -36,17 +36,17 @@ jobs:
 
       - name: Echo download-times-app-2
         run: echo "${{ steps.download-times-app-2.outputs.content }}"
-      - name: Echo download-times-app-2-1
+      - name: Increment download-times-app-2
+        id: increment-download-times-app-2
         # the next line generate the error invalid arithmetic operator
         # run: echo $((steps.download-times-app-2.outputs.content + 1))
-        run: echo "parseInt(${{ steps.download-times-app-2.outputs.content }}) + 1"
+        run: | 
+          intNum=parseInt(${{ steps.download-times-app-2.outputs.content }})
+          echo "::set-output name=downloadTimes::$intNum+1"
 
-
-      - name: Output download-times-app-2
-        id: output-download-times-app-2
-        run: echo "::set-output name=downloadTimes::${{ steps.download-times-app-2.outputs.content }}"
       - name: Echo modified download-times-app-2
-        run: echo "${{ steps.output-download-times-app-2.outputs.downloadTimes }} + 1"
+        run: echo "${{ steps.increment-download-times-app-2.outputs.downloadTimes }}"
+
       - name: Modify apps/2/download-times.json
         uses: jaywcjlove/github-action-modify-file-content@main
         with:
