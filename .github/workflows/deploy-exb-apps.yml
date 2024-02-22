@@ -34,21 +34,23 @@ jobs:
         with:
           path: apps/2/download-times.json
 
-      - name: Echo download-times-app-2
-        run: echo "${{ steps.download-times-app-2.outputs.content }}"
-      - name: Increment download-times-app-2
-        id: increment-download-times-app-2
-        run: | 
-          echo "::set-output name=downloadTimes::${{ steps.download-times-app-2.outputs.content }}+1"
+      - name: Set env variable
+        run: echo "INCREMENTED_DT=$((${{ steps.download-times-app-2.outputs.content }} + 1))" >> $GITHUB_ENV
 
-      - name: Echo modified download-times-app-2
-        run: echo "${{ steps.increment-download-times-app-2.outputs.downloadTimes }}"
+      - name: Increment and echo
+        run: |
+          content=$(echo "${{ steps.download-times-app-2.outputs.content }}" | tr -d '\n')
+          echo $((content + 1))
+        shell: bash
+
+      - name: Echo GITHUB_ENV_INCREMENTED_DT
+        run: echo "$GITHUB_ENV_INCREMENTED_DT"
 
       - name: Modify apps/2/download-times.json
         uses: jaywcjlove/github-action-modify-file-content@main
         with:
           path: apps/2/download-times.json
-          body: "${{ steps.download-times-app-2.outputs.content }} + 1"
+          body: "$GITHUB_ENV_INCREMENTED_DT"
 
       - name: NPM install client folder
         run: npm ci
