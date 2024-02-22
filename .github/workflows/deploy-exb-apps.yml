@@ -36,7 +36,7 @@ jobs:
       - name: Echo download-times-app-2
         run: echo "download-times ${{ steps.download-times-app-2.outputs.content }}"
       - name: Echo modified download-times-app-2
-        run: echo "modified download-times "${{ steps.download-times-app-2.outputs.content }} + 1"
+        run: echo "modified download-times "${{ steps.download-times-app-2.outputs.content }}" + 1
       - name: Modify apps/2/download-times.json
         uses: jaywcjlove/github-action-modify-file-content@main
         with:
