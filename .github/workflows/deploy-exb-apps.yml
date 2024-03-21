@@ -49,16 +49,17 @@ jobs:
 
       - name: Set env variable
         run: echo "INCREMENTED_DT=$((${{ steps.download-times-app-exb_demo.outputs.content }} + 1))" >> $GITHUB_ENV
+
       - name: Echo INCREMENTED_DT
         run: echo "$INCREMENTED_DT"
 
-      - name: Modify apps/app-exb/download-times.json
+      - name: Modify apps/exb_demo/download-times.json
         id: modify-file-content
         uses: jaywcjlove/github-action-modify-file-content@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: apps/app-exb/download-times.json
-          body: "{{$INCREMENTED_DT}}"
+          path: apps/exb_demo/download-times.json
+          body: $INCREMENTED_DT
           overwrite: true
           message: "Increment download times to {{$INCREMENTED_DT}}"
           branch: master
