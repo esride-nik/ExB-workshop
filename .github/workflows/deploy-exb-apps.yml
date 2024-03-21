@@ -45,10 +45,10 @@ jobs:
           path: apps/exb_demo/download-times.json
         
       - name: Read DT file variable
-        run: echo "(${{ steps.download-times-app-app-exb.outputs.content }}"
+        run: echo "${{ steps.download-times-app-exb_demo.outputs.content }}"
 
       - name: Set env variable
-        run: echo "INCREMENTED_DT=$((${{ steps.download-times-app-app-exb.outputs.content }} + 1))" >> $GITHUB_ENV
+        run: echo "INCREMENTED_DT=$((${{ steps.download-times-app-exb_demo.outputs.content }} + 1))" >> $GITHUB_ENV
       - name: Echo INCREMENTED_DT
         run: echo "$INCREMENTED_DT"
 
