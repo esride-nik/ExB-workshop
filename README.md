@@ -28,7 +28,7 @@ For example, when following [this guide](https://doc.arcgis.com/de/experience-bu
 ## Deprecation of NPM package "xlsx"
 
 This package is based on the Excel tool library "SheetJS" and is no longer maintained.
-The GiHub advisory db says: "[All versions of SheetJS CE through 0.19.2 are vulnerable to "Prototype Pollution" when reading specially crafted files. Workflows that do not read arbitrary files (for example, exporting data to spreadsheet files) are unaffected.](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6)" As we're not reading anything, I guess it's not that urgent..
+The GitHub advisory db says: "[All versions of SheetJS CE through 0.19.2 are vulnerable to "Prototype Pollution" when reading specially crafted files. Workflows that do not read arbitrary files (for example, exporting data to spreadsheet files) are unaffected.](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6)" As we're not reading anything, I guess it's not that urgent..
 .. but maybe try out [Mr.Excel](https://www.npmjs.com/package/mr-excel) some day?
 
 ## Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder >= 1.12
