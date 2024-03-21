@@ -1,12 +1,12 @@
 {
   "created": 1705334642720,
   "description": "",
-  "id": "2",
+  "id": "exb_demo",
   "modified": 1708444713466,
   "owner": "esride-nik",
   "tags": [],
   "thumbnail": null,
-  "title": "Advanced select",
+  "title": "ExB Workshop Demo App",
   "type": "Web Experience",
   "snippet": "",
   "typeKeywords": [
@@ -14,8 +14,8 @@
     "Ready To Use",
     "JavaScript",
     "status: Published",
-    "version:1.13.0",
-    "publishVersion:1.13.0"
+    "version:1.14.0",
+    "publishVersion:1.14.0"
   ],
   "portalUrl": "https://esri-de.maps.arcgis.com",
   "username": "esride-nik",

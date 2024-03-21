@@ -7,6 +7,15 @@ Some Widgets and a theme.
 * Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
 * Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
 
+### Optional: Use the demo app locally
+* Link the config of the app in the server folder:
+  * Open command prompt (does not work with Git Bash or similar)
+  * If the subfolders ``public\apps`` do not yet exist on the server side, create them manually
+  * ``mklink /j "<ExB path>\server\public\apps\fah_basis" "<ExB path>\client\WebClient_LastGen\apps\fah_basis"``
+  * The success message: ``Junction created for <ExB path>\server\public\apps\fah_basis <<===>> <ExB path>\client\WebClient_LastGen\apps\fah_basis``
+* In the file ``client/tsconfig.json``, include the folder name of the repository in the include array. Or remove / comment out the include array completely from the file.
+* Restart Watcher (call ``npm start`` in the client folder)
+
 ## Looking for the what3words widget?
 This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
 
