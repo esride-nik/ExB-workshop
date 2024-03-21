@@ -59,7 +59,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: apps/exb_demo/download-times.json
-          body: $INCREMENTED_DT
+          body: "{{$INCREMENTED_DT}}"
           overwrite: true
           message: "Increment download times to {{$INCREMENTED_DT}}"
           branch: master
