@@ -1,5 +1,5 @@
 import { DataSourceManager, React, type AllWidgetProps } from 'jimu-core'
-import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
+import { FeatureLayerDataSource, JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import Graphic from 'esri/Graphic'
 import { type Point } from 'esri/geometry'
 
@@ -21,7 +21,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
     return props.useMapWidgetIds && props.useMapWidgetIds.length === 1
   }
 
-  const activeViewChangeHandler = (jmv: JimuMapView) => {
+  const activeViewChangeHandler = async (jmv: JimuMapView) => {
     jimuMapView = jmv
 
     const queryString = window.location.search
@@ -36,6 +36,15 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
     // find datasource from DataSourceManager by ID from data_filter
     const dataSource = DataSourceManager.getInstance().getDataSource(dataSourceId)
     console.log('dataSource', dataSource)
+
+    const featureLayerDataSource = dataSource as FeatureLayerDataSource
+
+    const flQuery = featureLayerDataSource.layer.createQuery()
+    flQuery.where = whereClause
+    const flFilteredExtent = await featureLayerDataSource.layer.queryExtent(flQuery)
+    console.log('flFilteredExtent', flFilteredExtent)
+
+    jimuMapView.view.goTo(flFilteredExtent)
   }
 
   if (!isConfigured()) {
