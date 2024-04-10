@@ -1,0 +1,17 @@
+{
+  "name": "filterAndZoom",
+  "label": "Filter and Zoom",
+  "type": "widget",
+  "dependency": ["jimu-arcgis"],
+  "version": "0.1.0",
+  "exbVersion": "1.14.0",
+  "author": "Niklas Köhn, Esri Deutschland GmbH",
+  "description": "Zoom to features filtered via URL parameter",
+  "copyright": "Esri Deutschland GmbH, 2024",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "defaultSize": {
+    "width": 400,
+    "height": 400
+  },
+  "translatedLocales": ["en", "de"]
+}
