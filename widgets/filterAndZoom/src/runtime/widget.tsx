@@ -1,20 +1,10 @@
 import { DataSourceManager, React, type AllWidgetProps } from 'jimu-core'
-import { FeatureLayerDataSource, JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
-import Graphic from 'esri/Graphic'
-import { type Point } from 'esri/geometry'
-
-const { useState, useEffect } = React
+import { type FeatureLayerDataSource, JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 
 /**
  * This widget will show features from a configured feature layer
  */
 export default function Widget (props: AllWidgetProps<{ Config }>) {
-  const [dataSourceId, setDataSourceId] = useState<string>(undefined)
-
-  useEffect(() => {
-    // queryFunc();
-  }, [])
-
   let jimuMapView: JimuMapView
 
   const isConfigured = () => {
