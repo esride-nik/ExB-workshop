@@ -1,4 +1,5 @@
-import { AllDataSourceTypes, FormattedMessage, Immutable, React, type UseDataSource } from 'jimu-core'
+import { AllDataSourceTypes, FormattedMessage, React, type UseDataSource } from 'jimu-core'
+import Immutable from 'seamless-immutable'
 import { MapWidgetSelector } from 'jimu-ui/advanced/setting-components'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { DataSourceSelector } from 'jimu-ui/advanced/data-source-selector'
