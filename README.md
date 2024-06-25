@@ -7,6 +7,11 @@ Some Widgets and a theme.
 * Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
 * Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
 
+### Using 3rd party NPM packages in your widgets
+
+It's a good practice to ``npm init`` within the widget folder and install dependencies there. During development, it will work also with a central ``package.json`` file containing the dependencies for all your widgets (resulting in one single ``node_modules`` folder outside ``widgets``), but fails to resolve dependencies for production use. We'll end up with one ``package.json`` per widget using packages, but that's what ``npm run install-subfolders`` (see above) is for.
+For example, when following [this guide](https://doc.arcgis.com/de/experience-builder/11.0/configure-widgets/add-custom-widgets.htm), the ``npm run build:prod`` will not find the installed packages after copying only the subfolder with your widget into ``your-extensions/widgets``.
+
 ### Optional: Use the demo app locally
 * Link the config of the app in the server folder:
   * Open command prompt (does not work with Git Bash or similar)
@@ -29,22 +34,29 @@ Steps:
   * create your own derived widget class: ``export default class Widget extends <Widget-Name>``
   * overwrite methods as needed, but call ``super.<method>()`` to keep the functionality of the base class
 
-## Using 3rd party NPM packages in your widgets
+## Compiler settings
 
-It's a good practice to ``npm init`` within the widget folder and install dependencies there. During development, it will work also with a central ``package.json`` file containing the dependencies for all your widgets (resulting in one single ``node_modules`` folder outside ``widgets``), but fails to resolve dependencies for production use.
-For example, when following [this guide](https://doc.arcgis.com/de/experience-builder/11.0/configure-widgets/add-custom-widgets.htm), the ``npm run build:prod`` will not find the installed packages after copying only the subfolder with your widget into ``your-extensions/widgets``.
+### Using imports in Jest
 
-## Deprecation of NPM package "xlsx"
+For Jest to be able to import anything, add ``"esModuleInterop": true`` to your ``tsconfig.json``.
 
-This package is based on the Excel tool library "SheetJS" and is no longer maintained.
-The GitHub advisory db says: "[All versions of SheetJS CE through 0.19.2 are vulnerable to "Prototype Pollution" when reading specially crafted files. Workflows that do not read arbitrary files (for example, exporting data to spreadsheet files) are unaffected.](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6)" As we're not reading anything, I guess it's not that urgent..
-.. but maybe try out [Mr.Excel](https://www.npmjs.com/package/mr-excel) some day?
+### Path resolution of ``shared-code``
 
-## Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder >= 1.12
+By default, the ``paths.widgets`` array in your ``tsconfig.json`` only contains a reference to ``"./your-extensions/widgets/*"``. To enable the TS compiler to find your shared code when importing it in your widget and business code, enhance the array with the folder names of the repositories with ``/widgets/`` postfix:
 
-The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-builder-questions/cannot-find-arcgis-maps-sdk-for-javascript-module/m-p/1308587#M7620) does not work for me. I need to remove the ``include`` array from tsconfig.json (no whitelist means including everyting).
+```
+"paths": {
+  [...]
+  "widgets/*": [
+    "./your-extensions/widgets/*",
+    "./<your_repository>/widgets/*"
+  ]
+}
+```
 
-Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
+### Using shared code in multiple web-extension-repos
+
+To ensure that no entries are overwritten, the central ``ts`` file with the collected exports should be named individually. For example, instead of ``entry1.ts``, you would be using ``entry_<project_name>.ts`` in your repository.
 
 ## Polyfills for Node APIs in Experience Builder >= 1.8
 
@@ -106,3 +118,15 @@ That works.
 The trouble is, that the webpack files on root level of the "client" folder are not part of the "exb-web-extension-repo", but are delivered with ExB. Now if you use NPM packages in your custom widgets that require polyfills, you have to update the webpack configs on Node JS root level. Please refer to the ``_webpack5-config-updates`` subfolder in this repository for sample files.
 
 [Originally published in the ArcGIS community.](https://community.esri.com/t5/arcgis-experience-builder-questions/npm-packages-in-experience-builder-1-8/m-p/1181885#M4574)
+
+## Deprecation of NPM package "xlsx"
+
+This package is based on the Excel tool library "SheetJS" and is no longer maintained.
+The GitHub advisory db says: "[All versions of SheetJS CE through 0.19.2 are vulnerable to "Prototype Pollution" when reading specially crafted files. Workflows that do not read arbitrary files (for example, exporting data to spreadsheet files) are unaffected.](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6)" As we're not reading anything, I guess it's not that urgent..
+.. but maybe try out [Mr.Excel](https://www.npmjs.com/package/mr-excel) some day?
+
+## Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder 1.12
+
+The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-builder-questions/cannot-find-arcgis-maps-sdk-for-javascript-module/m-p/1308587#M7620) does not work for me. I need to remove the ``include`` array from tsconfig.json (no whitelist means including everyting).
+
+Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
