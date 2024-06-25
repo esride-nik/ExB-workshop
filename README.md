@@ -98,6 +98,7 @@ So far so good. Except that this configuration has been chopped up in ArcGIS Exp
     npm i buffer
     npm i assert
     npm i url
+    npm i querystring-es3
     ```
 
 That works.
