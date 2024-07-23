@@ -702,6 +702,8 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig> & ExtraP
       : this.state.aoiGeometries.distanceUnit || this.state.searchSettings.distanceUnits || portalUnit
     const incidentGeometry = this.state.aoiGeometries.incidentGeometry4326 || this.state.aoiGeometries.incidentGeometry
     const featureRecordsWithDistance = selectedFeatures
+
+    // TODO: route instead of distance
     for (let i = 0; i < featureRecordsWithDistance.length; i++) {
       const featureRecord = featureRecordsWithDistance as any
       if (incidentGeometry && featureRecord[i].feature.geometry) {
