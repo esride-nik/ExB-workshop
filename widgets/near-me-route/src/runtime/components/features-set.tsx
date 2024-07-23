@@ -51,7 +51,7 @@ export default class FeaturesSet extends React.PureComponent<Props, State> {
     this.popUpContent = React.createRef()
     this.symbolRef = React.createRef()
 
-    if (this.props.config) {
+    if (this.props?.config) {
       this.state = {
         isFeatureLayerOpen: this.props.isExpanded,
         isIconRight: !this.props.isExpanded,

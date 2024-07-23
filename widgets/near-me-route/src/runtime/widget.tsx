@@ -30,6 +30,9 @@ import FeatureLayer from 'esri/layers/FeatureLayer'
 import Graphic from 'esri/Graphic'
 import SummaryResult from './components/summary-result'
 import { versionManager } from '../version-manager'
+import * as route from '@arcgis/core/rest/route.js'
+import RouteParameters from 'esri/rest/support/RouteParameters'
+import RestSupportFeatureSet from '@arcgis/core/rest/support/FeatureSet.js'
 
 const widgetIcon = require('./assets/icons/nearme-icon.svg')
 const closestIconComponent = require('jimu-icons/svg/outlined/gis/service-find-closest.svg')
@@ -693,26 +696,69 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig> & ExtraP
    * @param selectedFeatures selected features on the map
    * @returns selected features
    */
-  getFeaturesDistance = (selectedFeatures: DataRecord[]) => {
-    const { showAllFeatures, searchCurrentExtent } = getSearchWorkflow(this.state.searchSettings)
-    const portalUnit = getPortalUnit()
+  getFeaturesDistance = async (selectedFeatures: DataRecord[]) => {
+    // const { showAllFeatures, searchCurrentExtent } = getSearchWorkflow(this.state.searchSettings)
+    // const portalUnit = getPortalUnit()
     //Use portal unit in case of show all features OR search by extent
-    const distanceUnit = showAllFeatures || searchCurrentExtent
-      ? portalUnit
-      : this.state.aoiGeometries.distanceUnit || this.state.searchSettings.distanceUnits || portalUnit
+    // const distanceUnit = showAllFeatures || searchCurrentExtent
+    //   ? portalUnit
+    //   : this.state.aoiGeometries.distanceUnit || this.state.searchSettings.distanceUnits || portalUnit
     const incidentGeometry = this.state.aoiGeometries.incidentGeometry4326 || this.state.aoiGeometries.incidentGeometry
     const featureRecordsWithDistance = selectedFeatures
 
     // TODO: route instead of distance
-    for (let i = 0; i < featureRecordsWithDistance.length; i++) {
-      const featureRecord = featureRecordsWithDistance as any
-      if (incidentGeometry && featureRecord[i].feature.geometry) {
-        featureRecord[i].feature.distance = getDistance(incidentGeometry,
-          featureRecord[i].feature.geometry, distanceUnit as __esri.LinearUnits)
-      } else {
-        featureRecord[i].feature.distance = 0
+    const routeUrl = 'https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World'
+    // const routeLayer = new GraphicsLayer()
+
+    // // Define the symbology used to display the stops
+    // const stopSymbol = {
+    //   type: 'simple-marker',
+    //   style: 'cross',
+    //   size: 15,
+    //   outline: {
+    //     width: 4
+    //   }
+    // }
+
+    // // Define the symbology used to display the route
+    // const routeSymbol = {
+    //   type: 'simple-line',
+    //   color: [0, 0, 255, 0.5],
+    //   width: 5
+    // }
+
+    // const stops: Graphic[] = []
+
+    // Setup the route parameters
+    const routeParams = new RouteParameters({
+      // An authorization string used to access the routing service
+      // apiKey: '%YOUR_ACCESS_TOKEN%',
+      stops: new RestSupportFeatureSet(),
+      // stops: new RestSupportFeatureSet({
+      //   features: []
+      // }),
+      outSpatialReference: {
+        wkid: 3857
       }
-    }
+    })
+
+    featureRecordsWithDistance.forEach((featureRecord: any, i: number) => {
+      // TODO: this is just to try out the solve. we need single routes for each pair
+      if (i > 149) return
+      if (incidentGeometry && featureRecord.feature.geometry) {
+        // stops.push(featureRecord.feature)
+        routeParams.stops.features.push(featureRecord.feature)
+        // featureRecord.distance = getDistance(incidentGeometry,
+        //   featureRecord.geometry, distanceUnit as __esri.LinearUnits)
+      } else {
+        featureRecord.distance = 0
+      }
+    })
+
+    // TODO: ok, this returns a route. we still need single routes for each pair and then put them into their fake 'DataRecord[] as any with distance' object to keep the rest of the widget code as it is.
+    const routeResult = await route.solve(routeUrl, routeParams)
+    console.log('### routeResult ###', routeResult)
+
     return featureRecordsWithDistance
   }
 
@@ -1097,7 +1143,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig> & ExtraP
    * @param analysisId configured analysis id
    * @returns Object of feature set, features count, layers info and records
    */
-  createFeatureSet = (featureList: DataRecord[], layerInfo: LayersInfo, objIdField: string, distanceUnit: __esri.LinearUnits, analysisId: string, isReturnOneAnalysisResult: boolean) => {
+  createFeatureSet = async (featureList: DataRecord[], layerInfo: LayersInfo, objIdField: string, distanceUnit: __esri.LinearUnits, analysisId: string, isReturnOneAnalysisResult: boolean) => {
     const jsxElements: JSX.Element[] = []
     let features: DataRecord[] = []
     const layerAnalysisInfo = layerInfo.analysisInfo as any
@@ -1120,7 +1166,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig> & ExtraP
     const { searchByLocation, searchCurrentExtent } = getSearchWorkflow(this.state.searchSettings)
     if (searchByLocation) {
       //show feature distance only in case of define search area with distance
-      features = this.getFeaturesDistance(features)
+
+      // TODO: this gets the distance and sorts by distance. we need to execute route async to even get the distance => split up in 2 steps
+      // features = this.getFeaturesDistance(features)
+
       //search by distance - 1.sort feature by distance is selected then sort features by distance
       //2.sort feature by field is selected then sort features by field value
       featuresAndGroup = this.getSortedFeatures(features, layerInfo, false, objIdField)
@@ -1286,7 +1335,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig> & ExtraP
    * @param analysisId configured analysis id
    * @returns promise of the feature set
    */
-  performAnalysis = async (layerInfo, analysisId: string, isReturnOneAnalysisResult: boolean) => {
+  performAnalysis = (layerInfo, analysisId: string, isReturnOneAnalysisResult: boolean) => {
     const promise = new Promise((resolve, reject) => {
       const dsId: string = layerInfo.useDataSource.dataSourceId
       const ds = getSelectedLayerInstance(dsId) as any
@@ -1322,8 +1371,10 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig> & ExtraP
             resolve(featureSet)
           } else if ((layerInfo.analysisInfo.analysisType === AnalysisTypeName.Closest && searchByLocation) ||
             layerInfo.analysisInfo.analysisType === AnalysisTypeName.Proximity) {
-            featureSet = this.createFeatureSet(featureList, layerInfo, objIdField, distanceUnit as __esri.LinearUnits, analysisId, isReturnOneAnalysisResult)
-            resolve(featureSet)
+            // TODO: async issues within this function
+            // return this.createFeatureSet(featureList, layerInfo, objIdField, distanceUnit as __esri.LinearUnits, analysisId, isReturnOneAnalysisResult)
+
+            return this.getFeaturesDistance(featureList)
           }
         } else {
           resolve(featureSet)
