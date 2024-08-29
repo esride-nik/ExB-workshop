@@ -4,7 +4,7 @@
   "type": "widget",
   "dependency": "jimu-arcgis",
   "version": "0.9.1",
-  "exbVersion": "1.13.0",
+  "exbVersion": "1.15.0",
   "author": "Niklas Köhn, Esri Deutschland",
   "description": "This widget exports records from a Data Action to an Excel Sheet.",
   "copyright": "",
