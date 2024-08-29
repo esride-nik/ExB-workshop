@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download Experience Builder
         run: curl -o exb.zip "$(curl -s 'https://downloads.arcgis.com/dms/rest/download/secured/arcgis-experience-builder-1.14.zip?f=json&folder=software%2FExperienceBuilder%2F1.14' | python3 -c "import sys, json; print(json.load(sys.stdin)['url'])")"
         # the "classic" way of downloading via "npx arcgis-lib-downloader -p arcgis-experience-builder -v 1.14" doesn't work anymore! :/
