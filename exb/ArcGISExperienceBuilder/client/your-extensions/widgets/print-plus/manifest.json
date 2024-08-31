@@ -1,0 +1,21 @@
+{
+  "name": "print-plus",
+  "label": "PrintPlus",
+  "type": "widget",
+  "dependency": ["jimu-arcgis"],
+  "version": "0.1.0",
+  "exbVersion": "1.3.0",
+  "author": "Esri Deutschland GmbH",
+  "description": "Print Plus Widget",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "properties": {},
+  "translatedLocales": [
+    "en",
+    "de"
+  ],
+  "defaultSize": {
+    "width": 400,
+    "height": 800
+  }
+}

@@ -1,0 +1,1 @@
+System.register([],function(e){return{execute:function(){e({notPublished:"Tato aplikace ještě není publikována. Nejprve ji prosím publikujte.",notFound:"Nenalezeno."})}}});

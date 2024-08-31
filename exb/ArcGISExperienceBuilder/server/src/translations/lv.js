@@ -1,0 +1,1 @@
+System.register([],function(t){return{execute:function(){t({notPublished:"Šī Experience lietotne vēl nav publicēta. Vispirms, lūdzu, publicējiet to.",notFound:"Nav atrasts."})}}});

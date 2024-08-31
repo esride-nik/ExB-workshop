@@ -1,0 +1,17 @@
+{
+  "name": "mapClickQueryClass",
+  "label": "Map Click Query Class",
+  "type": "widget",
+  "dependency": ["jimu-arcgis"],
+  "version": "1.1.0",
+  "exbVersion": "1.7.0",
+  "author": "Niklas Köhn, Esri Deutschland GmbH",
+  "description": "Map Click Query Class.",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "defaultSize": {
+    "width": 400,
+    "height": 400
+  },
+  "translatedLocales": ["en", "de"]
+}

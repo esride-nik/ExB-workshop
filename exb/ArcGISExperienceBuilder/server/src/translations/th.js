@@ -1,0 +1,1 @@
+System.register([],function(e){return{execute:function(){e({notPublished:"ยังไม่ได้เผยแพร่ประสบการณ์นี้ โปรดเผยแพร่ก่อน",notFound:"ไม่พบ"})}}});

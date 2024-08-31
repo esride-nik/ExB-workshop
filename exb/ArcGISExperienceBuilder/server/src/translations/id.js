@@ -1,0 +1,1 @@
+System.register([],function(i){return{execute:function(){i({notPublished:"Pengalaman ini belum dipublikasikan. Publikasikan terlebih dahulu.",notFound:"Tidak ditemukan."})}}});
