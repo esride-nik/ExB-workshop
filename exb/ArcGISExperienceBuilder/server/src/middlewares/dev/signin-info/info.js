@@ -1,0 +1,1 @@
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var infoJson={created:0,description:"",id:"",modified:0,owner:"",tags:[],thumbnail:null,title:"",type:"Web Experience",snippet:"",typeKeywords:["Web Experience","status: Draft"]};exports.default=infoJson;

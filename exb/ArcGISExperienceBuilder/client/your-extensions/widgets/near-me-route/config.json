@@ -1,0 +1,29 @@
+{
+  "useMapWidget": false,
+  "generalSettings": {
+    "highlightColor": "",
+    "noResultsFoundText": "",
+    "noResultMsgStyleSettings": {
+      "fontFamily": "Avenir Next",
+      "fontBold": false,
+      "fontItalic": false,
+      "fontUnderline": false,
+      "fontStrike": false,
+      "fontColor": "var(--black)",
+      "fontSize": "12px"
+    },
+    "promptTextMessage": "",
+    "promptTextMsgStyleSettings": {
+      "fontFamily": "Avenir Next",
+      "fontBold": false,
+      "fontItalic": false,
+      "fontUnderline": false,
+      "fontStrike": false,
+      "fontColor": "var(--black)",
+      "fontSize": "12px"
+    }
+  },
+  "configInfo": {
+
+  }
+}

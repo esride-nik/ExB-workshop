@@ -1,0 +1,1 @@
+System.register([],function(e){return{execute:function(){e({notPublished:"Ta spletna aplikacija še ni objavljena. Najprej jo objavite.",notFound:"Ni najdeno."})}}});

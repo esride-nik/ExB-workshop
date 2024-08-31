@@ -1,0 +1,7 @@
+{
+  "packages": [
+    "your-extensions",
+    "your-extensions/widgets/**/*"
+  ],
+  "version": "0.1.0"
+}
