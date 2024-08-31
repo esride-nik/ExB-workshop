@@ -1,1 +1,0 @@
-System.register([],(function(a){return{execute:function(){a({_widgetLabel:"Navigasi Tampilan",tabStyle:"Gaya tab",navBtnStyle:"Gaya tombol navigasi",stepTips:"Hanya berfungsi saat animasi transisi diatur untuk widget Bagian yang berkaitan.",paginationStyle:"Format penomoran halaman"})}}}));

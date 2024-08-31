@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"侧边栏",_layout_FIRST_label:"首页",_layout_SECOND_label:"秒",_action_toggleSidebar_label:"切换侧边栏",widgetProperties:"微件属性",widgetFunctions:"微件功能",widgetName:"微件名称：",widgetProps:"微件属性："})}}}));

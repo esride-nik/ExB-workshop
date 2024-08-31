@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"סרגל צד",_layout_FIRST_label:"ראשון",_layout_SECOND_label:"שנייה",_action_toggleSidebar_label:"החלף מצב סרגל צד",widgetProperties:"מאפייני ווידג'ט",widgetFunctions:"פונקציות ווידג'ט",widgetName:"שם ווידג'ט:",widgetProps:"מאפייני ווידג'ט:"})}}}));

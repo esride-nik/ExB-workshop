@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Sidepanel",_layout_FIRST_label:"Første",_layout_SECOND_label:"Sekund",_action_toggleSidebar_label:"Skift sidepanel",widgetProperties:"Widget-egenskaber",widgetFunctions:"Widget-funktioner",widgetName:"widget-navn:",widgetProps:"widget-egenskaber:"})}}}));

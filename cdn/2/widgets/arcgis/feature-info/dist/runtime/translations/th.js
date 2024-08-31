@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"ข้อมูลฟีเจอร์",noDeataMessageDefaultText:"ไม่พบข้อมูล",featureNumbers:"{index} จาก {count}",featureInfoDataActionLabel:"บันทึกข้อมูลปัจจุบันของข้อมูลฟีเจอร์ {layer}"})}}}));

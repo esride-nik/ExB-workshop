@@ -1,1 +1,0 @@
-System.register([],(function(t){return{execute:function(){t({_widgetLabel:"ビューのナビゲーション",tabStyle:"タブのスタイル",navBtnStyle:"ナビゲーション ボタンのスタイル",stepTips:"対応するセクション ウィジェットのトランジション アニメーションが設定されている場合のみ有効です。",paginationStyle:"改ページのスタイル"})}}}));

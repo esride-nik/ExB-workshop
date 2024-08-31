@@ -1,0 +1,1954 @@
+{
+  "pages": {
+    "page_0": {
+      "id": "page_0",
+      "mode": "FIT_WINDOW",
+      "type": "NORMAL",
+      "layout": {
+        "LARGE": "layout_0"
+      },
+      "isDefault": true,
+      "isVisible": true,
+      "label": "Page"
+    }
+  },
+  "layouts": {
+    "layout_0": {
+      "type": "FIXED",
+      "content": {
+        "2": {
+          "type": "WIDGET",
+          "widgetId": "widget_3",
+          "bbox": {
+            "left": "0%",
+            "right": "0%",
+            "top": "0%",
+            "bottom": "0%",
+            "width": "100%",
+            "height": "100%"
+          },
+          "setting": {
+            "autoProps": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false,
+              "height": "STRETCH",
+              "width": "STRETCH"
+            },
+            "vCenter": false,
+            "hCenter": false
+          }
+        }
+      },
+      "order": [
+        "2"
+      ]
+    },
+    "layout_1": {
+      "content": {},
+      "type": "FIXED",
+      "label": "Map FixedLayout"
+    },
+    "layout_2": {
+      "content": {
+        "0": {
+          "type": "WIDGET",
+          "widgetId": "widget_4",
+          "bbox": {
+            "left": "0%",
+            "right": "0%",
+            "top": "0%",
+            "bottom": "0%",
+            "width": "100%",
+            "height": "100%"
+          },
+          "setting": {
+            "autoProps": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false,
+              "height": "STRETCH",
+              "width": "STRETCH"
+            },
+            "vCenter": false,
+            "hCenter": false
+          }
+        }
+      },
+      "type": "FIXED",
+      "label": "First",
+      "order": [
+        "0"
+      ]
+    },
+    "layout_3": {
+      "content": {
+        "0": {
+          "type": "WIDGET",
+          "widgetId": "widget_5",
+          "bbox": {
+            "left": "0.0%",
+            "right": "0.0%",
+            "top": "0.0%",
+            "bottom": "0.0%",
+            "width": "100.0%",
+            "height": "100.0%"
+          },
+          "setting": {
+            "autoProps": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false,
+              "height": "STRETCH",
+              "width": "STRETCH"
+            },
+            "vCenter": false,
+            "hCenter": false
+          }
+        }
+      },
+      "type": "FIXED",
+      "label": "Second",
+      "order": [
+        "0"
+      ]
+    },
+    "layout_4": {
+      "content": {
+        "0": {
+          "type": "WIDGET",
+          "widgetId": "widget_2",
+          "bbox": {
+            "left": "0.0%",
+            "right": "0.0%",
+            "top": "0.0%",
+            "bottom": "71.4%",
+            "width": "100.0%",
+            "height": "142.00px"
+          },
+          "setting": {
+            "autoProps": {
+              "right": false,
+              "left": true,
+              "top": false,
+              "bottom": true
+            },
+            "vCenter": false,
+            "hCenter": false
+          }
+        },
+        "1": {
+          "type": "WIDGET",
+          "widgetId": "widget_6",
+          "bbox": {
+            "left": "2.00%",
+            "right": "2.00%",
+            "top": "145.00px",
+            "bottom": "0.0%",
+            "width": "100.0%",
+            "height": "71.5%"
+          },
+          "setting": {
+            "autoProps": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false,
+              "height": "STRETCH",
+              "width": "STRETCH"
+            },
+            "vCenter": false,
+            "hCenter": false
+          }
+        }
+      },
+      "type": "FIXED",
+      "label": "First",
+      "order": [
+        "0",
+        "1"
+      ]
+    },
+    "layout_5": {
+      "content": {
+        "0": {
+          "type": "WIDGET",
+          "widgetId": "widget_1",
+          "bbox": {
+            "left": "0%",
+            "right": "0%",
+            "top": "0%",
+            "bottom": "0%",
+            "width": "100%",
+            "height": "100%"
+          },
+          "setting": {
+            "autoProps": {
+              "left": false,
+              "right": false,
+              "top": false,
+              "bottom": false,
+              "height": "STRETCH",
+              "width": "STRETCH"
+            },
+            "vCenter": false,
+            "hCenter": false
+          }
+        }
+      },
+      "type": "FIXED",
+      "label": "Second",
+      "order": [
+        "0"
+      ]
+    }
+  },
+  "exbVersion": "1.14.0",
+  "mainSizeMode": "LARGE",
+  "theme": "themes/default/",
+  "forBuilderAttributes": {
+    "lockLayout": false
+  },
+  "template": "blankfullscreen",
+  "widgets": {
+    "widget_1": {
+      "uri": "widgets/arcgis/arcgis-map/",
+      "version": "1.14.0",
+      "label": "Map",
+      "config": {
+        "toolConfig": {
+          "canZoom": true,
+          "canHome": true,
+          "canSearch": true,
+          "canNavigation": true,
+          "canSelect": true,
+          "canSelectState": true
+        },
+        "isUseCustomMapState": false
+      },
+      "id": "widget_1",
+      "layouts": {
+        "MapFixedLayout": {
+          "LARGE": "layout_1"
+        }
+      },
+      "useDataSources": [
+        {
+          "dataSourceId": "dataSource_2",
+          "mainDataSourceId": "dataSource_2"
+        }
+      ]
+    },
+    "widget_2": {
+      "uri": "widgets/arcgis/swipe/",
+      "version": "1.14.0",
+      "label": "Swipe",
+      "config": {
+        "swipeStyle": "SIMPLE_HORIZONTAL",
+        "swipeMode": "SWIPE_BETWEEN_LAYERS_OF_ONE_MAP",
+        "swipeMapViewList": {
+          "widget_1-dataSource_2": {
+            "leadingLayersId": [
+              "widget_1-dataSource_2-View_Baumgesundheit_Gruppe_1_5693"
+            ],
+            "trailingLayersId": [
+              "widget_1-dataSource_2-View_Baumgesundheit_Gruppe_2_663"
+            ]
+          }
+        }
+      },
+      "id": "widget_2",
+      "useMapWidgetIds": [
+        "widget_1"
+      ]
+    },
+    "widget_3": {
+      "uri": "widgets/layout/sidebar/",
+      "version": "1.14.0",
+      "label": "Sidebar",
+      "config": {
+        "direction": "VERTICAL",
+        "collapseSide": "SECOND",
+        "overlay": false,
+        "size": "300px",
+        "divider": {
+          "visible": true,
+          "lineStyle": {
+            "type": "solid",
+            "color": "var(--light-500)",
+            "width": "1px"
+          }
+        },
+        "resizable": true,
+        "toggleBtn": {
+          "visible": true,
+          "iconSource": 0,
+          "icon": "DOWN",
+          "offsetX": 0,
+          "offsetY": -15,
+          "position": "CENTER",
+          "iconSize": 14,
+          "width": 60,
+          "height": 15,
+          "border": {
+            "type": "solid",
+            "color": "var(--light-500)",
+            "width": "1px"
+          },
+          "color": {
+            "normal": {
+              "icon": {
+                "useTheme": false,
+                "color": "var(--black)"
+              },
+              "bg": {
+                "useTheme": true,
+                "color": "var(--light)"
+              }
+            },
+            "hover": {
+              "bg": {
+                "useTheme": true,
+                "color": "var(--light)"
+              }
+            }
+          },
+          "expandStyle": {
+            "style": {
+              "borderRadius": "92px 92px 0 0"
+            }
+          },
+          "collapseStyle": {
+            "style": {
+              "borderRadius": "92px 92px 0 0"
+            }
+          }
+        },
+        "defaultState": 1
+      },
+      "id": "widget_3",
+      "layouts": {
+        "FIRST": {
+          "LARGE": "layout_2"
+        },
+        "SECOND": {
+          "LARGE": "layout_3"
+        }
+      }
+    },
+    "widget_4": {
+      "uri": "widgets/layout/sidebar/",
+      "version": "1.14.0",
+      "label": "Sidebar 2",
+      "config": {
+        "direction": "HORIZONTAL",
+        "collapseSide": "FIRST",
+        "overlay": false,
+        "size": "300px",
+        "divider": {
+          "visible": true,
+          "lineStyle": {
+            "type": "solid",
+            "color": "var(--light-500)",
+            "width": "1px"
+          }
+        },
+        "resizable": true,
+        "toggleBtn": {
+          "visible": true,
+          "iconSource": 0,
+          "icon": "LEFT",
+          "offsetX": 15,
+          "offsetY": 0,
+          "position": "CENTER",
+          "iconSize": 14,
+          "width": 15,
+          "height": 60,
+          "border": {
+            "type": "solid",
+            "color": "var(--light-500)",
+            "width": "1px"
+          },
+          "color": {
+            "normal": {
+              "icon": {
+                "useTheme": false,
+                "color": "var(--black)"
+              },
+              "bg": {
+                "useTheme": false,
+                "color": "var(--primary)"
+              }
+            },
+            "hover": {
+              "bg": {
+                "useTheme": false,
+                "color": "var(--warning)"
+              }
+            }
+          },
+          "expandStyle": {
+            "style": {
+              "borderRadius": "0 92px 92px 0"
+            }
+          },
+          "collapseStyle": {
+            "style": {
+              "borderRadius": "0 92px 92px 0"
+            }
+          }
+        },
+        "defaultState": 1,
+        "firstPanelStyle": {
+          "background": {
+            "color": "var(--light)",
+            "fillType": "fill",
+            "image": {
+              "url": ""
+            }
+          }
+        }
+      },
+      "id": "widget_4",
+      "layouts": {
+        "FIRST": {
+          "LARGE": "layout_4"
+        },
+        "SECOND": {
+          "LARGE": "layout_5"
+        }
+      }
+    },
+    "widget_5": {
+      "uri": "widgets/common/table/",
+      "version": "1.14.0",
+      "label": "Table",
+      "config": {
+        "layersConfig": [
+          {
+            "id": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693-1",
+            "name": "View Baumgesundheit Gruppe 1",
+            "useDataSource": {
+              "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
+              "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
+              "rootDataSourceId": "dataSource_2",
+              "fields": [
+                "esrignss_speed",
+                "esrignss_direction",
+                "esrisnsr_azimuth",
+                "esrignss_positionsourcetype",
+                "esrignss_receiver",
+                "esrignss_h_rms",
+                "esrignss_v_rms",
+                "esrignss_latitude",
+                "esrignss_longitude",
+                "esrignss_altitude",
+                "esrignss_pdop",
+                "esrignss_hdop",
+                "esrignss_vdop",
+                "esrignss_fixtype",
+                "esrignss_correctionage",
+                "esrignss_stationid",
+                "esrignss_numsats",
+                "esrignss_fixdatetime",
+                "esrignss_avg_h_rms",
+                "esrignss_avg_v_rms",
+                "esrignss_avg_positions",
+                "esrignss_h_stddev",
+                "Gesundheit"
+              ]
+            },
+            "allFields": [
+              {
+                "jimuName": "OBJECTID",
+                "name": "OBJECTID",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeOID",
+                "alias": "OBJECTID",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_speed",
+                "name": "esrignss_speed",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Speed (km/h)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_direction",
+                "name": "esrignss_direction",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Direction of travel (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrisnsr_azimuth",
+                "name": "esrisnsr_azimuth",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Compass reading (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_positionsourcetype",
+                "name": "esrignss_positionsourcetype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Position source type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_receiver",
+                "name": "esrignss_receiver",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Receiver Name",
+                "format": null
+              },
+              {
+                "jimuName": "esrignss_h_rms",
+                "name": "esrignss_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_v_rms",
+                "name": "esrignss_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_latitude",
+                "name": "esrignss_latitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Latitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                }
+              },
+              {
+                "jimuName": "esrignss_longitude",
+                "name": "esrignss_longitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Longitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                }
+              },
+              {
+                "jimuName": "esrignss_altitude",
+                "name": "esrignss_altitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Altitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_pdop",
+                "name": "esrignss_pdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "PDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_hdop",
+                "name": "esrignss_hdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "HDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_vdop",
+                "name": "esrignss_vdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "VDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_fixtype",
+                "name": "esrignss_fixtype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Fix Type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_correctionage",
+                "name": "esrignss_correctionage",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Correction Age",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_stationid",
+                "name": "esrignss_stationid",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Station ID",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_numsats",
+                "name": "esrignss_numsats",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Number of Satellites",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_fixdatetime",
+                "name": "esrignss_fixdatetime",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "Fix Time",
+                "format": {
+                  "digitSeparator": false
+                }
+              },
+              {
+                "jimuName": "esrignss_avg_h_rms",
+                "name": "esrignss_avg_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_avg_v_rms",
+                "name": "esrignss_avg_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_avg_positions",
+                "name": "esrignss_avg_positions",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Averaged Positions",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_h_stddev",
+                "name": "esrignss_h_stddev",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Standard Deviation (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 3
+                }
+              },
+              {
+                "jimuName": "GlobalID",
+                "name": "GlobalID",
+                "type": "STRING",
+                "esriType": "esriFieldTypeGlobalID",
+                "alias": "GlobalID",
+                "format": null
+              },
+              {
+                "jimuName": "CreationDate",
+                "name": "CreationDate",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "CreationDate",
+                "format": null
+              },
+              {
+                "jimuName": "Creator",
+                "name": "Creator",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Creator",
+                "format": null
+              },
+              {
+                "jimuName": "EditDate",
+                "name": "EditDate",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "EditDate",
+                "format": null
+              },
+              {
+                "jimuName": "Editor",
+                "name": "Editor",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Editor",
+                "format": null
+              },
+              {
+                "jimuName": "Gesundheit",
+                "name": "Gesundheit",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Gesundheit",
+                "format": null
+              }
+            ],
+            "tableFields": [
+              {
+                "jimuName": "esrignss_speed",
+                "name": "esrignss_speed",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Speed (km/h)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_direction",
+                "name": "esrignss_direction",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Direction of travel (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrisnsr_azimuth",
+                "name": "esrisnsr_azimuth",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Compass reading (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_positionsourcetype",
+                "name": "esrignss_positionsourcetype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Position source type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_receiver",
+                "name": "esrignss_receiver",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Receiver Name",
+                "format": null,
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_h_rms",
+                "name": "esrignss_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_v_rms",
+                "name": "esrignss_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_latitude",
+                "name": "esrignss_latitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Latitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_longitude",
+                "name": "esrignss_longitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Longitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_altitude",
+                "name": "esrignss_altitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Altitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_pdop",
+                "name": "esrignss_pdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "PDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_hdop",
+                "name": "esrignss_hdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "HDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_vdop",
+                "name": "esrignss_vdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "VDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_fixtype",
+                "name": "esrignss_fixtype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Fix Type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_correctionage",
+                "name": "esrignss_correctionage",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Correction Age",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_stationid",
+                "name": "esrignss_stationid",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Station ID",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_numsats",
+                "name": "esrignss_numsats",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Number of Satellites",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_fixdatetime",
+                "name": "esrignss_fixdatetime",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "Fix Time",
+                "format": {
+                  "digitSeparator": false
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_avg_h_rms",
+                "name": "esrignss_avg_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_avg_v_rms",
+                "name": "esrignss_avg_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_avg_positions",
+                "name": "esrignss_avg_positions",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Averaged Positions",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_h_stddev",
+                "name": "esrignss_h_stddev",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Standard Deviation (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 3
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "Gesundheit",
+                "name": "Gesundheit",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Gesundheit",
+                "format": null,
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              }
+            ],
+            "enableAttachements": false,
+            "enableEdit": false,
+            "allowCsv": false,
+            "enableSearch": false,
+            "searchFields": [],
+            "enableRefresh": true,
+            "enableSelect": true,
+            "selectMode": "SINGLE",
+            "headerFontSetting": {
+              "backgroundColor": "",
+              "fontSize": 14,
+              "bold": false,
+              "color": ""
+            },
+            "layerHonorMode": "WEBMAP"
+          },
+          {
+            "id": "dataSource_2-View_Baumgesundheit_Gruppe_2_663-2",
+            "name": "View Baumgesundheit Gruppe 2",
+            "useDataSource": {
+              "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
+              "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
+              "rootDataSourceId": "dataSource_2",
+              "fields": [
+                "esrignss_speed",
+                "esrignss_direction",
+                "esrisnsr_azimuth",
+                "esrignss_positionsourcetype",
+                "esrignss_receiver",
+                "esrignss_h_rms",
+                "esrignss_v_rms",
+                "esrignss_latitude",
+                "esrignss_longitude",
+                "esrignss_altitude",
+                "esrignss_pdop",
+                "esrignss_hdop",
+                "esrignss_vdop",
+                "esrignss_fixtype",
+                "esrignss_correctionage",
+                "esrignss_stationid",
+                "esrignss_numsats",
+                "esrignss_fixdatetime",
+                "esrignss_avg_h_rms",
+                "esrignss_avg_v_rms",
+                "esrignss_avg_positions",
+                "esrignss_h_stddev",
+                "Gesundheit"
+              ]
+            },
+            "allFields": [
+              {
+                "jimuName": "OBJECTID",
+                "name": "OBJECTID",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeOID",
+                "alias": "OBJECTID",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_speed",
+                "name": "esrignss_speed",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Speed (km/h)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_direction",
+                "name": "esrignss_direction",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Direction of travel (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrisnsr_azimuth",
+                "name": "esrisnsr_azimuth",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Compass reading (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_positionsourcetype",
+                "name": "esrignss_positionsourcetype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Position source type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_receiver",
+                "name": "esrignss_receiver",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Receiver Name",
+                "format": null
+              },
+              {
+                "jimuName": "esrignss_h_rms",
+                "name": "esrignss_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_v_rms",
+                "name": "esrignss_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_latitude",
+                "name": "esrignss_latitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Latitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                }
+              },
+              {
+                "jimuName": "esrignss_longitude",
+                "name": "esrignss_longitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Longitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                }
+              },
+              {
+                "jimuName": "esrignss_altitude",
+                "name": "esrignss_altitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Altitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_pdop",
+                "name": "esrignss_pdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "PDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_hdop",
+                "name": "esrignss_hdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "HDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_vdop",
+                "name": "esrignss_vdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "VDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_fixtype",
+                "name": "esrignss_fixtype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Fix Type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_correctionage",
+                "name": "esrignss_correctionage",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Correction Age",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_stationid",
+                "name": "esrignss_stationid",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Station ID",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_numsats",
+                "name": "esrignss_numsats",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Number of Satellites",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_fixdatetime",
+                "name": "esrignss_fixdatetime",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "Fix Time",
+                "format": {
+                  "dateFormat": "shortDateLongTime",
+                  "digitSeparator": false
+                }
+              },
+              {
+                "jimuName": "esrignss_avg_h_rms",
+                "name": "esrignss_avg_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_avg_v_rms",
+                "name": "esrignss_avg_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                }
+              },
+              {
+                "jimuName": "esrignss_avg_positions",
+                "name": "esrignss_avg_positions",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Averaged Positions",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                }
+              },
+              {
+                "jimuName": "esrignss_h_stddev",
+                "name": "esrignss_h_stddev",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Standard Deviation (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 3
+                }
+              },
+              {
+                "jimuName": "GlobalID",
+                "name": "GlobalID",
+                "type": "STRING",
+                "esriType": "esriFieldTypeGlobalID",
+                "alias": "GlobalID",
+                "format": null
+              },
+              {
+                "jimuName": "CreationDate",
+                "name": "CreationDate",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "CreationDate",
+                "format": null
+              },
+              {
+                "jimuName": "Creator",
+                "name": "Creator",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Creator",
+                "format": null
+              },
+              {
+                "jimuName": "EditDate",
+                "name": "EditDate",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "EditDate",
+                "format": null
+              },
+              {
+                "jimuName": "Editor",
+                "name": "Editor",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Editor",
+                "format": null
+              },
+              {
+                "jimuName": "Gesundheit",
+                "name": "Gesundheit",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Gesundheit",
+                "format": null
+              }
+            ],
+            "tableFields": [
+              {
+                "jimuName": "esrignss_speed",
+                "name": "esrignss_speed",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Speed (km/h)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_direction",
+                "name": "esrignss_direction",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Direction of travel (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrisnsr_azimuth",
+                "name": "esrisnsr_azimuth",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Compass reading (°)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_positionsourcetype",
+                "name": "esrignss_positionsourcetype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Position source type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_receiver",
+                "name": "esrignss_receiver",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Receiver Name",
+                "format": null,
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_h_rms",
+                "name": "esrignss_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_v_rms",
+                "name": "esrignss_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_latitude",
+                "name": "esrignss_latitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Latitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_longitude",
+                "name": "esrignss_longitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Longitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 8
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_altitude",
+                "name": "esrignss_altitude",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Altitude",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_pdop",
+                "name": "esrignss_pdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "PDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_hdop",
+                "name": "esrignss_hdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "HDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_vdop",
+                "name": "esrignss_vdop",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "VDOP",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_fixtype",
+                "name": "esrignss_fixtype",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Fix Type",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_correctionage",
+                "name": "esrignss_correctionage",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Correction Age",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_stationid",
+                "name": "esrignss_stationid",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Station ID",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_numsats",
+                "name": "esrignss_numsats",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeSmallInteger",
+                "alias": "Number of Satellites",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_fixdatetime",
+                "name": "esrignss_fixdatetime",
+                "type": "DATE",
+                "esriType": "esriFieldTypeDate",
+                "alias": "Fix Time",
+                "format": {
+                  "dateFormat": "shortDateLongTime",
+                  "digitSeparator": false
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_avg_h_rms",
+                "name": "esrignss_avg_h_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Horizontal Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_avg_v_rms",
+                "name": "esrignss_avg_v_rms",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Average Vertical Accuracy (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 2
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_avg_positions",
+                "name": "esrignss_avg_positions",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeInteger",
+                "alias": "Averaged Positions",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 0
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "esrignss_h_stddev",
+                "name": "esrignss_h_stddev",
+                "type": "NUMBER",
+                "esriType": "esriFieldTypeDouble",
+                "alias": "Standard Deviation (m)",
+                "format": {
+                  "digitSeparator": true,
+                  "places": 3
+                },
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              },
+              {
+                "jimuName": "Gesundheit",
+                "name": "Gesundheit",
+                "type": "STRING",
+                "esriType": "esriFieldTypeString",
+                "alias": "Gesundheit",
+                "format": null,
+                "editAuthority": true,
+                "editable": true,
+                "visible": true
+              }
+            ],
+            "enableAttachements": false,
+            "enableEdit": false,
+            "allowCsv": false,
+            "enableSearch": false,
+            "searchFields": [],
+            "enableRefresh": true,
+            "enableSelect": true,
+            "selectMode": "MULTIPLE",
+            "headerFontSetting": {
+              "backgroundColor": "",
+              "fontSize": 14,
+              "bold": false,
+              "color": ""
+            },
+            "layerHonorMode": "WEBMAP",
+            "showCount": true
+          }
+        ],
+        "arrangeType": "TABS"
+      },
+      "id": "widget_5",
+      "dataActions": {
+        "showOnMap": {
+          "config": {
+            "isUseCustomSymbol": true,
+            "symbolOption": {
+              "pointSymbol": {
+                "type": "esriSMS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "angle": 0,
+                "xoffset": 0,
+                "yoffset": 0,
+                "size": 12,
+                "style": "esriSMSCircle",
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                }
+              },
+              "polylineSymbol": {
+                "type": "esriSLS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "width": 0.75,
+                "style": "esriSLSSolid"
+              },
+              "polygonSymbol": {
+                "type": "esriSFS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                },
+                "style": "esriSFSSolid"
+              }
+            }
+          }
+        }
+      },
+      "useDataSources": [
+        {
+          "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
+          "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
+          "rootDataSourceId": "dataSource_2",
+          "fields": [
+            "esrignss_speed",
+            "esrignss_direction",
+            "esrisnsr_azimuth",
+            "esrignss_positionsourcetype",
+            "esrignss_receiver",
+            "esrignss_h_rms",
+            "esrignss_v_rms",
+            "esrignss_latitude",
+            "esrignss_longitude",
+            "esrignss_altitude",
+            "esrignss_pdop",
+            "esrignss_hdop",
+            "esrignss_vdop",
+            "esrignss_fixtype",
+            "esrignss_correctionage",
+            "esrignss_stationid",
+            "esrignss_numsats",
+            "esrignss_fixdatetime",
+            "esrignss_avg_h_rms",
+            "esrignss_avg_v_rms",
+            "esrignss_avg_positions",
+            "esrignss_h_stddev",
+            "Gesundheit"
+          ]
+        },
+        {
+          "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
+          "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
+          "rootDataSourceId": "dataSource_2",
+          "fields": [
+            "esrignss_speed",
+            "esrignss_direction",
+            "esrisnsr_azimuth",
+            "esrignss_positionsourcetype",
+            "esrignss_receiver",
+            "esrignss_h_rms",
+            "esrignss_v_rms",
+            "esrignss_latitude",
+            "esrignss_longitude",
+            "esrignss_altitude",
+            "esrignss_pdop",
+            "esrignss_hdop",
+            "esrignss_vdop",
+            "esrignss_fixtype",
+            "esrignss_correctionage",
+            "esrignss_stationid",
+            "esrignss_numsats",
+            "esrignss_fixdatetime",
+            "esrignss_avg_h_rms",
+            "esrignss_avg_v_rms",
+            "esrignss_avg_positions",
+            "esrignss_h_stddev",
+            "Gesundheit"
+          ]
+        }
+      ]
+    },
+    "widget_6": {
+      "uri": "widgets/excelExport/",
+      "version": "0.9.1",
+      "label": "Excel Export",
+      "config": null,
+      "id": "widget_6"
+    }
+  },
+  "widgetsManifest": {},
+  "views": {},
+  "sections": {},
+  "dialogs": {},
+  "dataSources": {
+    "dataSource_1": {
+      "id": "dataSource_1",
+      "type": "WEB_MAP",
+      "sourceLabel": "PLZs",
+      "itemId": "116b401f81eb44d1afaec98ac74b589a",
+      "portalUrl": "https://esri-de.maps.arcgis.com"
+    },
+    "dataSource_2": {
+      "id": "dataSource_2",
+      "type": "WEB_MAP",
+      "sourceLabel": "Baumkataster - Bürgerpark Nord Köln",
+      "itemId": "d08cfb8dd5ce4fd59c314a9eb5d41eff",
+      "portalUrl": "https://esri-de.maps.arcgis.com"
+    }
+  },
+  "messageConfigs": {},
+  "attributes": {
+    "portalUrl": "https://esri-de.maps.arcgis.com",
+    "isWebTier": false,
+    "clientId": "pSM9aNISD0wgzyXA",
+    "title": "Swipe & Export",
+    "description": null,
+    "type": "Web Experience",
+    "thumbnail": null
+  },
+  "sharedThemeVariables": {
+    "header": {},
+    "body": {},
+    "button": {},
+    "logo": {}
+  },
+  "originExbVersion": "1.14.0",
+  "pageStructure": [
+    {
+      "page_0": []
+    }
+  ],
+  "customTheme": {
+    "colors": {
+      "primary": "#bb07e5"
+    }
+  },
+  "timestamp": 1724771803700,
+  "publishTimestamp": 1725107596028
+}

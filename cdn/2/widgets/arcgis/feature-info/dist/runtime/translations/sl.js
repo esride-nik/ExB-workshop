@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informacije o geoobjektu",noDeataMessageDefaultText:"Ni najdenih podatkov.",featureNumbers:"{index} od {count}",featureInfoDataActionLabel:"Trenutni zapis z informacijami o geoobjektu {layer}"})}}}));

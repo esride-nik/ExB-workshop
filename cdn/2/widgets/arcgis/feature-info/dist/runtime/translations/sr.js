@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informacije za komponentu",noDeataMessageDefaultText:"Nema pronađenih podataka.",featureNumbers:"{index} od {count}",featureInfoDataActionLabel:"{layer} funkcijske informacije za trenutni zapis"})}}}));

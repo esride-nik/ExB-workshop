@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Barre latérale",_layout_FIRST_label:"Premier",_layout_SECOND_label:"Second",_action_toggleSidebar_label:"Activer/désactiver la barre latérale",widgetProperties:"Propriétés du widget",widgetFunctions:"Fonctions du widget",widgetName:"Nom du widget :",widgetProps:"Propriétés du widget :"})}}}));

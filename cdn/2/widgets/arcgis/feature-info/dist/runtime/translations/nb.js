@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Geoobjektinfo",noDeataMessageDefaultText:"Finner ingen data.",featureNumbers:"{index} av {count}",featureInfoDataActionLabel:"{layer} geoobjektinfo, gjeldende post"})}}}));

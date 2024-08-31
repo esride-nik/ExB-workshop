@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Информация об объекте",noDeataMessageDefaultText:"Данные не найдены.",featureNumbers:"{index} из {count}",featureInfoDataActionLabel:"Текущая запись информации об объекте {layer}"})}}}));

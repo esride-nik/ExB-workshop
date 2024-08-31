@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Bočný panel",_layout_FIRST_label:"Prvá",_layout_SECOND_label:"Druhá",_action_toggleSidebar_label:"Prepínanie bočného panela",widgetProperties:"Vlastnosti widgetu",widgetFunctions:"Funkcie widgetu",widgetName:"názov widgetu:",widgetProps:"vlastnosti widgetu:"})}}}));

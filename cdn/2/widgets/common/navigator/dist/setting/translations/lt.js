@@ -1,1 +1,0 @@
-System.register([],(function(i){return{execute:function(){i({_widgetLabel:"Rodinių navigacija",tabStyle:"Skirtuko stilius",navBtnStyle:"Navigacijos mygtuko stilius",stepTips:"Veikia tik tada, kai atitinkamos Skilties valdikliui nustatyta perėjimo animacija.",paginationStyle:"Puslapių numeravimo stilius"})}}}));

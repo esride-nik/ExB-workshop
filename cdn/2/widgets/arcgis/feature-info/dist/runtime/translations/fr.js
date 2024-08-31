@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informations sur l’entité",noDeataMessageDefaultText:"Aucune donnée trouvée.",featureNumbers:"{index} sur {count}",featureInfoDataActionLabel:"Enregistrement actuel pour les informations sur les entités de la couche {layer}"})}}}));

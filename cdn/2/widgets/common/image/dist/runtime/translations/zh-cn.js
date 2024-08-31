@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"影像",imageChooseShape:"形状",imageCrop:"裁切"})}}}));

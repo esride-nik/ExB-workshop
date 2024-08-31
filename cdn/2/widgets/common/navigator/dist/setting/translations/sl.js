@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Navigacija pogledov",tabStyle:"Slog zavihka",navBtnStyle:"Slog gumba za navigacijo",stepTips:"Deluje samo, če je nastavljena animacija prehoda za ustrezen pripomoček Razdelek.",paginationStyle:"Stil oštevilčenja"})}}}));

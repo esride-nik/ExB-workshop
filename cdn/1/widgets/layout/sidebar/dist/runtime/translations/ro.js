@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Bară laterală",_layout_FIRST_label:"La început",_layout_SECOND_label:"Secundă",_action_toggleSidebar_label:"Comutare bară laterală",widgetProperties:"Proprietăți widget",widgetFunctions:"Funcții widget",widgetName:"Nume widget:",widgetProps:"Proprietăți widget:"})}}}));

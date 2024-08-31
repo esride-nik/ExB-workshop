@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"滑動",leadingLayers:"前導圖層",trailingLayers:"尾端圖層",webSceneNotSupported:"不支援 Web 場景。",noConfiguredLayerText:"目前沒有配置的圖層。",noValidLayerText:"沒有有效的圖層。",mapOccupiedMsg:"另一個連接到目標地圖的作用中撥動已關閉。",runtimeLayers:"執行階段圖層"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"卷帘",leadingLayers:"前导图层",trailingLayers:"尾随图层",webSceneNotSupported:"不支持 Web 场景。",noConfiguredLayerText:"当前尚未配置图层。",noValidLayerText:"无有效图层。",mapOccupiedMsg:"连接到目标地图的另一个活动卷帘已关闭。",runtimeLayers:"运行时图层"})}}}));

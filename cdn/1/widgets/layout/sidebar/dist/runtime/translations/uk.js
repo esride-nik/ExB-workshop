@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Бічна панель",_layout_FIRST_label:"Перший",_layout_SECOND_label:"Секунда",_action_toggleSidebar_label:"Увімкнути бічну панель",widgetProperties:"Властивості віджету",widgetFunctions:"Функції віджету",widgetName:"назва віджету:",widgetProps:"властивості віджету:"})}}}));

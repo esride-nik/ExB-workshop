@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"แถบด้านข้าง",_layout_FIRST_label:"หน้าแรก",_layout_SECOND_label:"วินาที",_action_toggleSidebar_label:"สลับแถบด้านข้าง",widgetProperties:"คุณสมบัติของวิดเจ็ต",widgetFunctions:"ฟังก์ชันของวิดเจ็ต",widgetName:"ชื่อของวิดเจ็ต:",widgetProps:"คุณสมบัติของวิดเจ็ต:"})}}}));

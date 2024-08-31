@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informacje o obiektach",noDeataMessageDefaultText:"Nie znaleziono danych.",featureNumbers:"{index} z {count}",featureInfoDataActionLabel:"Bieżący rekord informacji o obiekcie w warstwie {layer}"})}}}));

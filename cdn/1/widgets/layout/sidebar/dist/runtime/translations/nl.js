@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Zijbalk",_layout_FIRST_label:"Eerste",_layout_SECOND_label:"Seconde",_action_toggleSidebar_label:"Zijbalk in-/uitschakelen",widgetProperties:"Widget Eigenschappen",widgetFunctions:"Widgetfuncties",widgetName:"widgetnaam:",widgetProps:"widgeteigenschappen:"})}}}));

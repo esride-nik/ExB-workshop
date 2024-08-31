@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Informace o prvku",noDeataMessageDefaultText:"Nebyla nalezena žádná data.",featureNumbers:"{index} z {count}",featureInfoDataActionLabel:"Aktuální záznam informace o prvku {layer}"})}}}));

@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"스와이프",leadingLayers:"선행 레이어",trailingLayers:"후행 레이어",webSceneNotSupported:"웹 씬은 지원되지 않습니다.",noConfiguredLayerText:"현재 구성된 레이어가 없습니다.",noValidLayerText:"유효한 레이어가 없습니다.",mapOccupiedMsg:"대상 맵에 연결되는 또 다른 활성 스와이프가 꺼져 있습니다.",runtimeLayers:"런타임 레이어"})}}}));

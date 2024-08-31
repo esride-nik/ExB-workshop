@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"kuva",imageChooseShape:"Muoto",imageCrop:"Rajaa"})}}}));

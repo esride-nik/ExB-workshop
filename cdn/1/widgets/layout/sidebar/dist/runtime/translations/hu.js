@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"Oldalsáv",_layout_FIRST_label:"Első",_layout_SECOND_label:"Második",_action_toggleSidebar_label:"Oldalsáv ki-/bekapcsolása",widgetProperties:"Widget tulajdonságai",widgetFunctions:"Widget függvényei",widgetName:"widget neve:",widgetProps:"widget tulajdonságai:"})}}}));

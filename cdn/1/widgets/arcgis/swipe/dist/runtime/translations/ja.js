@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"スワイプ",leadingLayers:"前に表示するレイヤー",trailingLayers:"後に表示するレイヤー",webSceneNotSupported:"Web シーンはサポートされていません。",noConfiguredLayerText:"現在構成されたレイヤーはありません。",noValidLayerText:"有効なレイヤーがありません。",mapOccupiedMsg:"ターゲット マップに接続する別のアクティブ スワイプがオフになっています。",runtimeLayers:"ランタイム レイヤー"})}}}));

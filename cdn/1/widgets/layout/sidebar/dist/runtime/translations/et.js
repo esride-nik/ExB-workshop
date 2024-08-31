@@ -1,0 +1,1 @@
+System.register([],(function(i){return{execute:function(){i({_widgetLabel:"Külgriba",_layout_FIRST_label:"Esimene",_layout_SECOND_label:"Sekund",_action_toggleSidebar_label:"Lülita külgriba",widgetProperties:"Vidina omadused",widgetFunctions:"Vidina funktsioonid",widgetName:"vidina nimi:",widgetProps:"vidina omadused:"})}}}));

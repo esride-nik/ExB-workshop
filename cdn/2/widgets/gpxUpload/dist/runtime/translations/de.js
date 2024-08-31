@@ -1,1 +1,0 @@
-System.register([],(function(e){return{execute:function(){e({_widgetLabel:"GPX Upload",cfgDataSources:"Bitte Datenquellen konfigurieren",dropIt:"GPX Datei hier ablegen"})}}}));
