@@ -1,23 +1,22 @@
 {
-  "created": 1705334642720,
+  "created": 1725104031093,
   "description": "",
-  "id": "exb_demo",
-  "modified": 1708444713466,
-  "owner": "esride-nik",
-  "tags": [],
+  "id": "1",
+  "modified": 1725107596093,
+  "owner": "nik_esri_de",
+  "tags": "",
   "thumbnail": null,
-  "title": "ExB Workshop Demo App",
+  "title": "Swipe & Export",
   "type": "Web Experience",
-  "snippet": "",
+  "snippet": null,
   "typeKeywords": [
-    "EXB Experience",
+    "Web Experience",
     "Ready To Use",
     "JavaScript",
     "status: Published",
-    "version:1.14.0",
-    "publishVersion:1.14.0"
+    "version: 1.14.0"
   ],
   "portalUrl": "https://esri-de.maps.arcgis.com",
-  "username": "esride-nik",
+  "username": "nik_esri_de",
   "url": null
 }
