@@ -16,25 +16,26 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+
       - name: Download Experience Builder
         run: curl -o exb.zip "$(curl -s 'https://downloads.arcgis.com/dms/rest/download/secured/arcgis-experience-builder-1.14.zip?f=json&folder=software%2FExperienceBuilder%2F1.14' | python3 -c "import sys, json; print(json.load(sys.stdin)['url'])")"
         # the "classic" way of downloading via "npx arcgis-lib-downloader -p arcgis-experience-builder -v 1.14" doesn't work anymore! :/
         # see this blog article: https://community.esri.com/t5/arcgis-experience-builder-questions/download-experience-builder-via-cmd/td-p/1391180
-        # WARNING: 
         # THIS METHOD OF DOWNLOADING EXPERIENCE BUILDER MAY BREAK IF ESRI CHANGES HOW DOWNLOADS WORK IN THE FUTURE.
-        # IN OTHER WORDS, IT COULD BREAK AT ANY TIME.
-        # THERE IS NO WARRANTY OR GUARANTEE THAT THIS COMMAND WILL WORK IN THE FUTURE.
-        # ONLY USE THIS COMMAND IF YOU UNDERSTAND HOW IT IS BEING USED AND ARE COMFORTABLE FIXING IT IF IT BREAKS:
+
       - name: Unzip Experience Builder
         run: unzip -q exb.zip -d exb
 
       - name: Copy Custom Widgets
         run: cp -r widgets/* exb/ArcGISExperienceBuilder/client/your-extensions/widgets
+
       - name: Install Custom Widgets dependencies
         run: node npm-install-subfolders.js ./exb/ArcGISExperienceBuilder/client/your-extensions/widgets
+
       - name: Create App directory
         run: mkdir public && cd public && mkdir apps && cd apps
         working-directory: exb/ArcGISExperienceBuilder/server
+
       - name: Copy apps
         run: cp -r apps/* exb/ArcGISExperienceBuilder/server/public/apps
 
@@ -59,17 +60,11 @@ jobs:
         id: modify-file-content
         run: sed -i "s/${{ steps.download-times-app-exb_demo.outputs.content }}/$INCREMENTED_DT/g" apps/exb_demo/download-times.json
 
-      # - name: Modify apps/exb_demo/download-times.json
-      #   id: modify-file-content
-      #   uses: jaywcjlove/github-action-modify-file-content@main
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     path: apps/exb_demo/download-times.json
-      #     # TODO: writing a variable value does not work. need alternative. => https://github.com/jaywcjlove/github-action-modify-file-content/issues/8#issuecomment-1413120240
-      #     body: 1
-      #     overwrite: true
-      #     message: "Increment download times to {{$INCREMENTED_DT}}"
-      #     branch: master
+      - name: Commit and push changes
+        run: |
+          git add -A
+          git commit -m "download-times modified to $INCREMENTED_DT"
+          git push
 
       - name: Echo modified apps/exb_demo/download-times.json
         run: echo "${{steps.modify-file-content.outputs.content}}"
