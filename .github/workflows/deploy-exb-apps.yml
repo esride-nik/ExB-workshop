@@ -38,57 +38,66 @@ jobs:
       - name: Copy apps
         run: cp -r apps/* exb/ArcGISExperienceBuilder/server/public/apps
 
-      - name: Read apps/exb_demo/download-times.json
-        id: download-times-app-exb_demo
-        uses: jaywcjlove/github-action-read-file@main
-        with:
-          path: apps/exb_demo/download-times.json
+        # START Download-times
+
+      # - name: Read apps/exb_demo/download-times.json
+      #   id: download-times-app-exb_demo
+      #   uses: jaywcjlove/github-action-read-file@main
+      #   with:
+      #     path: apps/exb_demo/download-times.json
         
-      - name: Read DT file variable
-        run: echo "${{ steps.download-times-app-exb_demo.outputs.content }}"
+      # - name: Read DT file variable
+      #   run: echo "${{ steps.download-times-app-exb_demo.outputs.content }}"
 
-      - name: Set env variable
-        run: echo "INCREMENTED_DT=$((${{ steps.download-times-app-exb_demo.outputs.content }} + 1))" >> $GITHUB_ENV
+      # - name: Set env variable
+      #   run: echo "INCREMENTED_DT=$((${{ steps.download-times-app-exb_demo.outputs.content }} + 1))" >> $GITHUB_ENV
 
-      - name: Echo INCREMENTED_DT
-        run: echo "$INCREMENTED_DT"
+      # - name: Echo INCREMENTED_DT
+      #   run: echo "$INCREMENTED_DT"
 
-      - name: Modify apps/exb_demo/download-times.json
-        id: modify-file-content
-        uses: jaywcjlove/github-action-modify-file-content@main
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: apps/exb_demo/download-times.json
-          # TODO: this does not work. need alternative. => https://github.com/jaywcjlove/github-action-modify-file-content/issues/8#issuecomment-1413120240
-          body: "{{$INCREMENTED_DT}}"
-          overwrite: true
-          message: "Increment download times to {{$INCREMENTED_DT}}"
-          branch: master
+      # - name: Modify apps/exb_demo/download-times.json
+      #   id: modify-file-content
+      #   uses: jaywcjlove/github-action-modify-file-content@main
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     path: apps/exb_demo/download-times.json
+      #     # TODO: writing a variable value does not work. need alternative. => https://github.com/jaywcjlove/github-action-modify-file-content/issues/8#issuecomment-1413120240
+      #     body: 1
+      #     overwrite: true
+      #     message: "Increment download times to {{$INCREMENTED_DT}}"
+      #     branch: master
 
-      - name: Echo modified apps/app-exb/download-times.json
-        run: echo "${{steps.modify-file-content.outputs.content}}"
+      # - name: Echo modified apps/app-exb/download-times.json
+      #   run: echo "${{steps.modify-file-content.outputs.content}}"
+
+      # END Download-times
 
       - name: NPM install client folder
         run: npm ci
         working-directory: exb/ArcGISExperienceBuilder/client
+
       - name: NPM install in server folder
         run: npm ci
         working-directory: exb/ArcGISExperienceBuilder/server
+
       - name: Build widgets
         run: npm run build:prod
         working-directory: exb/ArcGISExperienceBuilder/client
+
       - name: Run download script
         # include clientId of the app, as explained here: https://community.esri.com/t5/arcgis-experience-builder-blog/experience-builder-devops-generating-the-app/ba-p/1112247
-        run: node -e "require('./server/src/middlewares/dev/apps/app-download.js').zipApp('2', 'app.zip', 'pSM9aNISD0wgzyXA')"
+        run: node -e "require('./server/src/middlewares/dev/apps/app-download.js').zipApp('exb_demo', 'app.zip', 'pSM9aNISD0wgzyXA')"
         working-directory: exb/ArcGISExperienceBuilder
         env:
           NODE_ENV: production
+
       - name: Unzip app zip
         # ExB has non-standard file permissions so use chmod after unzip
         run: |
           unzip -q app.zip -d app
           chmod -R 777 app
         working-directory: exb/ArcGISExperienceBuilder
+
       - name: Generate screenshot (optional)
         working-directory: exb/ArcGISExperienceBuilder/app
         continue-on-error: true
@@ -98,6 +107,7 @@ jobs:
           echo "{\"trailingSlash\":true}" > serve.json
           serve . -p 5000 &
           pageres http://localhost:5000/index.html 1024x768 --filename=screenshot --delay=10
+
       - name: Deploy app zip to GH Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
