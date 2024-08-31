@@ -16,7 +16,10 @@ For example, when following [this guide](https://doc.arcgis.com/de/experience-bu
 * Link the config of the app in the server folder:
   * Open command prompt (does not work with Git Bash or similar)
   * If the subfolders ``public\apps`` do not yet exist on the server side, create them manually
-  * ``mklink /j "<ExB path>\server\public\apps\fah_basis" "<ExB path>\client\WebClient_LastGen\apps\fah_basis"``
+  * Create a link, mapping the source folder in the server directory to the apps folder in the repo:
+    ```
+    mklink /j "<ExB path>\server\public\apps\exb_demo" "<ExB path>\client\WebClient_LastGen\apps\exb_demo"
+    ```
   * The success message: ``Junction created for <ExB path>\server\public\apps\fah_basis <<===>> <ExB path>\client\WebClient_LastGen\apps\fah_basis``
 * In the file ``client/tsconfig.json``, include the folder name of the repository in the include array. Or remove / comment out the include array completely from the file.
 * Restart Watcher (call ``npm start`` in the client folder)
