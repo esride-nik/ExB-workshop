@@ -64,7 +64,7 @@ jobs:
         run: |
           git config --global user.name "Pipeline"
           git config --global user.email "n.koehn@esri"
-          git add -A
+          git add apps/exb_demo/download-times.json
           git commit -m "download-times modified to $INCREMENTED_DT"
           git push
 
