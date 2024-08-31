@@ -1,0 +1,42 @@
+System.register(["jimu-core","jimu-ui/advanced/setting-components","jimu-ui","jimu-layouts/layout-runtime","jimu-theme"],(function(e,t){var o={},n={},l={},s={},a={};return{setters:[function(e){o.Immutable=e.Immutable,o.React=e.React,o.ReactRedux=e.ReactRedux,o.css=e.css,o.getAppStore=e.getAppStore,o.jsx=e.jsx,o.lodash=e.lodash,o.polished=e.polished},function(e){n.NavQuickStyleItem=e.NavQuickStyleItem,n.QuickStylePopper=e.QuickStylePopper},function(e){l.NavButtonGroup=e.NavButtonGroup,l.Navigation=e.Navigation,l.PageNumber=e.PageNumber,l.Slider=e.Slider,l.componentStyleUtils=e.componentStyleUtils,l.styleUtils=e.styleUtils},function(){},function(e){a.useTheme=e.useTheme}],execute:function(){e((()=>{var e={4175:e=>{e.exports='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path fill="#000" fill-rule="evenodd" d="M1.25 2.5h17.5v11.25H1.25zM0 2.5c0-.69.56-1.25 1.25-1.25h17.5c.69 0 1.25.56 1.25 1.25v11.25c0 .69-.56 1.25-1.25 1.25H1.25C.56 15 0 14.44 0 13.75zm3.75 16.25h2.5V17.5h-2.5zm7.5 0h-2.5V17.5h2.5zm2.5 0h2.5V17.5h-2.5z" clip-rule="evenodd"></path></svg>'},11407:e=>{e.exports='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16"><path fill="#000" fill-rule="evenodd" d="M11.347 2.146a.485.485 0 0 1 0 .708L5.76 8l5.587 5.146a.486.486 0 0 1 0 .708.538.538 0 0 1-.738 0l-5.956-5.5a.485.485 0 0 1 0-.708l5.956-5.5a.538.538 0 0 1 .738 0" clip-rule="evenodd"></path></svg>'},3273:e=>{e.exports='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16"><path fill="#000" fill-rule="evenodd" d="M4.653 13.854a.485.485 0 0 1 0-.708L10.24 8 4.653 2.854a.485.485 0 0 1 0-.708.538.538 0 0 1 .738 0l5.956 5.5a.485.485 0 0 1 0 .708l-5.956 5.5a.538.538 0 0 1-.738 0" clip-rule="evenodd"></path></svg>'},63503:e=>{e.exports='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6"><circle cx="1104" cy="1049" r="3" fill="#000" fill-rule="nonzero" transform="translate(-1101 -1046)"></circle></svg>'},48891:e=>{"use strict";e.exports=o},74758:e=>{"use strict";e.exports=s},34796:e=>{"use strict";e.exports=a},30726:e=>{"use strict";e.exports=l},77756:e=>{"use strict";e.exports=n}},t={};function i(o){var n=t[o];if(void 0!==n)return n.exports;var l=t[o]={exports:{}};return e[o](l,l.exports,i),l.exports}i.d=(e,t)=>{for(var o in t)i.o(t,o)&&!i.o(e,o)&&Object.defineProperty(e,o,{enumerable:!0,get:t[o]})},i.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t),i.r=e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})};var r={};return(()=>{"use strict";i.r(r),i.d(r,{NavQuickStyle:()=>x,default:()=>b});var e,t,o=i(48891),n=i(77756);(t=e||(e={})).Auto="AUTO",t.Custom="CUSTOM";var l=i(30726);i(74758),i(4175);var s=i(34796);const{useEffect:a,useMemo:u,useCallback:c}=o.React,{useSelector:v,useDispatch:d}=o.ReactRedux,p=(i(63503),i(11407),i(3273),e=>(0,o.Immutable)(e).merge({item:{hover:{fontWeight:"400"},active:{fontWeight:"400"},disabled:{fontWeight:"400"}}},{deep:!0})),m=e=>{var t,o;const{type:n,navStyle:l}=e||{},{showIcon:s,showText:a,alternateIcon:i,showPageNumber:r}=null!==(t=null==e?void 0:e.standard)&&void 0!==t?t:{};if("nav"===n){const{filename:e}=null!==(o=null==i?void 0:i.properties)&&void 0!==o?o:{};return`${n}-${l}-${s?"showIcon":"hideIcon"}-${a?"showText":"hideText"}-icon-${e}`}if("navButtonGroup"===n)return`${n}-${l}-${r?"showPageNumber":""}`};const g=o.css`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+`,y=e=>{const{data:t,progress:n=0,type:a,navStyle:i,vertical:r,advanced:c,variant:v,onChange:d,activeView:m,standard:y,paginationFontColor:h}=e,f=function(e,t){var o={};for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&t.indexOf(n)<0&&(o[n]=e[n]);if(null!=e&&"function"==typeof Object.getOwnPropertySymbols){var l=0;for(n=Object.getOwnPropertySymbols(e);l<n.length;l++)t.indexOf(n[l])<0&&Object.prototype.propertyIsEnumerable.call(e,n[l])&&(o[n[l]]=e[n[l]])}return o}(e,["data","progress","type","navStyle","vertical","advanced","variant","onChange","activeView","standard","paginationFontColor"]),{current:x,totalPage:b,showPageNumber:S,scrollable:w,disablePrevious:j,disableNext:P,previousText:O,previousIcon:N,nextText:I,nextIcon:$,showIcon:T,gap:B,alternateIcon:R,activedIcon:C,showText:k,showTitle:U,iconPosition:G,textAlign:V,hideThumb:A}=y||{},M=o.React.useRef((()=>0));o.React.useEffect((()=>(M.current=o.lodash.throttle((e=>{let t=+e.target.value;t=Number((t/100).toFixed(2)),null==d||d("slider",t)}),100),()=>{M.current.cancel()})),[d]);const Q=o.React.useCallback((e=>m===(e=>{if(!(null==e?void 0:e.value))return"";const t=e.value.split(",");return(null==t?void 0:t.length)?t[1]:""})(e)),[m]),z=((e,t,n,s,a,i)=>u((()=>{var r,u,c;if(!n||!s)return o.css``;const v=null===(c=null===(u=null===(r=(0,o.getAppStore)())||void 0===r?void 0:r.getState())||void 0===u?void 0:u.appContext)||void 0===c?void 0:c.isRTL;return"nav"===e?((e,t,n,s)=>o.css`
+    .jimu-nav{
+      ${l.componentStyleUtils.nav.getRootStyles(null==t?void 0:t.root)};
+      ${l.componentStyleUtils.nav.getVariantStyles(e,p(t),n,s)};
+      ${l.styleUtils.getButtonStyleByState(null==t?void 0:t.item,!0)}
+    }
+`)(t,s,a,v):"navButtonGroup"===e?(e=>o.css`
+    .nav-button-group {
+      ${l.componentStyleUtils.navButtonGroup.getVariantStyles(p(e))};
+      ${l.styleUtils.getButtonStyleByState(null==e?void 0:e.item,!1)}
+    }
+ `)(s):"slider"===e?((e,t,n)=>o.css`
+   > .jimu-slider {
+    ${l.componentStyleUtils.slider.getRootStyles(null==e?void 0:e.root)};
+    ${l.componentStyleUtils.slider.getVariantStyles(e,t,n)};
+   }
+ `)(s,i,v):o.css``}),[n,e,t,s,a,i]))(a,i,c,v,r,A),F=(e=>{var t;const n=(0,s.useTheme)();return u((()=>{var t;return o.css`
+      ${"slider"===e&&o.css`padding: 0.625rem 0.25rem;`}
+      .nav-button-group >.direction-button {
+        &:focus,
+        &:focus-visible {
+          outline-offset: -${null===(t=null==n?void 0:n.focusedStyles)||void 0===t?void 0:t.offset};
+        }
+      }
+    `}),[null===(t=null==n?void 0:n.focusedStyles)||void 0===t?void 0:t.offset,e])})(a);return(0,o.jsx)("div",Object.assign({className:"navigation",css:[g,z,F]},f),"nav"===a&&(0,o.jsx)(l.Navigation,{role:"tablist",vertical:r,isActive:Q,scrollable:w,data:t,gap:B,type:i,showIcon:T,alternateIcon:R,activedIcon:C,showText:k,showTitle:U||k,isUseNativeTitle:!0,iconPosition:G,navLinkRole:"button",textAlign:V}),"slider"===a&&(0,o.jsx)(l.Slider,{className:"h-100",size:"sm",value:100*n,hideThumb:A,onChange:e=>{var t;null===(t=e.persist)||void 0===t||t.call(e),M.current(e)}}),"navButtonGroup"===a&&(0,o.jsx)(l.NavButtonGroup,{type:i,previousText:O,previousIcon:N,nextText:I,nextIcon:$,vertical:r,disablePrevious:j,disableNext:P,onChange:e=>{null==d||d("navButtonGroup",e)}},S&&(0,o.jsx)(l.PageNumber,{current:x,totalPage:b,css:h?o.css`color: ${h}`:o.css``})))};const h=(0,o.Immutable)([{name:"v1",value:"p1,v1"},{name:"v2"},{name:"v3"},{name:"v4"}]),f=o.css`
+  .body {
+    display: flex;
+    padding: ${o.polished.rem(10)} ${o.polished.rem(20)} ${o.polished.rem(20)} ${o.polished.rem(20)};
+    width: ${o.polished.rem(260)};
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    .quick-style-item:not(:last-of-type) {
+      margin-bottom: 10px;
+    }
+  }
+`,x=e=>{const{templates:t,display:l,usePopper:s,onChange:a,children:i}=e,r=function(e,t){var o={};for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&t.indexOf(n)<0&&(o[n]=e[n]);if(null!=e&&"function"==typeof Object.getOwnPropertySymbols){var l=0;for(n=Object.getOwnPropertySymbols(e);l<n.length;l++)t.indexOf(n[l])<0&&Object.prototype.propertyIsEnumerable.call(e,n[l])&&(o[n[l]]=e[n[l]])}return o}(e,["templates","display","usePopper","onChange","children"]),u=()=>(0,o.jsx)("div",{className:"body"},t.map(((e,t)=>{const s=Object.assign({},e),i=s.label;delete s.label;const r="navButtonGroup"===e.type?{current:1,totalPage:4,disablePrevious:!0,disableNext:!1}:{},u="nav"===e.type?{scrollable:!1}:{},c=o.lodash.assign({},s.standard,r,u);return(0,o.jsx)(n.NavQuickStyleItem,{key:t,title:i,selected:!(null==l?void 0:l.advanced)&&m(s)===m(l),onClick:()=>{a(s)}},(0,o.jsx)(y,{type:s.type,data:h,navStyle:s.navStyle,activeView:"v1",standard:c}))})));return s?(0,o.jsx)(n.QuickStylePopper,Object.assign({},r,{css:f,trapFocus:!1,autoFocus:!1}),u()):(0,o.jsx)("div",{css:f},u())},b={NavQuickStyle:x}})(),r})())}}}));

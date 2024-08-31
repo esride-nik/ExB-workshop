@@ -1,0 +1,1 @@
+System.register([],(function(e){return{execute:function(){e({_widgetLabel:"テーブル",_widgetDescription:"これは対話型のテーブル ウィジェットです",showAllRecords:"すべてのレコードを表示",refresh:"更新",showHideCols:"列の表示/非表示",toggleSelect:"選択/すべての表示",_action_viewInTable_label:"テーブルに表示",tableDataActionLabel:"{layer} テーブルの選択",tableCount:"合計: {total} | 選択: {selected}",_action_addToTable_label:"テーブルに追加"})}}}));
