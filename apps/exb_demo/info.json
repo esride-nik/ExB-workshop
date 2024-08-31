@@ -2,7 +2,7 @@
   "created": 1725104031093,
   "description": "",
   "id": "exb_demo",
-  "modified": 1725107596093,
+  "modified": 1725115537426,
   "owner": "nik_esri_de",
   "tags": "",
   "thumbnail": null,
@@ -14,9 +14,12 @@
     "Ready To Use",
     "JavaScript",
     "status: Published",
-    "version: 1.14.0"
+    "version:1.15.0",
+    "publishVersion:1.14.0"
   ],
   "portalUrl": "https://esri-de.maps.arcgis.com",
   "username": "nik_esri_de",
-  "url": null
+  "url": null,
+  "name": "Swipe & Export",
+  "isLocalApp": true
 }

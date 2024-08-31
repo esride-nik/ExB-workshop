@@ -206,7 +206,7 @@
       ]
     }
   },
-  "exbVersion": "1.14.0",
+  "exbVersion": "1.15.0",
   "mainSizeMode": "LARGE",
   "theme": "themes/default/",
   "forBuilderAttributes": {
@@ -216,7 +216,7 @@
   "widgets": {
     "widget_1": {
       "uri": "widgets/arcgis/arcgis-map/",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "label": "Map",
       "config": {
         "toolConfig": {
@@ -244,7 +244,7 @@
     },
     "widget_2": {
       "uri": "widgets/arcgis/swipe/",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "label": "Swipe",
       "config": {
         "swipeStyle": "SIMPLE_HORIZONTAL",
@@ -267,8 +267,8 @@
     },
     "widget_3": {
       "uri": "widgets/layout/sidebar/",
-      "version": "1.14.0",
-      "label": "Sidebar",
+      "version": "1.15.0",
+      "label": "Global",
       "config": {
         "direction": "VERTICAL",
         "collapseSide": "SECOND",
@@ -341,8 +341,8 @@
     },
     "widget_4": {
       "uri": "widgets/layout/sidebar/",
-      "version": "1.14.0",
-      "label": "Sidebar 2",
+      "version": "1.15.0",
+      "label": "Map & functions",
       "config": {
         "direction": "HORIZONTAL",
         "collapseSide": "FIRST",
@@ -424,7 +424,7 @@
     },
     "widget_5": {
       "uri": "widgets/common/table/",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "label": "Table",
       "config": {
         "layersConfig": [
@@ -1091,7 +1091,11 @@
               "bold": false,
               "color": ""
             },
-            "layerHonorMode": "WEBMAP"
+            "layerHonorMode": "WEBMAP",
+            "columnSetting": {
+              "responsiveType": "FIXED",
+              "columnWidth": 200
+            }
           },
           {
             "id": "dataSource_2-View_Baumgesundheit_Gruppe_2_663-2",
@@ -1759,7 +1763,11 @@
               "color": ""
             },
             "layerHonorMode": "WEBMAP",
-            "showCount": true
+            "showCount": true,
+            "columnSetting": {
+              "responsiveType": "FIXED",
+              "columnWidth": 200
+            }
           }
         ],
         "arrangeType": "TABS"
@@ -1932,7 +1940,7 @@
     "button": {},
     "logo": {}
   },
-  "originExbVersion": "1.14.0",
+  "originExbVersion": "1.15.0",
   "pageStructure": [
     {
       "page_0": []
@@ -1943,5 +1951,5 @@
       "primary": "#bb07e5"
     }
   },
-  "timestamp": 1724771803700
+  "timestamp": 1725115535946
 }
