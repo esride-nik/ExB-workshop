@@ -1,1 +1,0 @@
-System.register([],function(e){return{execute:function(){e({notPublished:"Cette expérience n’est pas encore publiée. Veuillez d’abord la publier.",notFound:"Introuvable."})}}});

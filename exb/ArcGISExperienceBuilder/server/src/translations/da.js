@@ -1,1 +1,0 @@
-System.register([],function(e){return{execute:function(){e({notPublished:"Denne oplevelse er endnu ikke publiceret. Publicér den først.",notFound:"Ikke fundet."})}}});

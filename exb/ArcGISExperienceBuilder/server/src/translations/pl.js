@@ -1,1 +1,0 @@
-System.register([],function(o){return{execute:function(){o({notPublished:"To środowisko nie zostało jeszcze opublikowane. Najpierw musisz je opublikować.",notFound:"Nie znaleziono."})}}});

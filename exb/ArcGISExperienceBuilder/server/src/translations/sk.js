@@ -1,1 +1,0 @@
-System.register([],function(e){return{execute:function(){e({notPublished:"Tento zážitok ešte nie je publikovaný. Najskôr ho publikujte.",notFound:"Nenájdené."})}}});

@@ -1,1 +1,0 @@
-System.register([],function(e){return{execute:function(){e({notPublished:"Ova iskustvo nije objavljeno još uvek. Objavite ga prvo.",notFound:"Nije pronađeno."})}}});

@@ -1,1 +1,0 @@
-System.register([],function(e){return{execute:function(){e({notPublished:"Tätä kokemusta ei ole vielä julkaistu. Julkaise se ensin.",notFound:"Ei löydy."})}}});

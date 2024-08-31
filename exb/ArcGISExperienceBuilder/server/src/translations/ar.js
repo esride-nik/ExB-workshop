@@ -1,1 +1,0 @@
-System.register([],function(e){return{execute:function(){e({notPublished:"لم يتم نشر هذه التجربة بعد. يرجى نشرها أولاً.",notFound:"لم يتم العثور."})}}});

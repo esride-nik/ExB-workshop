@@ -1,1 +1,0 @@
-System.register([],function(e){return{execute:function(){e({notPublished:"Opplevelsen er ikke publisert ennå. Publiser den først.",notFound:"Ikke funnet."})}}});
