@@ -342,7 +342,7 @@
     "widget_4": {
       "uri": "widgets/layout/sidebar/",
       "version": "1.15.0",
-      "label": "Map & FFFFFunctions",
+      "label": "Map & FXXunctions",
       "config": {
         "direction": "HORIZONTAL",
         "collapseSide": "FIRST",
