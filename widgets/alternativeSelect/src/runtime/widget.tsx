@@ -1,4 +1,4 @@
-import { React, type AllWidgetProps, FormattedMessage, type DataSource, DataSourceComponent, type FeatureLayerQueryParams } from 'jimu-core'
+import { React, type AllWidgetProps, FormattedMessage, type DataSource, DataSourceComponent, type FeatureLayerQueryParams, DataSourceManager } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource, type FeatureDataRecord } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
@@ -64,15 +64,18 @@ export default function (props: AllWidgetProps<unknown>) {
   sketchGraphicsLayer.add(bufferGraphic)
 
   const executeAttributiveQuery = async () => {
-    const fl = jimuMapView.view.map.findLayerById('18d0de1c6e2-layer-2')
-    const featureLayerView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
-    const flvResults = await featureLayerView.queryFeatures({
+    const featureLayerDataSource = DataSourceManager.getInstance().getDataSource(props.useDataSources?.[0]?.dataSourceId) as FeatureLayerDataSource
+    const fl = featureLayerDataSource.layer
+    // const featureLayerView = await jimuMapView.view.whenLayerView(fl)
+    // const flvResults = await featureLayerView.queryFeatures({
+    const flvResults = await fl.queryObjectIds({
       geometry: bufferGraphic.geometry,
       spatialRelationship: 'contains'
     })
-
+    const whereClause = `objectid in (${flvResults.map((id: number) => id.toString()).join(',')})`
+    console.log('whereClause', whereClause)
     const dsResult = await featureLayerDataSource.query({
-      where: `objectid in (${flvResults.features.map((r: Graphic) => r.getObjectId()).join(',')})`
+      where: whereClause
     })
     console.log('dsResult', dsResult)
     const records = dsResult?.records as FeatureDataRecord[]
