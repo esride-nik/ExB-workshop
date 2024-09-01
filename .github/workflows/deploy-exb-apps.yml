@@ -1,4 +1,4 @@
-name: Deploy Experience Builder Apps
+name: Deploy Experience Builder App
 on:
   push:
     branches:
@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  Deploy-Experience-Builder-Apps:
+  setup-exb-app:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -103,17 +103,20 @@ jobs:
           chmod -R 777 app
         working-directory: exb/ArcGISExperienceBuilder
 
-      # - name: Deploy app zip to GH Pages
-      #   uses: JamesIves/github-pages-deploy-action@v4
-      #   with:
-      #     branch: gh-pages
-      #     folder: exb/ArcGISExperienceBuilder/app
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: exb/ArcGISExperienceBuilder/app
+          path: 'exb/ArcGISExperienceBuilder/app'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
