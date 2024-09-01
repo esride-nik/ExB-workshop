@@ -16,8 +16,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup-exb-app:
+  deploy-exb-app:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -103,13 +106,6 @@ jobs:
           chmod -R 777 app
         working-directory: exb/ArcGISExperienceBuilder
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: setup-exb-app
-    steps:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
