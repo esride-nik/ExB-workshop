@@ -1,3 +1,5 @@
+// CUSTOM EXTENSION: layerfx action
+
 // import {MessageManager, ExtentChangeMessage, MessageType} from 'jimu-core';
 import Action from './action'
 import type Widget from '../widget'

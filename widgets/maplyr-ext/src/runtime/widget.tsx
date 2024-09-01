@@ -12,7 +12,10 @@ export default class Widget extends MapLayers {
     console.log('Extended: registerLayerListActions')
     super.registerLayerListActions()
     this.layerListActions.push(new DownAction(this, 'Nach unten verschieben'))
+
+    // CUSTOM EXTENSION
     this.layerListActions.push(new LayerFx(this, 'Layer Effects'))
+    
     console.log(this.layerListActions)
   }
 
