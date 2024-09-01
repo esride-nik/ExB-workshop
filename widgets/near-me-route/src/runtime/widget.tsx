@@ -706,7 +706,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig> & ExtraP
     const incidentGeometry = this.state.aoiGeometries.incidentGeometry4326 || this.state.aoiGeometries.incidentGeometry
     const featureRecordsWithDistance = selectedFeatures
 
-    // TODO: route instead of distance
+    // TODO: CUSTOM EXTENSION route instead of distance
     const routeUrl = 'https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World'
     // const routeLayer = new GraphicsLayer()
 
