@@ -9,7 +9,12 @@ permissions:
   contents: write
   pages: write
   id-token: write
-  
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   Deploy-Experience-Builder-Apps:
     runs-on: ubuntu-latest
@@ -39,8 +44,7 @@ jobs:
       - name: Copy apps
         run: cp -r apps/* exb/ArcGISExperienceBuilder/server/public/apps
 
-      # START Download-times
-
+      # Increase the value in download-times.json: It's gonna be used as "buildNumber" and folder name in the artifact (see 'gh-pages' branch)
       - name: Read apps/exb_demo/download-times.json
         id: download-times-app-exb_demo
         uses: jaywcjlove/github-action-read-file@main
@@ -71,7 +75,7 @@ jobs:
       - name: Echo modified apps/exb_demo/download-times.json
         run: echo "${{steps.modify-file-content.outputs.content}}"
 
-      # END Download-times
+      # END download-times.json
 
       - name: NPM install client folder
         run: npm ci
@@ -99,8 +103,17 @@ jobs:
           chmod -R 777 app
         working-directory: exb/ArcGISExperienceBuilder
 
-      - name: Deploy app zip to GH Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      # - name: Deploy app zip to GH Pages
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   with:
+      #     branch: gh-pages
+      #     folder: exb/ArcGISExperienceBuilder/app
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          branch: gh-pages
-          folder: exb/ArcGISExperienceBuilder/app
+          path: exb/ArcGISExperienceBuilder/app
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
