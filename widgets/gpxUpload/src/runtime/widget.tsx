@@ -128,10 +128,12 @@ export default function (props: AllWidgetProps<unknown>) {
     return DataSourceManager.getInstance().getDataSource(props.outputDataSources?.[0])
   }
   const getOriginDataSource = () => {
+    // TODO: Modify to support multiple origin data sources
     return DataSourceManager.getInstance().getDataSource(props.useDataSources?.[0]?.dataSourceId)
   }
 
   const setSourceRecordsToOutputDs = async (queryGeometry: Geometry = undefined) => {
+    // TODO: something with the output DS doesn't work in ExB 1.15
     /**
      * Just like using other data sources, to use an output data source, widget should use it through `DataSourceComponent`, the framework will create the data source instance on the fly.
      * No output data source instance means there isn't any widgets using the output data source,

@@ -70,7 +70,10 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
                       onToggleUseDataEnabled={onToggleUseDataEnabled}
                       onChange={onDataSourceChange}
                       widgetId={props.id}
+                      // TODO: Multiple origin data sources not supported
                   />
+                </SettingRow>
+                <SettingRow>
                   {
                     props.useDataSources && props.useDataSources.length > 0 &&
                     <FieldSelector
