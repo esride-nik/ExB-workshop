@@ -17,17 +17,13 @@ For example, when following [this guide](https://doc.arcgis.com/de/experience-bu
   * Open command prompt (does not work with Git Bash or similar)
   * If the subfolders ``public\apps`` do not yet exist on the server side, create them manually
   * Create a link, mapping the source folder in the server directory to the apps folder in the repo:
-    ```
-    mklink /j "<ExB path>\server\public\apps\exb_demo" "<ExB path>\client\WebClient_LastGen\apps\exb_demo"
-    ```
-  * The success message: ``Junction created for <ExB path>\server\public\apps\fah_basis <<===>> <ExB path>\client\WebClient_LastGen\apps\fah_basis``
+    ``mklink /J <exb_path>\server\public\exb_demo <exb_path>\client\ExB-workshop\apps\exb_demo``
+  * The success message: ``Junction created for <exb_path>\server\public\exb_demo <<===>> <exb_path>\client\ExB-workshop\apps\exb_demo``
+
 * In the file ``client/tsconfig.json``, include the folder name of the repository in the include array. Or remove / comment out the include array completely from the file.
 * Restart Watcher (call ``npm start`` in the client folder)
 
-## Looking for the what3words widget?
-This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
-
-## Extending built-in widgets by inheritance
+### Extending built-in widgets by inheritance
 As an example, ``widgets/maplyr-ext`` adds custom actions to the standard ``map-layers`` widget.
 Steps:
 * copy the original class-based widget from ``dist/widgets/arcgis`` into ``<your repo folder>/widgets`` or ``your-extensions/widgets``
@@ -36,6 +32,12 @@ Steps:
   * import original widget with alias name: ``import { Widget as <Widget-Name> } from '<widget-name>.tsx``
   * create your own derived widget class: ``export default class Widget extends <Widget-Name>``
   * overwrite methods as needed, but call ``super.<method>()`` to keep the functionality of the base class
+
+### Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder 1.12
+
+The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-builder-questions/cannot-find-arcgis-maps-sdk-for-javascript-module/m-p/1308587#M7620) does not work for me. I need to remove the ``include`` array from tsconfig.json (no whitelist means including everyting).
+
+Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
 
 ## Compiler settings
 
@@ -122,14 +124,13 @@ The trouble is, that the webpack files on root level of the "client" folder are 
 
 [Originally published in the ArcGIS community.](https://community.esri.com/t5/arcgis-experience-builder-questions/npm-packages-in-experience-builder-1-8/m-p/1181885#M4574)
 
-## Deprecation of NPM package "xlsx"
+## Further info
+
+### Looking for the what3words widget?
+This one was moved to its own repo: [w3w-arcgis-exb-widget](https://github.com/EsriDE/w3w-arcgis-exb-widget)
+
+### Deprecation of NPM package "xlsx"
 
 This package is based on the Excel tool library "SheetJS" and is no longer maintained.
 The GitHub advisory db says: "[All versions of SheetJS CE through 0.19.2 are vulnerable to "Prototype Pollution" when reading specially crafted files. Workflows that do not read arbitrary files (for example, exporting data to spreadsheet files) are unaffected.](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6)" As we're not reading anything, I guess it's not that urgent..
 .. but maybe try out [Mr.Excel](https://www.npmjs.com/package/mr-excel) some day?
-
-## Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder 1.12
-
-The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-builder-questions/cannot-find-arcgis-maps-sdk-for-javascript-module/m-p/1308587#M7620) does not work for me. I need to remove the ``include`` array from tsconfig.json (no whitelist means including everyting).
-
-Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
