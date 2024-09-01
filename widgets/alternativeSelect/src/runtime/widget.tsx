@@ -33,8 +33,8 @@ export default function (props: AllWidgetProps<unknown>) {
     if (!featureLayerView && featureLayerDataSource) {
       // featureLayerView has to be set first, because it's used in updateFilter(), which is called from updateBuffer(), which is called from initSketch()
       const getFlView = async (layerId: string) => {
-        const fl = jimuMapView.view.map.findLayerById(layerId)
-        const flView = await jimuMapView.view.whenLayerView(fl) as FeatureLayerView
+        const fl = jimuMapView?.view.map.findLayerById(layerId)
+        const flView = await jimuMapView?.view.whenLayerView(fl) as FeatureLayerView
         console.log('setFeatureLayerView')
         setFeatureLayerView(flView) // this will trigger useEffect again, but this time with featureLayerView set
       }
@@ -81,6 +81,7 @@ export default function (props: AllWidgetProps<unknown>) {
     const records = dsResult?.records as FeatureDataRecord[]
 
     if (records.length > 0) {
+      // TODO: broken in ExB 1.15?
       featureLayerDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
     } else {
       featureLayerDataSource.clearSelection()
