@@ -3,6 +3,25 @@
 
 Some Widgets and a theme.
 
+- [Experience Builder Workshop Extensions Repo](#experience-builder-workshop-extensions-repo)
+    - [by Niklas Köhn, Esri Deutschland](#by-niklas-köhn-esri-deutschland)
+  - [How to use the samples](#how-to-use-the-samples)
+    - [Using 3rd party NPM packages in your widgets](#using-3rd-party-npm-packages-in-your-widgets)
+    - [Optional: Use the demo app locally](#optional-use-the-demo-app-locally)
+    - [Extending built-in widgets by inheritance](#extending-built-in-widgets-by-inheritance)
+  - [Compiler settings](#compiler-settings)
+    - [Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder ^1.12](#cannot-find-arcgis-maps-sdk-for-javascript-modules-in-experience-builder-112)
+    - [Using imports in Jest](#using-imports-in-jest)
+    - [Path resolution of ``shared-code``](#path-resolution-of-shared-code)
+    - [Using shared code in multiple web-extension-repos](#using-shared-code-in-multiple-web-extension-repos)
+  - [Polyfills for Node APIs in Experience Builder \>= 1.8](#polyfills-for-node-apis-in-experience-builder--18)
+    - [From left to right:](#from-left-to-right)
+    - [Steps to do:](#steps-to-do)
+  - [Further info](#further-info)
+    - [Looking for the what3words widget?](#looking-for-the-what3words-widget)
+    - [Deprecation of NPM package "xlsx"](#deprecation-of-npm-package-xlsx)
+
+
 ## How to use the samples
 * Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
 * Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
@@ -33,13 +52,14 @@ Steps:
   * create your own derived widget class: ``export default class Widget extends <Widget-Name>``
   * overwrite methods as needed, but call ``super.<method>()`` to keep the functionality of the base class
 
-### Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder 1.12
+## Compiler settings
+
+### Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder ^1.12
 
 The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-builder-questions/cannot-find-arcgis-maps-sdk-for-javascript-module/m-p/1308587#M7620) does not work for me. I need to remove the ``include`` array from tsconfig.json (no whitelist means including everyting).
 
 Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
 
-## Compiler settings
 
 ### Using imports in Jest
 
