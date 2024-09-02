@@ -327,7 +327,8 @@
           "canSearch": true,
           "canNavigation": true,
           "canSelect": true,
-          "canSelectState": true
+          "canSelectState": true,
+          "canLayers": true
         },
         "isUseCustomMapState": false
       },
@@ -3227,7 +3228,10 @@
         {
           "dataSourceId": "dataSource_2-Köln_Baumkataster_6678",
           "mainDataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "rootDataSourceId": "dataSource_2"
+          "rootDataSourceId": "dataSource_2",
+          "fields": [
+            "StandortNr"
+          ]
         }
       ]
     }
@@ -3334,6 +3338,6 @@
       "primary": "#bb07e5"
     }
   },
-  "timestamp": 1725196290846,
-  "publishTimestamp": 1725196291428
+  "timestamp": 1725299815092,
+  "publishTimestamp": 1725299816929
 }
