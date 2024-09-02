@@ -81,7 +81,6 @@ export default function (props: AllWidgetProps<unknown>) {
     const records = dsResult?.records as FeatureDataRecord[]
 
     if (records.length > 0) {
-      // TODO: broken in ExB 1.15?
       featureLayerDataSource.selectRecordsByIds(records.map((r: any) => r.getId()), records)
     } else {
       featureLayerDataSource.clearSelection()
