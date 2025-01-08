@@ -6,6 +6,7 @@ Some Widgets and a theme.
 - [Experience Builder Workshop Extensions Repo](#experience-builder-workshop-extensions-repo)
     - [by Niklas Köhn, Esri Deutschland](#by-niklas-köhn-esri-deutschland)
   - [How to use the samples](#how-to-use-the-samples)
+    - [``npm run install-subfolders``](#npm-run-install-subfolders)
     - [Using 3rd party NPM packages in your widgets](#using-3rd-party-npm-packages-in-your-widgets)
     - [Optional: Use the demo app locally](#optional-use-the-demo-app-locally)
     - [Extending built-in widgets by inheritance](#extending-built-in-widgets-by-inheritance)
@@ -24,7 +25,11 @@ Some Widgets and a theme.
 
 ## How to use the samples
 * Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
-* Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
+* Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run install-subfolders``.
+
+### ``npm run install-subfolders``
+* Run ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
+* Run ``npm run install-subfolders -- -af`` to perform an ``npm audit fix`` in the same subfolders.
 
 ### Using 3rd party NPM packages in your widgets
 
