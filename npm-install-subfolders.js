@@ -5,7 +5,7 @@ Run ``npm run install-subfolders -- -af`` to perform an ``npm audit fix`` in the
 
 const { execSync } = require('child_process');
 const { readdirSync, statSync } = require('fs');
-const { join, resolve } = require('path');
+const { join } = require('path');
 
 const initialDir = process.cwd(); // Store the initial working directory
 
