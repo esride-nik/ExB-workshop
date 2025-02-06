@@ -19,7 +19,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
     console.log('urlParams', urlParams.get('data_filter'))
     const dataFilter = urlParams.get('data_filter')
     const dataSourceId = dataFilter.split(':')[0]
-    const whereClause = dataFilter.split(':')[1]
+    const whereClause = decodeURI(dataFilter.split(':')[1])
     console.log('dataSourceId', dataSourceId, whereClause)
     console.log('whereClause', whereClause)
 
