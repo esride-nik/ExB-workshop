@@ -6,7 +6,7 @@ Some Widgets and a theme.
 - [Experience Builder Workshop Extensions Repo](#experience-builder-workshop-extensions-repo)
     - [by Niklas Köhn, Esri Deutschland](#by-niklas-köhn-esri-deutschland)
   - [How to use the samples](#how-to-use-the-samples)
-    - [``npm run install-subfolders``](#npm-run-install-subfolders)
+    - [Install dependencies in subfolders](#install-dependencies-in-subfolders)
     - [Using 3rd party NPM packages in your widgets](#using-3rd-party-npm-packages-in-your-widgets)
     - [Optional: Use the demo app locally](#optional-use-the-demo-app-locally)
     - [Extending built-in widgets by inheritance](#extending-built-in-widgets-by-inheritance)
@@ -25,15 +25,15 @@ Some Widgets and a theme.
 
 ## How to use the samples
 * Clone the sample repo into your Experience Builder Client root folder and restart your watcher.
-* Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run install-subfolders``.
+* Some widgets depend on 3rd party NPM packages, which need to be installed before compiling. These widgets have their own ``package.json`` in their root folder. Either navigate to the particular folders and execute ``npm i`` in there or run the script ``npm run insts``.
 
-### ``npm run install-subfolders``
-* Run ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
-* Run ``npm run install-subfolders -- -af`` to perform an ``npm audit fix`` in the same subfolders.
+### Install dependencies in subfolders
+* Run ``npm run insts`` right in the repository root. This will scan through the widget folders and install all dependencies.
+* Run ``npm run insts -- -af`` to perform an ``npm audit fix`` in the same subfolders.
 
 ### Using 3rd party NPM packages in your widgets
 
-It's a good practice to ``npm init`` within the widget folder and install dependencies there. During development, it will work also with a central ``package.json`` file containing the dependencies for all your widgets (resulting in one single ``node_modules`` folder outside ``widgets``), but fails to resolve dependencies for production use. We'll end up with one ``package.json`` per widget using packages, but that's what ``npm run install-subfolders`` (see above) is for.
+It's a good practice to ``npm init`` within the widget folder and install dependencies there. During development, it will work also with a central ``package.json`` file containing the dependencies for all your widgets (resulting in one single ``node_modules`` folder outside ``widgets``), but fails to resolve dependencies for production use. We'll end up with one ``package.json`` per widget using packages, but that's what ``npm run insts`` (see above) is for.
 For example, when following [this guide](https://doc.arcgis.com/de/experience-builder/11.0/configure-widgets/add-custom-widgets.htm), the ``npm run build:prod`` will not find the installed packages after copying only the subfolder with your widget into ``your-extensions/widgets``.
 
 ### Optional: Use the demo app locally
