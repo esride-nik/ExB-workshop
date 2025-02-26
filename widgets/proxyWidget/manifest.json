@@ -1,0 +1,25 @@
+{
+  "name": "proxyWidget",
+  "label": "Proxy Widget",
+  "type": "widget",
+  "version": "1.14.0",
+  "exbVersion": "1.14.0",
+  "author": "Esri Deutschland GmbH",
+  "description": "Widget ohne UI, das zu einer App hinzugefügt werden kann, wenn ein Proxy benötigt wird.",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "properties": {},
+  "translatedLocales": [
+    "en"
+  ],
+  "defaultSize": {
+    "width": 0,
+    "height": 0
+  },
+  "extensions": [
+    {
+      "point": "APP_CONFIG_PROCESSOR",
+      "uri": "extensions/setProxy"
+    }
+  ]
+}
