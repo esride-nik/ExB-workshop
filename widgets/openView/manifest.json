@@ -1,0 +1,19 @@
+{
+  "name": "openView",
+  "label": "Open View",
+  "type": "widget",
+  "version": "1.16.0",
+  "exbVersion": "1.16.0",
+  "author": "Esri DE",
+  "description": "Öffnet eine View, in der ein bestimmtes Widget liegt.",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "properties": {},
+  "translatedLocales": [
+    "en"
+  ],
+  "defaultSize": {
+    "width": 500,
+    "height": 200
+  }
+}
