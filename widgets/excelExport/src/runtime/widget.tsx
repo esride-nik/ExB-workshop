@@ -1,7 +1,7 @@
 import { React, type AllWidgetProps, Immutable, FormattedMessage } from 'jimu-core'
 import defaultMessages from './translations/default'
 
-import { type JSON2SheetOpts, utils, writeFile } from 'xlsx'
+import ExcelJS from 'exceljs'
 import type Graphic from 'esri/Graphic'
 import type FeatureLayer from 'esri/layers/FeatureLayer'
 import { Button, MultiSelect, type MultiSelectItem } from 'jimu-ui'
@@ -137,16 +137,19 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
   }
 
   private exportExcelFile (wss: WorksheetObject[], filename: any) {
-    const wb = utils.book_new()
-    wss.forEach((wsObject: WorksheetObject) => { utils.book_append_sheet(wb, wsObject.ws, wsObject.wsName.substr(0, 31)) }
-    )
-    writeFile(wb, `${filename}.xlsb`)
+    const wb = new ExcelJS.Workbook()
+    console.log('workbook created', wb)
+    // wss.forEach((wsObject: WorksheetObject) => { utils.book_append_sheet(wb, wsObject.ws, wsObject.wsName.substr(0, 31)) }
+    // )
+    // writeFile(wb, `${filename}.xlsb`)
   }
 
   private createWorksheet (featureAttributes: any[], sheetname: any): WorksheetObject {
-    const newWorksheet = utils.json_to_sheet(featureAttributes, { sheet: sheetname } as JSON2SheetOpts)
+    console.log('createWorksheet')
+    // const newWorksheet = utils.json_to_sheet(featureAttributes, { sheet: sheetname } as JSON2SheetOpts)
     return {
-      ws: newWorksheet,
+      ws: undefined,
+      // ws: newWorksheet,
       wsName: sheetname
     }
   }
