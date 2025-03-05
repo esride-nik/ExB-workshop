@@ -38,7 +38,7 @@ jobs:
         run: cp -r widgets/* exb/ArcGISExperienceBuilder/client/your-extensions/widgets
 
       - name: Install Custom Widgets dependencies
-        run: node npm-install-subfolders.js ./exb/ArcGISExperienceBuilder/client/your-extensions/widgets
+        run: npm run insts --path ./exb/ArcGISExperienceBuilder/client/your-extensions/widgets --af
 
       - name: Create App directory
         run: mkdir public && cd public && mkdir apps && cd apps
