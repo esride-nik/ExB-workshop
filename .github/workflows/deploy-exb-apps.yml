@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download Experience Builder
-        run: curl -o exb.zip "$(curl -s 'https://downloads.arcgis.com/dms/rest/download/secured/arcgis-experience-builder-1.15.zip?f=json&folder=software%2FExperienceBuilder%2F1.15' | python3 -c "import sys, json; print(json.load(sys.stdin)['url'])")"
+        run: curl -o exb.zip "$(curl -s 'https://downloads.arcgis.com/dms/rest/download/secured/arcgis-experience-builder-1.16.zip?f=json&folder=software%2FExperienceBuilder%2F1.16' | python3 -c "import sys, json; print(json.load(sys.stdin)['url'])")"
         # the "classic" way of downloading via "npx arcgis-lib-downloader -p arcgis-experience-builder -v 1.15" doesn't work anymore! :/
         # see this blog article: https://community.esri.com/t5/arcgis-experience-builder-questions/download-experience-builder-via-cmd/td-p/1391180
         # THIS METHOD OF DOWNLOADING EXPERIENCE BUILDER MAY BREAK IF ESRI CHANGES HOW DOWNLOADS WORK IN THE FUTURE.
