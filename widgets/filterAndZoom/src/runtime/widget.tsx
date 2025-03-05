@@ -17,9 +17,13 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
 
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
+    if (!urlParams || !urlParams.get('data_filter')) {
+      console.log('No \'data_filter\' URL parameter found.')
+      return
+    }
     console.log('urlParams', urlParams.get('data_filter'))
     const dataFilter = urlParams.get('data_filter')
-    const dataSourceId = dataFilter.split(':')[0]
+    const dataSourceId = dataFilter?.split(':')[0]
     const whereClause = decodeURI(dataFilter.split(':')[1])
     console.log('dataSourceId', dataSourceId, whereClause)
     console.log('whereClause', whereClause)
