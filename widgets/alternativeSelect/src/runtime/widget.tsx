@@ -108,6 +108,14 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
         executeAttributiveQuery()
       }
     })
+
+    sketch.on('delete', (evt: __esri.SketchDeleteEvent) => {
+      filterGeometry.current = null
+      bufferGraphic.current.geometry = null
+      updateFilter()
+      console.log('sketch delete', evt)
+    })
+
     setSketchWidget(sketch)
 
     bufferGraphicsLayer.current = new GraphicsLayer({ id: 'bufferGraphicsLayer' })
