@@ -16,6 +16,11 @@ const { useState, useRef, useEffect } = React
 export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
+  const sketchGraphicsLayer = useRef<GraphicsLayer>()
+  const bufferGraphicsLayer = useRef<GraphicsLayer>()
+  const bufferGraphic = useRef<Graphic>()
+  const filterGeometry = useRef<Geometry>()
+
   const distanceNum = useRef<Slider>()
   const [featureLayerDataSource, setFeatureLayerDataSource] = useState<FeatureLayerDataSource>(undefined)
   const [featureLayerView, setFeatureLayerView] = useState<FeatureLayerView>(undefined)
@@ -48,35 +53,17 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     }
   }, [jimuMapView, featureLayerDataSource, featureLayerView])
 
-  const sketchGraphicsLayer = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
-  let filterGeometry: Geometry = null
-  const bufferGraphic = new Graphic({
-    geometry: null,
-    symbol: {
-      type: 'simple-fill',
-      color: [51, 51, 204, 0.4],
-      style: 'solid',
-      outline: {
-        color: 'white',
-        width: 1
-      }
-    } as unknown as SimpleFillSymbol
-  })
-  sketchGraphicsLayer.add(bufferGraphic)
-
   const executeAttributiveQuery = async () => {
     const featureLayerDataSource = DataSourceManager.getInstance().getDataSource(props.useDataSources?.[0]?.dataSourceId) as FeatureLayerDataSource
     const fl = featureLayerDataSource.layer
     const flvResults = await fl.queryObjectIds({
-      geometry: bufferGraphic.geometry,
+      geometry: bufferGraphic.current?.geometry,
       spatialRelationship: 'contains'
     })
     const whereClause = `objectid in (${flvResults.map((id: number) => id.toString()).join(',')})`
-    console.log('whereClause', whereClause)
     const dsResult = await featureLayerDataSource.query({
       where: whereClause
     })
-    console.log('dsResult', dsResult)
     const records = dsResult?.records as FeatureDataRecord[]
 
     if (records.length > 0) {
@@ -84,18 +71,19 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     } else {
       featureLayerDataSource.clearSelection()
     }
-    console.log('records selected', records)
   }
 
   const initSketch = () => {
     const container = document.createElement('div')
     apiSketchWidgetContainer.current.appendChild(container)
 
+    sketchGraphicsLayer.current = new GraphicsLayer({ id: 'sketchGraphicsLayer' })
+    jimuMapView.view.map.add(sketchGraphicsLayer.current)
+
     const sketch = new Sketch({
-      layer: sketchGraphicsLayer,
+      layer: sketchGraphicsLayer.current,
       view: jimuMapView.view,
       container: container,
-      // graphic will be selected as soon as it is created
       creationMode: 'update',
       availableCreateTools: ['point', 'polyline'],
       visibleElements: {
@@ -115,14 +103,28 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
 
     sketch.on('create', (evt: __esri.SketchCreateEvent) => {
       if (evt.state === 'complete') {
-        filterGeometry = evt.graphic.geometry as Geometry
+        filterGeometry.current = evt.graphic.geometry as Geometry
         updateBuffer(bufferDistance, 'meters')
         executeAttributiveQuery()
       }
     })
     setSketchWidget(sketch)
 
-    jimuMapView.view.map.add(sketchGraphicsLayer)
+    bufferGraphicsLayer.current = new GraphicsLayer({ id: 'bufferGraphicsLayer' })
+    jimuMapView.view.map.add(bufferGraphicsLayer.current)
+    bufferGraphic.current = new Graphic({
+      geometry: null,
+      symbol: {
+        type: 'simple-fill',
+        color: [51, 51, 204, 0.4],
+        style: 'solid',
+        outline: {
+          color: 'white',
+          width: 1
+        }
+      } as unknown as SimpleFillSymbol
+    })
+    bufferGraphicsLayer.current.add(bufferGraphic.current)
   }
 
   const initSlider = () => {
@@ -157,17 +159,17 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
     // TODO: clean up buffer when removing the Sketch graphic
     if (distance > 0 && filterGeometry) {
-      bufferGraphic.geometry = geometryEngine.geodesicBuffer(filterGeometry, distance, unit) as Polygon
+      bufferGraphic.current.geometry = geometryEngine.geodesicBuffer(filterGeometry.current, distance, unit) as Polygon
       updateFilter()
     } else {
-      bufferGraphic.geometry = null
+      bufferGraphic.current.geometry = null
       updateFilter()
     }
   }
 
   const updateFilter = () => {
     featureFilter = {
-      geometry: filterGeometry,
+      geometry: filterGeometry.current,
       spatialRelationship: 'intersects',
       distance: bufferDistance,
       units: 'meters'
