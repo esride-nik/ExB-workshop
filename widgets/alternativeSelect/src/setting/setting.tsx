@@ -4,8 +4,13 @@ import { MapWidgetSelector } from 'jimu-ui/advanced/setting-components'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { DataSourceSelector } from 'jimu-ui/advanced/data-source-selector'
 import defaultMessages from './translations/default'
+import { NumericInput } from 'jimu-ui'
 
-export default function Setting (props: AllWidgetSettingProps<unknown>): React.ReactElement {
+export interface AlternativeSelectProps {
+  radius: number
+}
+
+export default function Setting (props: AllWidgetSettingProps<AlternativeSelectProps>): React.ReactElement {
   const onMapSelected = (useMapWidgetIds: string[]) => {
     props.onSettingChange({
       id: props.id,
@@ -23,7 +28,17 @@ export default function Setting (props: AllWidgetSettingProps<unknown>): React.R
   const onDataSourceChange = (useDataSources: UseDataSource[]) => {
     props.onSettingChange({
       id: props.id,
-      useDataSources: useDataSources
+      useDataSources
+    })
+  }
+
+  const onRadiusChange = (radius: number) => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        radius
+      }
     })
   }
 
@@ -47,6 +62,7 @@ export default function Setting (props: AllWidgetSettingProps<unknown>): React.R
                     onChange={onDataSourceChange}
                     widgetId={props.id}
                 />
+                <NumericInput onChange={onRadiusChange} value={props.config.radius} precision={0} showHandlers={true} />
             </p>
         </div>
   )

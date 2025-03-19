@@ -9,10 +9,11 @@ import { type Geometry, type Polygon } from 'esri/geometry'
 import { type SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
+import { type AlternativeSelectProps } from '../setting/setting'
 
 const { useState, useRef, useEffect } = React
 
-export default function (props: AllWidgetProps<unknown>) {
+export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const distanceNum = useRef<Slider>()
@@ -66,8 +67,6 @@ export default function (props: AllWidgetProps<unknown>) {
   const executeAttributiveQuery = async () => {
     const featureLayerDataSource = DataSourceManager.getInstance().getDataSource(props.useDataSources?.[0]?.dataSourceId) as FeatureLayerDataSource
     const fl = featureLayerDataSource.layer
-    // const featureLayerView = await jimuMapView.view.whenLayerView(fl)
-    // const flvResults = await featureLayerView.queryFeatures({
     const flvResults = await fl.queryObjectIds({
       geometry: bufferGraphic.geometry,
       spatialRelationship: 'contains'
@@ -131,7 +130,7 @@ export default function (props: AllWidgetProps<unknown>) {
     distanceNum.current = new Slider({
       container: apiSliderWidgetContainer.current,
       min: 0,
-      max: 1000,
+      max: props.config.radius,
       values: [bufferDistance],
       steps: 1,
       visibleElements: {

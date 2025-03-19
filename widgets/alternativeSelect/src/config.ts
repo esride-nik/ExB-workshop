@@ -1,7 +1,7 @@
 import { type ImmutableObject } from 'jimu-core'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Config {
+  radius: number
 }
 
 export type IMConfig = ImmutableObject<Config>
