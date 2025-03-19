@@ -123,12 +123,25 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
       clearSketch()
     })
 
-    reactiveUtils.watch(() => sketch.activeTool, (activeTool) => {
-      console.log('activeTool', activeTool, sketch.state)
-      // if (!activeTool && sketch.state === 'ready') {
-      //   clearSketch()
-      // }
+    sketch.on('update', (evt: __esri.SketchUpdateEvent) => {
+      console.log('udpate', evt, evt.state, evt.tool)
+      // TODO: move sketch and buffer graphics
+      // filterGeometry.current.set( evt.graphics[0].geometry
     })
+
+    // reactiveUtils.watch(() => sketch.activeTool, (activeTool) => {
+    //   console.log('activeTool', activeTool, sketch.state)
+    //   // if (!activeTool && sketch.state === 'ready') {
+    //   //   clearSketch()
+    //   // }
+    // })
+
+    // reactiveUtils.watch(() => featureLayerDataSource.layer., (numberOfSelectedRecords) => {
+    //   console.log('numberOfSelectedRecords', numberOfSelectedRecords)
+    //   // if (!activeTool && sketch.state === 'ready') {
+    //   //   clearSketch()
+    //   // }
+    // })
 
     setSketchWidget(sketch)
 
