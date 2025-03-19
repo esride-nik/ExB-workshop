@@ -10,6 +10,7 @@ import { type SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
 import { type AlternativeSelectProps } from '../setting/setting'
+import * as reactiveUtils from 'esri/core/reactiveUtils'
 
 const { useState, useRef, useEffect } = React
 
@@ -73,6 +74,12 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     }
   }
 
+  const clearSketch = () => {
+    filterGeometry.current = null
+    bufferGraphic.current.geometry = null
+    updateFilter()
+  }
+
   const initSketch = () => {
     const container = document.createElement('div')
     apiSketchWidgetContainer.current.appendChild(container)
@@ -93,7 +100,8 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
           'rectangle-selection': false
         },
         settingsMenu: false,
-        snappingControls: false
+        snappingControls: false,
+        duplicateButton: false
       },
       defaultUpdateOptions: {
         tool: 'move',
@@ -102,7 +110,9 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     })
 
     sketch.on('create', (evt: __esri.SketchCreateEvent) => {
-      if (evt.state === 'complete') {
+      if (evt.state === 'start') {
+        sketchGraphicsLayer.current.removeAll()
+      } else if (evt.state === 'complete') {
         filterGeometry.current = evt.graphic.geometry as Geometry
         updateBuffer(bufferDistance, 'meters')
         executeAttributiveQuery()
@@ -110,10 +120,14 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     })
 
     sketch.on('delete', (evt: __esri.SketchDeleteEvent) => {
-      filterGeometry.current = null
-      bufferGraphic.current.geometry = null
-      updateFilter()
-      console.log('sketch delete', evt)
+      clearSketch()
+    })
+
+    reactiveUtils.watch(() => sketch.activeTool, (activeTool) => {
+      console.log('activeTool', activeTool, sketch.state)
+      // if (!activeTool && sketch.state === 'ready') {
+      //   clearSketch()
+      // }
     })
 
     setSketchWidget(sketch)
