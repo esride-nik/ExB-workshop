@@ -17,12 +17,9 @@
   A copy of the license is available in the repository's
   LICENSE file.
 */
-import { ImmutableObject } from 'jimu-core'
+import { type ImmutableObject } from 'jimu-core'
 
-export interface Config {
-  w3wApiKey: string
-  w3wOnMap: boolean
-  showW3wSquare: boolean
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Config {}
 
 export type IMConfig = ImmutableObject<Config>
