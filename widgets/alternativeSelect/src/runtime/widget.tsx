@@ -106,6 +106,10 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
         },
         settingsMenu: false,
         snappingControls: false
+      },
+      defaultUpdateOptions: {
+        tool: 'move',
+        toggleToolOnClick: false
       }
     })
 
