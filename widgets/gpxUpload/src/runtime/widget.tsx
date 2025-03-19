@@ -72,7 +72,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const addTrackToMap = (esriFeatures: Graphic[]) => {
     gpxLayer = new GraphicsLayer({
-      listMode: 'show',
+      listMode: 'hide',
       id: 'gpxLineString'
     })
     gpxLayer.addMany(esriFeatures)

@@ -3,7 +3,7 @@ import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource, ty
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
-import geometryEngine from 'esri/geometry/geometryEngine'
+import * as geometryEngine from 'esri/geometry/geometryEngine'
 import Graphic from 'esri/Graphic'
 import { type Geometry, type Polygon } from 'esri/geometry'
 import { type SimpleFillSymbol } from 'esri/symbols'

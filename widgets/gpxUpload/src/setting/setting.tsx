@@ -64,7 +64,7 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
                 })}>
                 <SettingRow>
                   <DataSourceSelector
-                      types={Immutable([AllDataSourceTypes.FeatureLayer])}
+                      types={Immutable.default([AllDataSourceTypes.FeatureLayer])}
                       useDataSources={props.useDataSources}
                       useDataSourcesEnabled={props.useDataSourcesEnabled}
                       onToggleUseDataEnabled={onToggleUseDataEnabled}
@@ -79,7 +79,7 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
                     <FieldSelector
                       useDataSources={props.useDataSources}
                       onChange={onFieldChange}
-                      selectedFields={props.useDataSources[0].fields || Immutable([])}
+                      selectedFields={props.useDataSources[0].fields || Immutable.default([])}
                     />
                   }
                 </SettingRow>
