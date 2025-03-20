@@ -10,7 +10,7 @@ import { type SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
 import { type AlternativeSelectProps } from '../setting/setting'
-import * as reactiveUtils from 'esri/core/reactiveUtils'
+import './alternativeSelect.css'
 
 const { useState, useRef, useEffect } = React
 
@@ -18,9 +18,9 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const sketchGraphicsLayer = useRef<GraphicsLayer>()
+  const sketchGeometry = useRef<Geometry>()
   const bufferGraphicsLayer = useRef<GraphicsLayer>()
   const bufferGraphic = useRef<Graphic>()
-  const filterGeometry = useRef<Geometry>()
 
   const distanceNum = useRef<Slider>()
   const [featureLayerDataSource, setFeatureLayerDataSource] = useState<FeatureLayerDataSource>(undefined)
@@ -75,8 +75,11 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   }
 
   const clearSketch = () => {
-    filterGeometry.current = null
+    // buffer graphic is drawn manually and disapperas when geometry is set to null
     bufferGraphic.current.geometry = null
+    // sketch graphic is maintained by Sketch widget and stays on screen if not explicitely removed
+    sketchGeometry.current = null
+    sketchGraphicsLayer.current.removeAll()
     updateFilter()
   }
 
@@ -101,9 +104,10 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
         },
         settingsMenu: false,
         snappingControls: false,
-        duplicateButton: false,
-        deleteButton: false,
-        selectionCountLabel: false
+        duplicateButton: false
+        // these are documented for JSSDK 4.32 but don't work in JSSDK 4.31 => elements hidden via CSS
+        // deleteButton: false,
+        // selectionCountLabel: false
       },
       defaultUpdateOptions: {
         tool: 'move',
@@ -112,11 +116,9 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     })
 
     sketch.on('create', (evt: __esri.SketchCreateEvent) => {
-      if (evt.state === 'start') {
-        sketchGraphicsLayer.current.removeAll()
-      } else if (evt.state === 'complete') {
+      if (evt.state === 'complete') {
         // draw initial sketch and buffer graphics
-        filterGeometry.current = evt.graphic.geometry as Geometry
+        sketchGeometry.current = evt.graphic.geometry as Geometry
         updateBuffer(bufferDistance, 'meters')
         executeAttributiveQuery()
       }
@@ -127,27 +129,16 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     })
 
     sketch.on('update', (evt: __esri.SketchUpdateEvent) => {
-      if (evt.tool === 'move') {
+      if (evt.state === 'active' && evt.tool === 'move') {
         // move sketch and buffer graphics
-        filterGeometry.current = evt.graphics[0].geometry as Geometry
+        sketchGeometry.current = evt.graphics[0].geometry as Geometry
         updateBuffer(bufferDistance, 'meters')
         executeAttributiveQuery()
+      } else if (evt.state === 'complete') {
+        // clear sketch and buffer graphics when tool or selection arrow in Sketch widget are clicked
+        clearSketch()
       }
     })
-
-    reactiveUtils.watch(() => sketch.activeTool, (activeTool) => {
-      console.log('activeTool', activeTool, sketch.state, sketch)
-      // if (!activeTool && sketch.state === 'ready') {
-      //   clearSketch()
-      // }
-    })
-
-    // reactiveUtils.watch(() => featureLayerDataSource.layer., (numberOfSelectedRecords) => {
-    //   console.log('numberOfSelectedRecords', numberOfSelectedRecords)
-    //   // if (!activeTool && sketch.state === 'ready') {
-    //   //   clearSketch()
-    //   // }
-    // })
 
     setSketchWidget(sketch)
 
@@ -199,8 +190,8 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   // update the buffer graphic if user is filtering by distance
   const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
     // TODO: clean up buffer when removing the Sketch graphic
-    if (distance > 0 && filterGeometry) {
-      bufferGraphic.current.geometry = geometryEngine.geodesicBuffer(filterGeometry.current, distance, unit) as Polygon
+    if (distance > 0 && sketchGeometry) {
+      bufferGraphic.current.geometry = geometryEngine.geodesicBuffer(sketchGeometry.current, distance, unit) as Polygon
       updateFilter()
     } else {
       bufferGraphic.current.geometry = null
@@ -210,7 +201,7 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
 
   const updateFilter = () => {
     featureFilter = {
-      geometry: filterGeometry.current,
+      geometry: sketchGeometry.current,
       spatialRelationship: 'intersects',
       distance: bufferDistance,
       units: 'meters'
