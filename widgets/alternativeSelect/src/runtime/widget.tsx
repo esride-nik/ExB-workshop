@@ -101,7 +101,9 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
         },
         settingsMenu: false,
         snappingControls: false,
-        duplicateButton: false
+        duplicateButton: false,
+        deleteButton: false,
+        selectionCountLabel: false
       },
       defaultUpdateOptions: {
         tool: 'move',
@@ -113,6 +115,7 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
       if (evt.state === 'start') {
         sketchGraphicsLayer.current.removeAll()
       } else if (evt.state === 'complete') {
+        // draw initial sketch and buffer graphics
         filterGeometry.current = evt.graphic.geometry as Geometry
         updateBuffer(bufferDistance, 'meters')
         executeAttributiveQuery()
@@ -124,17 +127,20 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     })
 
     sketch.on('update', (evt: __esri.SketchUpdateEvent) => {
-      console.log('udpate', evt, evt.state, evt.tool)
-      // TODO: move sketch and buffer graphics
-      // filterGeometry.current.set( evt.graphics[0].geometry
+      if (evt.tool === 'move') {
+        // move sketch and buffer graphics
+        filterGeometry.current = evt.graphics[0].geometry as Geometry
+        updateBuffer(bufferDistance, 'meters')
+        executeAttributiveQuery()
+      }
     })
 
-    // reactiveUtils.watch(() => sketch.activeTool, (activeTool) => {
-    //   console.log('activeTool', activeTool, sketch.state)
-    //   // if (!activeTool && sketch.state === 'ready') {
-    //   //   clearSketch()
-    //   // }
-    // })
+    reactiveUtils.watch(() => sketch.activeTool, (activeTool) => {
+      console.log('activeTool', activeTool, sketch.state, sketch)
+      // if (!activeTool && sketch.state === 'ready') {
+      //   clearSketch()
+      // }
+    })
 
     // reactiveUtils.watch(() => featureLayerDataSource.layer., (numberOfSelectedRecords) => {
     //   console.log('numberOfSelectedRecords', numberOfSelectedRecords)
