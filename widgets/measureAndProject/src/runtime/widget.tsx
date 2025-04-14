@@ -3,42 +3,35 @@ import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import { useEffect, useRef, useState } from 'react'
 import Measurement from '@arcgis/core/widgets/Measurement.js'
-import * as reactiveUtils from '@arcgis/core/core/reactiveUtils.js'
+import { type Point } from 'esri/geometry'
 
 import './measureAndProject.css'
 
 export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
-  const [linearUnit, setLinearUnit] = useState<__esri.SystemOrLengthUnit>(undefined)
-  const [areaUnit, setAreaUnit] = useState<__esri.SystemOrAreaUnit>(undefined)
+  const [screenPoint, setScreenPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const measurementWidgetNode = useRef(null)
+  const measurementPositionNode = useRef(null)
 
   useEffect(() => {
     if (jimuMapView) {
       const measurement = new Measurement({
         view: jimuMapView.view,
-        // activeWidget: 'distance',
         container: measurementWidgetNode.current
       })
       setMeasurementWidget(measurement)
-      setLinearUnit(measurement.linearUnit)
-      setAreaUnit(measurement.areaUnit)
-    }
-  }, [jimuMapView])
 
-  useEffect(() => {
-    if (measurementWidget) {
-      setLinearUnit(measurementWidget.linearUnit)
-      setAreaUnit(measurementWidget.areaUnit)
-
-      // TODO: needed?
-      reactiveUtils.watch(() => measurementWidget.activeTool, (newValue: any) => {
-        setActiveTool(newValue)
+      jimuMapView.view.on('pointer-move', (event: any) => {
+        const screenPoint = jimuMapView.view.toMap({
+          x: event.x,
+          y: event.y
+        })
+        setScreenPoint(screenPoint)
       })
     }
-  }, [measurementWidget])
+  }, [jimuMapView])
 
   const isConfigured = () => {
     return props.useMapWidgetIds?.length > 0
@@ -66,6 +59,7 @@ export default function (props: AllWidgetProps<unknown>) {
                 if (measurementWidget) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = 'distance'
+                  setActiveTool('distance')
                 }
               }}
             ></button>
@@ -77,6 +71,7 @@ export default function (props: AllWidgetProps<unknown>) {
                 if (measurementWidget) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = 'area'
+                  setActiveTool('area')
                 }
               }}
             ></button>
@@ -88,6 +83,7 @@ export default function (props: AllWidgetProps<unknown>) {
                 if (measurementWidget) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = undefined
+                  setActiveTool('position')
                 }
               }}
             ></button>
@@ -98,12 +94,16 @@ export default function (props: AllWidgetProps<unknown>) {
               onClick={() => {
                 if (measurementWidget) {
                   measurementWidget.clear()
+                  setActiveTool('none')
                 }
               }}
             ></button>
           </div>
 
           <div id="measurementWidget" ref={measurementWidgetNode} />
+          { activeTool === 'position' && <div id="measurementPosition" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
+            {screenPoint?.latitude} {screenPoint?.longitude}
+          </div>}
 
           <div id="selectsrs" style={{ visibility: 'hidden' }}>
             <div style={{ marginLeft: '30px' }}>
