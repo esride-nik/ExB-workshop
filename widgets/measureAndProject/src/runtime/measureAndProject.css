@@ -1,0 +1,10 @@
+#toolbarDiv {
+    display: inline-flex;
+    background: none;
+    position: relative;
+}
+
+#toolbarDiv button {
+    border: 1px solid #555;
+    margin: 3px;
+}

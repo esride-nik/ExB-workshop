@@ -1,4 +1,8 @@
 System.register([], function (_export) {return {execute: function () {_export({
   _widgetLabel: 'Messen und Projizieren',
-  cfgDataSources: 'Bitte Datenquellen konfigurieren'
+  cfgDataSources: 'Bitte Datenquellen konfigurieren',
+  distanceMeasurementTool: 'Distanzmessung',
+  areaMeasurementTool: 'Flächenmessung',
+  positionTool: 'Position',
+  clearMeasurements: 'Messungen löschen'
 })}}});
