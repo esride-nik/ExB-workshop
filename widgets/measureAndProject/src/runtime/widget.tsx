@@ -1,12 +1,14 @@
 import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
+import { Label, Radio } from 'jimu-ui'
 import defaultMessages from './translations/default'
 import { useEffect, useRef, useState } from 'react'
 import Measurement from '@arcgis/core/widgets/Measurement.js'
-import { type Point } from 'esri/geometry'
+import * as projection from '@arcgis/core/geometry/projection.js'
+import { SpatialReference, type Point } from 'esri/geometry'
+import * as reactiveUtils from 'esri/core/reactiveUtils.js'
 
 import './measureAndProject.css'
-import { Label, Radio } from 'jimu-ui'
 
 enum allowedSrs {
   EPSG25832 = 25832,
@@ -25,6 +27,10 @@ export default function (props: AllWidgetProps<unknown>) {
   const measurementPositionNode = useRef(null)
 
   useEffect(() => {
+    projection.load()
+  }, [])
+
+  useEffect(() => {
     if (jimuMapView) {
       const measurement = new Measurement({
         view: jimuMapView.view,
@@ -39,6 +45,12 @@ export default function (props: AllWidgetProps<unknown>) {
         })
         setScreenPoint(screenPoint)
       })
+
+      // in case of lost WebGL context
+      reactiveUtils.when(
+        () => jimuMapView.view.fatalError,
+        () => { jimuMapView.view.tryFatalErrorRecovery() }
+      )
     }
   }, [jimuMapView])
 
@@ -50,6 +62,29 @@ export default function (props: AllWidgetProps<unknown>) {
     if (jmv) {
       setJimuMapView(jmv)
     }
+  }
+
+  const projectPoint = (point: Point, epsg: number): Point => {
+    if (!point) return
+
+    // const projectedPoint = projectOperator.execute(point, )
+
+    const geogtran = projection.getTransformation(point?.spatialReference, new SpatialReference({
+      wkid: epsg
+    }))
+    console.log('geogtran', geogtran)
+
+    const geogtrans = projection.getTransformations(point?.spatialReference, new SpatialReference({
+      wkid: epsg
+    }))
+    console.log('geogtrans', geogtrans)
+    // geogtrans.forEach(function(geogtran, index) {
+    //   geogtran.steps.forEach(function(step, index) {
+    //     console.log("step wkid: ", step.wkid);
+    //   })
+    // })
+
+    return point
   }
 
   if (!isConfigured()) {
@@ -117,7 +152,7 @@ export default function (props: AllWidgetProps<unknown>) {
               srs === allowedSrs.EPSG4326
                 ? screenPoint?.latitude.toFixed(2)
                 : srs === allowedSrs.EPSG25832
-                  ? 'IMPLEMENT PROJECTION'
+                  ? projectPoint(screenPoint, allowedSrs.EPSG25832)?.latitude.toFixed(2)
                   : 'IMPLEMENT'}</p>
             </div>
             <div id="markerLongitude" className="esri-measurement-position-number">
@@ -126,7 +161,7 @@ export default function (props: AllWidgetProps<unknown>) {
               srs === allowedSrs.EPSG4326
                 ? screenPoint?.longitude.toFixed(2)
                 : srs === allowedSrs.EPSG25832
-                  ? 'IMPLEMENT PROJECTION'
+                  ? projectPoint(screenPoint, allowedSrs.EPSG25832)?.longitude.toFixed(2)
                   : 'IMPLEMENT'}</p>
             </div>
             <div className="esri-measurement-selectsrs">
