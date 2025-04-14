@@ -6,12 +6,14 @@ import Measurement from '@arcgis/core/widgets/Measurement.js'
 import { type Point } from 'esri/geometry'
 
 import './measureAndProject.css'
+import { Label, Radio } from 'jimu-ui'
 
 export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [screenPoint, setScreenPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
+  const [srs, setSrs] = useState<string>('25832')
   const measurementWidgetNode = useRef(null)
   const measurementPositionNode = useRef(null)
 
@@ -102,21 +104,49 @@ export default function (props: AllWidgetProps<unknown>) {
 
           <div id="measurementWidget" ref={measurementWidgetNode} />
           { activeTool === 'position' && <div id="measurementPosition" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
-            {screenPoint?.latitude} {screenPoint?.longitude}
-          </div>}
-
-          <div id="selectsrs" style={{ visibility: 'hidden' }}>
-            <div style={{ marginLeft: '30px' }}>
-              <input type="radio" id="LS310" name="etrs" value="25832" checked />
-              <label id="LS310_Label" htmlFor="LS310">LS310 in Meter (ETRS 89)</label><br />
-              <input type="radio" id="LS320" name="etrs" value="8395" />
-              <label id="LS320_Label" htmlFor="LS320"> LS320 in Meter (nur gültig in Hamburg)</label><br />
-              <input type="radio" id="GRAD" name="etrs" value="4326" />
-              <label htmlFor="GRAD"> Dezimalgrad</label><br />
-              <input type="radio" id="DMS" name="etrs" value="0" />
-              <label htmlFor="DMS"> Grad, Minute, Sekunde</label>
+            <div id="markerLatitude" className="esri-measurement-position-number">
+              <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
+              <p>{screenPoint?.latitude}</p>
             </div>
-          </div>
+            <div id="markerLongitude" className="esri-measurement-position-number">
+              <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
+              <p>{screenPoint?.longitude}</p>
+            </div>
+            <div className="esri-measurement-selectsrs">
+              <Label centric className='esri-measurement-selectsrs-radio'>
+                <Radio
+                  checked={srs === '25832'}
+                  id="LS310" value="25832"
+                  onChange={() => { setSrs('25832') }}
+                />{' '}
+                <FormattedMessage id="srs25832" defaultMessage={defaultMessages.srs25832} />
+              </Label>
+              <Label centric className='esri-measurement-selectsrs-radio'>
+                <Radio
+                  checked={srs === '8395'}
+                  id="LS320" value="8395"
+                  onChange={() => { setSrs('8395') }}
+                />{' '}
+                <FormattedMessage id="srs8395" defaultMessage={defaultMessages.srs8395} />
+              </Label>
+              <Label centric className='esri-measurement-selectsrs-radio'>
+                <Radio
+                  checked={srs === '4326'}
+                  id="GRAD" value="4326"
+                  onChange={() => { setSrs('4326') }}
+                />{' '}
+                <FormattedMessage id="srs4326" defaultMessage={defaultMessages.srs4326} />
+              </Label>
+              <Label centric className='esri-measurement-selectsrs-radio'>
+                <Radio
+                  checked={srs === '0'}
+                  id="DMS" value="0"
+                  onChange={() => { setSrs('0') }}
+                />{' '}
+                <FormattedMessage id="srs0" defaultMessage={defaultMessages.srs0} />
+              </Label>
+            </div>
+          </div>}
 
           <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
         </div>

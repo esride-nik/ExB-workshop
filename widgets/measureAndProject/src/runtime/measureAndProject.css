@@ -8,3 +8,16 @@
     border: 1px solid #555;
     margin: 3px;
 }
+
+.esri-measurement-position-number {
+    width: 50%;
+    display: inline-block;
+}
+
+.esri-measurement-selectsrs {
+    margin: 10px;
+}
+
+.esri-measurement-selectsrs-radio {
+    display:block;
+}
