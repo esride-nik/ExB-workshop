@@ -8,12 +8,19 @@ import { type Point } from 'esri/geometry'
 import './measureAndProject.css'
 import { Label, Radio } from 'jimu-ui'
 
+enum allowedSrs {
+  EPSG25832 = 25832,
+  EPSG8395 = 8395,
+  EPSG4326 = 4326,
+  EPSG0 = 0
+}
+
 export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [screenPoint, setScreenPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
-  const [srs, setSrs] = useState<string>('25832')
+  const [srs, setSrs] = useState<allowedSrs>(25832)
   const measurementWidgetNode = useRef(null)
   const measurementPositionNode = useRef(null)
 
@@ -115,33 +122,33 @@ export default function (props: AllWidgetProps<unknown>) {
             <div className="esri-measurement-selectsrs">
               <Label centric className='esri-measurement-selectsrs-radio'>
                 <Radio
-                  checked={srs === '25832'}
+                  checked={srs === allowedSrs.EPSG25832}
                   id="LS310" value="25832"
-                  onChange={() => { setSrs('25832') }}
+                  onChange={() => { setSrs(allowedSrs.EPSG25832) }}
                 />{' '}
                 <FormattedMessage id="srs25832" defaultMessage={defaultMessages.srs25832} />
               </Label>
               <Label centric className='esri-measurement-selectsrs-radio'>
                 <Radio
-                  checked={srs === '8395'}
+                  checked={srs === allowedSrs.EPSG8395}
                   id="LS320" value="8395"
-                  onChange={() => { setSrs('8395') }}
+                  onChange={() => { setSrs(allowedSrs.EPSG8395) }}
                 />{' '}
                 <FormattedMessage id="srs8395" defaultMessage={defaultMessages.srs8395} />
               </Label>
               <Label centric className='esri-measurement-selectsrs-radio'>
                 <Radio
-                  checked={srs === '4326'}
+                  checked={srs === allowedSrs.EPSG4326}
                   id="GRAD" value="4326"
-                  onChange={() => { setSrs('4326') }}
+                  onChange={() => { setSrs(allowedSrs.EPSG4326) }}
                 />{' '}
                 <FormattedMessage id="srs4326" defaultMessage={defaultMessages.srs4326} />
               </Label>
               <Label centric className='esri-measurement-selectsrs-radio'>
                 <Radio
-                  checked={srs === '0'}
+                  checked={srs === allowedSrs.EPSG0}
                   id="DMS" value="0"
-                  onChange={() => { setSrs('0') }}
+                  onChange={() => { setSrs(allowedSrs.EPSG0) }}
                 />{' '}
                 <FormattedMessage id="srs0" defaultMessage={defaultMessages.srs0} />
               </Label>
