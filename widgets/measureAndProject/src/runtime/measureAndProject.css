@@ -9,6 +9,10 @@
     margin: 3px;
 }
 
+.esri-measurement-position {
+    padding: 5px;
+}
+
 .esri-measurement-position-number {
     width: 50%;
     display: inline-block;

@@ -113,11 +113,21 @@ export default function (props: AllWidgetProps<unknown>) {
           { activeTool === 'position' && <div id="measurementPosition" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
             <div id="markerLatitude" className="esri-measurement-position-number">
               <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
-              <p>{screenPoint?.latitude}</p>
+              <p>{
+              srs === allowedSrs.EPSG4326
+                ? screenPoint?.latitude.toFixed(2)
+                : srs === allowedSrs.EPSG25832
+                  ? 'IMPLEMENT PROJECTION'
+                  : 'IMPLEMENT'}</p>
             </div>
             <div id="markerLongitude" className="esri-measurement-position-number">
               <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
-              <p>{screenPoint?.longitude}</p>
+              <p>{
+              srs === allowedSrs.EPSG4326
+                ? screenPoint?.longitude.toFixed(2)
+                : srs === allowedSrs.EPSG25832
+                  ? 'IMPLEMENT PROJECTION'
+                  : 'IMPLEMENT'}</p>
             </div>
             <div className="esri-measurement-selectsrs">
               <Label centric className='esri-measurement-selectsrs-radio'>
