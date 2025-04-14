@@ -20,7 +20,7 @@ enum allowedSrs {
 export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
-  const [screenPoint, setScreenPoint] = useState<Point>(undefined)
+  const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
   const measurementWidgetNode = useRef(null)
@@ -39,11 +39,11 @@ export default function (props: AllWidgetProps<unknown>) {
       setMeasurementWidget(measurement)
 
       jimuMapView.view.on('pointer-move', (event: any) => {
-        const screenPoint = jimuMapView.view.toMap({
+        const mouseMapPoint = jimuMapView.view.toMap({
           x: event.x,
           y: event.y
         })
-        setScreenPoint(screenPoint)
+        setMouseMapPoint(mouseMapPoint)
       })
 
       // in case of lost WebGL context
@@ -66,25 +66,12 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const projectPoint = (point: Point, epsg: number): Point => {
     if (!point) return
-
-    // const projectedPoint = projectOperator.execute(point, )
-
-    const geogtran = projection.getTransformation(point?.spatialReference, new SpatialReference({
+    const outSr = new SpatialReference({
       wkid: epsg
-    }))
-    console.log('geogtran', geogtran)
-
-    const geogtrans = projection.getTransformations(point?.spatialReference, new SpatialReference({
-      wkid: epsg
-    }))
-    console.log('geogtrans', geogtrans)
-    // geogtrans.forEach(function(geogtran, index) {
-    //   geogtran.steps.forEach(function(step, index) {
-    //     console.log("step wkid: ", step.wkid);
-    //   })
-    // })
-
-    return point
+    })
+    const geogtran = projection.getTransformation(point?.spatialReference, outSr)
+    const projectedPoint = projection.project(point, outSr, geogtran)
+    return projectedPoint as Point
   }
 
   if (!isConfigured()) {
@@ -150,18 +137,18 @@ export default function (props: AllWidgetProps<unknown>) {
               <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
               <p>{
               srs === allowedSrs.EPSG4326
-                ? screenPoint?.latitude.toFixed(2)
+                ? mouseMapPoint?.y.toFixed(2)
                 : srs === allowedSrs.EPSG25832
-                  ? projectPoint(screenPoint, allowedSrs.EPSG25832)?.latitude.toFixed(2)
+                  ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.y.toFixed(2)
                   : 'IMPLEMENT'}</p>
             </div>
             <div id="markerLongitude" className="esri-measurement-position-number">
               <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
               <p>{
               srs === allowedSrs.EPSG4326
-                ? screenPoint?.longitude.toFixed(2)
+                ? mouseMapPoint?.x.toFixed(2)
                 : srs === allowedSrs.EPSG25832
-                  ? projectPoint(screenPoint, allowedSrs.EPSG25832)?.longitude.toFixed(2)
+                  ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
                   : 'IMPLEMENT'}</p>
             </div>
             <div className="esri-measurement-selectsrs">
