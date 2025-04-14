@@ -7,7 +7,7 @@ export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
 
   const isConfigured = () => {
-    return true // TODO: fill when settings page is done // props.useDataSourcesEnabled && props.useDataSources?.length > 0 && props.useMapWidgetIds?.length > 0
+    return props.useMapWidgetIds?.length > 0
   }
 
   const onActiveViewChange = async (jmv: JimuMapView) => {
