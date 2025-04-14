@@ -25,14 +25,6 @@ export default function (props: AllWidgetProps<unknown>) {
       setMeasurementWidget(measurement)
       setLinearUnit(measurement.linearUnit)
       setAreaUnit(measurement.areaUnit)
-
-      // TODO: units on Measuremant are not watchable
-      // measurement.watch('linearUnit', (newValue: __esri.SystemOrLengthUnit) => {
-      //   setLinearUnit(newValue)
-      // })
-      // measurement.watch('areaUnit', (newValue: __esri.SystemOrAreaUnit) => {
-      //   setAreaUnit(newValue)
-      // })
     }
   }, [jimuMapView])
 
@@ -41,13 +33,9 @@ export default function (props: AllWidgetProps<unknown>) {
       setLinearUnit(measurementWidget.linearUnit)
       setAreaUnit(measurementWidget.areaUnit)
 
+      // TODO: needed?
       reactiveUtils.watch(() => measurementWidget.activeTool, (newValue: any) => {
         setActiveTool(newValue)
-      })
-
-      // TODO: reactiveUtils.watch() doesn't work with units on Measuremant
-      reactiveUtils.watch(() => measurementWidget.areaUnit, (newValue: __esri.SystemOrAreaUnit) => {
-        setAreaUnit(newValue)
       })
     }
   }, [measurementWidget])
@@ -128,12 +116,6 @@ export default function (props: AllWidgetProps<unknown>) {
               <input type="radio" id="DMS" name="etrs" value="0" />
               <label htmlFor="DMS"> Grad, Minute, Sekunde</label>
             </div>
-          </div>
-
-          <div><h1>MONITORING</h1>
-            <p>{linearUnit}</p>
-            <p>{areaUnit}</p>
-            <p>{activeTool}</p>
           </div>
 
           <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
