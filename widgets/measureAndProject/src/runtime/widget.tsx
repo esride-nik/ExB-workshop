@@ -7,6 +7,8 @@ import Measurement from '@arcgis/core/widgets/Measurement.js'
 import * as projection from '@arcgis/core/geometry/projection.js'
 import { SpatialReference, type Point } from 'esri/geometry'
 import * as reactiveUtils from 'esri/core/reactiveUtils.js'
+import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.js'
+import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtils.js'
 
 import './measureAndProject.css'
 
@@ -28,6 +30,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   useEffect(() => {
     projection.load()
+    coordinateFormatter.load()
   }, [])
 
   useEffect(() => {
@@ -72,6 +75,12 @@ export default function (props: AllWidgetProps<unknown>) {
     const geogtran = projection.getTransformation(point?.spatialReference, outSr)
     const projectedPoint = projection.project(point, outSr, geogtran)
     return projectedPoint as Point
+  }
+
+  const formatPointAsDms = (point: Point): string => {
+    if (!point) return
+    const geoPoint = webMercatorUtils.webMercatorToGeographic(point) as Point
+    return coordinateFormatter.toLatitudeLongitude(geoPoint, 'dms', 2)
   }
 
   if (!isConfigured()) {
@@ -136,20 +145,24 @@ export default function (props: AllWidgetProps<unknown>) {
             <div id="markerLatitude" className="esri-measurement-position-number">
               <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
               <p>{
-              srs === allowedSrs.EPSG4326
+              srs === allowedSrs.EPSG4326 // decimal degrees
                 ? mouseMapPoint?.y.toFixed(2)
-                : srs === allowedSrs.EPSG25832
+                : srs === allowedSrs.EPSG25832 // LS310
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.y.toFixed(2)
-                  : 'IMPLEMENT'}</p>
+                  : srs === allowedSrs.EPSG8395 // LS320
+                    ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.y.toFixed(2) // degrees minutes seconds
+                    : formatPointAsDms(mouseMapPoint)?.split('N')[0]?.concat('N')}</p>
             </div>
             <div id="markerLongitude" className="esri-measurement-position-number">
               <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
               <p>{
-              srs === allowedSrs.EPSG4326
+              srs === allowedSrs.EPSG4326 // decimal degrees
                 ? mouseMapPoint?.x.toFixed(2)
-                : srs === allowedSrs.EPSG25832
+                : srs === allowedSrs.EPSG25832 // LS310
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
-                  : 'IMPLEMENT'}</p>
+                  : srs === allowedSrs.EPSG8395 // LS320
+                    ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2) // degrees minutes seconds
+                    : formatPointAsDms(mouseMapPoint)?.split('N ')[1]}</p>
             </div>
             <div className="esri-measurement-selectsrs">
               <Label centric className='esri-measurement-selectsrs-radio'>
