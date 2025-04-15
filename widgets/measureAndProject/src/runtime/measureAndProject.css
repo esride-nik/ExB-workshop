@@ -25,3 +25,7 @@
 .esri-measurement-selectsrs-radio {
     display:block;
 }
+
+.esri-measurement-widget-content__measurement-item__value {
+    display: none;
+}

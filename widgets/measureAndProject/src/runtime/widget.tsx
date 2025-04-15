@@ -100,6 +100,38 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = 'distance'
                   setActiveTool('distance')
+                  measurementWidget.viewModel.watch('state', (state: string) => {
+                    if (state === 'measuring') {
+                      (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: string) => {
+                        if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] || !m) return
+
+                        const element = document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement
+                        let duplicate
+                        if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value-rounded')[0]) {
+                          duplicate = element.cloneNode(true) as HTMLElement
+                          duplicate.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+                          element.parentNode.insertBefore(duplicate, element.nextSibling)
+                        } else {
+                          duplicate = document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value-rounded')[0] as HTMLElement
+                        }
+
+                        const mRound = (Math.round(m.length * 2) / 2)
+                        const measurementInnerText = element.innerText
+                        const measurementParts = measurementInnerText.split(/ /)
+                        measurementParts[0] = measurementParts[1] === 'km' ? (mRound / 1000).toFixed(2) : mRound.toFixed(1)
+                        duplicate.innerText = measurementParts.join(' ')
+                      })
+                    } else if (state === 'measured') {
+                      const measurementInnerText = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)?.innerText
+                      const measurementParts = measurementInnerText.split(/ /)
+                      const measurementValue = parseFloat(measurementParts[0])
+                      const measurementValueRound = (Math.round(measurementValue * 2) / 2).toFixed(1)
+                      measurementParts[0] = measurementValueRound;
+                      (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement).innerText = measurementParts.join(' ')
+                    } else {
+                      console.log('distance ' + measurementWidget.viewModel.state, document.getElementsByClassName('esri-measurement-widget-content__measurement'))
+                    }
+                  })
                 }
               }}
             ></button>
@@ -112,6 +144,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
+                  console.log('area', document.getElementsByClassName('esri-measurement-widget-content__measurement'))
                 }
               }}
             ></button>
@@ -124,6 +157,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = undefined
                   setActiveTool('position')
+                  console.log('position', document.getElementsByClassName('esri-measurement-widget-content__measurement'))
                 }
               }}
             ></button>
