@@ -102,6 +102,8 @@ export default function (props: AllWidgetProps<unknown>) {
                   setActiveTool('distance')
                   measurementWidget.viewModel.watch('state', (state: string) => {
                     if (state === 'measuring') {
+                      // TODO: Question: the WAB widget had a dropdown to select km/m => the ExB widget shows meters < 3000m and km above. is this whole effort even necessary?
+                      // TODO: extract to function
                       (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: string) => {
                         if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] || !m) return
 
@@ -122,6 +124,7 @@ export default function (props: AllWidgetProps<unknown>) {
                         duplicate.innerText = measurementParts.join(' ')
                       })
                     } else if (state === 'measured') {
+                      // TODO: rounded result has been calculated in "measuring" => correct here
                       const measurementInnerText = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)?.innerText
                       const measurementParts = measurementInnerText.split(/ /)
                       const measurementValue = parseFloat(measurementParts[0])
@@ -145,11 +148,12 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
                   console.log('area', document.getElementsByClassName('esri-measurement-widget-content__measurement'))
+                  // TODO: round result
                 }
               }}
             ></button>
             <button
-              id="area"
+              id="position"
               className="esri-widget--button esri-interactive esri-icon-map-pin"
               title={defaultMessages.positionTool}
               onClick={() => {
@@ -158,6 +162,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.activeTool = undefined
                   setActiveTool('position')
                   console.log('position', document.getElementsByClassName('esri-measurement-widget-content__measurement'))
+                  // TODO: draw point on GraphicsLayer on click event
                 }
               }}
             ></button>
