@@ -83,6 +83,16 @@ export default function (props: AllWidgetProps<unknown>) {
     return coordinateFormatter.toLatitudeLongitude(geoPoint, 'dms', 2)
   }
 
+  const getDmsLatitude = (point: Point): string => {
+    if (!point) return
+    return formatPointAsDms(mouseMapPoint)?.split('N')[0]?.concat('N')
+  }
+
+  const getDmsLongitude = (point: Point): string => {
+    if (!point) return
+    return formatPointAsDms(mouseMapPoint)?.split('N ')[1]
+  }
+
   const formatPointAsDecimalDegrees = (point: Point): Point => {
     if (!point) return
     return webMercatorUtils.webMercatorToGeographic(point) as Point
@@ -195,7 +205,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.y.toFixed(2)
                   : srs === allowedSrs.EPSG8395 // LS320
                     ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.y.toFixed(2)
-                    : formatPointAsDms(mouseMapPoint)?.split('N')[0]?.concat('N') // degrees minutes seconds
+                    : getDmsLatitude(mouseMapPoint) // degrees minutes seconds latitude
                 }</p>
             </div>
             <div id="markerLongitude" className="esri-measurement-position-number">
@@ -207,7 +217,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
                   : srs === allowedSrs.EPSG8395 // LS320
                     ? `3${projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2)}`
-                    : formatPointAsDms(mouseMapPoint)?.split('N ')[1] // degrees minutes seconds
+                    : getDmsLongitude(mouseMapPoint) // degrees minutes seconds longitude
                 }</p>
             </div>
             <div className="esri-measurement-selectsrs">
