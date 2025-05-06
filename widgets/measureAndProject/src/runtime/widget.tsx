@@ -90,7 +90,11 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const getDmsLongitude = (point: Point): string => {
     if (!point) return
-    return formatPointAsDms(mouseMapPoint)?.split('N ')[1]
+    const longitude = formatPointAsDms(mouseMapPoint)?.split('N')[1].trim()
+    const longitudeParts = longitude.split(' ')
+    if (longitudeParts.length < 3) return longitude // fallback
+    const longitudeFormatted = `${longitudeParts[0].replace(/^0+/, '')}°${longitudeParts[1]}′${longitudeParts[2].replace(/E+/, '')}″`
+    return longitudeFormatted
   }
 
   const formatPointAsDecimalDegrees = (point: Point): Point => {
