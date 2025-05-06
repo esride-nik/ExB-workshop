@@ -83,17 +83,27 @@ export default function (props: AllWidgetProps<unknown>) {
     return coordinateFormatter.toLatitudeLongitude(geoPoint, 'dms', 2)
   }
 
+  const getDegNoLeadingZeroes = (deg: string): string => {
+    return deg.replace(/^0+/, '').length > 0 ? deg.replace(/^0+/, '') : '0'
+  }
+
   const getDmsLatitude = (point: Point): string => {
     if (!point) return
-    return formatPointAsDms(mouseMapPoint)?.split('N')[0]?.concat('N')
+    const dmsPoint = formatPointAsDms(mouseMapPoint)
+    const latitude = dmsPoint?.split(/[N|S]/)[0]?.trim()
+    const latitudeParts = latitude.split(' ')
+    if (latitudeParts.length < 3) return latitude // fallback
+    const latitudeFormatted = `${dmsPoint.includes('S') ? '-' : ''}${getDegNoLeadingZeroes(latitudeParts[0])}°${latitudeParts[1]}′${latitudeParts[2].replace(/[N|S]+/, '')}″`
+    return latitudeFormatted
   }
 
   const getDmsLongitude = (point: Point): string => {
     if (!point) return
-    const longitude = formatPointAsDms(mouseMapPoint)?.split('N')[1].trim()
+    const dmsPoint = formatPointAsDms(mouseMapPoint)
+    const longitude = dmsPoint?.split(/[N|S]/)[1]?.trim()
     const longitudeParts = longitude.split(' ')
     if (longitudeParts.length < 3) return longitude // fallback
-    const longitudeFormatted = `${longitudeParts[0].replace(/^0+/, '')}°${longitudeParts[1]}′${longitudeParts[2].replace(/E+/, '')}″`
+    const longitudeFormatted = `${dmsPoint.includes('W') ? '-' : ''}${getDegNoLeadingZeroes(longitudeParts[0])}°${longitudeParts[1]}′${longitudeParts[2].replace(/[E|W]+/, '')}″`
     return longitudeFormatted
   }
 
