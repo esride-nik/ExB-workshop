@@ -83,6 +83,11 @@ export default function (props: AllWidgetProps<unknown>) {
     return coordinateFormatter.toLatitudeLongitude(geoPoint, 'dms', 2)
   }
 
+  const formatPointAsDecimalDegrees = (point: Point): Point => {
+    if (!point) return
+    return webMercatorUtils.webMercatorToGeographic(point) as Point
+  }
+
   if (!isConfigured()) {
     return <h5><FormattedMessage id="cfgDataSources" defaultMessage={defaultMessages.cfgDataSources} /></h5>
   }
@@ -185,7 +190,7 @@ export default function (props: AllWidgetProps<unknown>) {
               <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
               <p>{
               srs === allowedSrs.EPSG4326 // decimal degrees
-                ? mouseMapPoint?.y.toFixed(2)
+                ? formatPointAsDecimalDegrees(mouseMapPoint)?.y.toFixed(2)
                 : srs === allowedSrs.EPSG25832 // LS310
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.y.toFixed(2)
                   : srs === allowedSrs.EPSG8395 // LS320
@@ -197,7 +202,7 @@ export default function (props: AllWidgetProps<unknown>) {
               <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
               <p>{
               srs === allowedSrs.EPSG4326 // decimal degrees
-                ? mouseMapPoint?.x.toFixed(2)
+                ? formatPointAsDecimalDegrees(mouseMapPoint)?.x.toFixed(2)
                 : srs === allowedSrs.EPSG25832 // LS310
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
                   : srs === allowedSrs.EPSG8395 // LS320
