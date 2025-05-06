@@ -189,8 +189,9 @@ export default function (props: AllWidgetProps<unknown>) {
                 : srs === allowedSrs.EPSG25832 // LS310
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.y.toFixed(2)
                   : srs === allowedSrs.EPSG8395 // LS320
-                    ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.y.toFixed(2) // degrees minutes seconds
-                    : formatPointAsDms(mouseMapPoint)?.split('N')[0]?.concat('N')}</p>
+                    ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.y.toFixed(2)
+                    : formatPointAsDms(mouseMapPoint)?.split('N')[0]?.concat('N') // degrees minutes seconds
+                }</p>
             </div>
             <div id="markerLongitude" className="esri-measurement-position-number">
               <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
@@ -200,8 +201,9 @@ export default function (props: AllWidgetProps<unknown>) {
                 : srs === allowedSrs.EPSG25832 // LS310
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
                   : srs === allowedSrs.EPSG8395 // LS320
-                    ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2) // degrees minutes seconds
-                    : formatPointAsDms(mouseMapPoint)?.split('N ')[1]}</p>
+                    ? `3${projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2)}`
+                    : formatPointAsDms(mouseMapPoint)?.split('N ')[1] // degrees minutes seconds
+                }</p>
             </div>
             <div className="esri-measurement-selectsrs">
               <Label centric className='esri-measurement-selectsrs-radio'>
