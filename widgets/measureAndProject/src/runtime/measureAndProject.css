@@ -32,3 +32,7 @@
 .esri-measurement-widget-content__measurement-item__value {
     display: none;
 }
+
+.esri-measurement-widget-content__measurement-item__value-rounded {
+    font-weight: bold;
+}

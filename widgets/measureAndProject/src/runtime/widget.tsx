@@ -155,11 +155,10 @@ export default function (props: AllWidgetProps<unknown>) {
                   setActiveTool('distance')
                   measurementWidget.viewModel.watch('state', (state: string) => {
                     if (state === 'measuring') {
-                      // TODO: Question: the WAB widget had a dropdown to select km/m => the ExB widget shows meters < 3000m and km above. is this whole effort even necessary?
-                      // TODO: extract to function
                       (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: string) => {
                         if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] || !m) return
 
+                        // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
                         const element = document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement
                         let duplicate
                         if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value-rounded')[0]) {
@@ -170,6 +169,8 @@ export default function (props: AllWidgetProps<unknown>) {
                           duplicate = document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value-rounded')[0] as HTMLElement
                         }
 
+                        // TODO: this is going to be configurable by Settings
+                        // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
                         const mRound = (Math.round(m.length * 2) / 2)
                         const measurementInnerText = element.innerText
                         const measurementParts = measurementInnerText.split(/ /)
@@ -200,8 +201,6 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
-                  console.log('area', document.getElementsByClassName('esri-measurement-widget-content__measurement'))
-                  // TODO: round result
                 }
               }}
             ></button>
@@ -214,8 +213,6 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = undefined
                   setActiveTool('position')
-                  console.log('position', document.getElementsByClassName('esri-measurement-widget-content__measurement'))
-                  // TODO: draw point on GraphicsLayer on click event
                 }
               }}
             ></button>
