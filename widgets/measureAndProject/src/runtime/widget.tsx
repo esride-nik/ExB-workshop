@@ -186,6 +186,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.activeTool = 'distance'
                   setActiveTool('distance')
 
+                  // TODO: refactor with area
                   measurementWidget.viewModel.watch('state', (state: string) => {
                     if (measurementWidget.activeTool === 'distance' && state === 'measuring') {
                       const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
@@ -226,6 +227,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
 
+                  // TODO: refactor with distance
                   measurementWidget.viewModel.watch('state', (state: string) => {
                     if (measurementWidget.activeTool === 'area' && state === 'measuring') {
                       const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
