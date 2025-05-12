@@ -187,22 +187,28 @@ export default function (props: AllWidgetProps<unknown>) {
                   setActiveTool('distance')
 
                   measurementWidget.viewModel.watch('state', (state: string) => {
-                    if (state === 'measuring') {
+                    if (measurementWidget.activeTool === 'distance' && state === 'measuring') {
                       const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-                        if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] || !m) return
+                        if (!originalMeasurementResultNode?.current || !m) return
 
                         // TODO: this is going to be configurable by Settings
                         // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
                         const mRound = (Math.round(m.length * 2) / 2)
                         const measurementInnerText = originalMeasurementResultNode?.current?.innerText
                         const measurementParts = measurementInnerText.split(/ /)
-                        measurementParts[0] = measurementParts[1] === 'km' ? (mRound / 1000).toFixed(2) : mRound.toFixed(1)
+
+                        if (measurementParts[1] === 'm') {
+                          const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter' }) // format as meters including the unit (because it's in the standard) in local number format
+                          measurementParts[0] = numberFormat.format(mRound)
+                          delete measurementParts[1] // remove the unit
+                        }
                         if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = measurementParts.join(' ')
                       })
                       setWatchHandler(watchHandler)
                     } else if (state === 'measured') {
                       // TODO: Why is watchHandler undefined short after being set on the state as a fine object?
-                      // watchHandler.remove()
+                      console.log('removing distance watchHandler', watchHandler)
+                      watchHandler?.remove()
                     }
                   })
                 }
@@ -221,22 +227,27 @@ export default function (props: AllWidgetProps<unknown>) {
                   setActiveTool('area')
 
                   measurementWidget.viewModel.watch('state', (state: string) => {
-                    if (state === 'measuring') {
+                    if (measurementWidget.activeTool === 'area' && state === 'measuring') {
                       const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-                        // if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] || !m) return
+                        if (!originalMeasurementResultNode?.current || !m) return
 
                         // TODO: this is going to be configurable by Settings
                         // no need to distinguish by unit: m.area always contains meters, although the widget automatically displays km if m > 3000
                         const mRound = (Math.round(m.area * 2) / 2)
                         const measurementInnerText = originalMeasurementResultNode?.current?.innerText
                         const measurementParts = measurementInnerText.split(/ /)
-                        measurementParts[0] = measurementParts[1] === 'km²' ? (mRound / 1000000).toFixed(2) : mRound.toFixed(1)
+
+                        if (measurementParts[1] === 'm²') {
+                          const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal' }) // format as decimal in local number format
+                          measurementParts[0] = numberFormat.format(mRound)
+                        }
                         if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = measurementParts.join(' ')
                       })
                       setWatchHandler(watchHandler)
                     } else if (state === 'measured') {
                       // TODO: Why is watchHandler undefined short after being set on the state as a fine object?
-                      // watchHandler.remove()
+                      console.log('removing area watchHandler', watchHandler)
+                      watchHandler?.remove()
                     }
                   })
                 }
