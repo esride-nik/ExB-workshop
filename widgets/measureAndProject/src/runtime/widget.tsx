@@ -22,6 +22,8 @@ enum allowedSrs {
 export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
+  const [originalMeasurementResultNode, setOriginalMeasurementResultNode] = useState<HTMLElement>(undefined)
+  const [duplicateMeasurementResultNode, setDuplicateMeasurementResultNode] = useState<HTMLElement>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
@@ -58,6 +60,16 @@ export default function (props: AllWidgetProps<unknown>) {
       )
     }
   }, [jimuMapView])
+
+  useEffect(() => {
+    let duplicate
+    if (!duplicateMeasurementResultNode && originalMeasurementResultNode) {
+      duplicate = originalMeasurementResultNode.cloneNode(true) as HTMLElement
+      duplicate.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+      originalMeasurementResultNode.parentNode.insertBefore(duplicate, originalMeasurementResultNode.nextSibling)
+    } 
+    setDuplicateMeasurementResultNode(duplicate)
+  }, [originalMeasurementResultNode])
 
   const isConfigured = () => {
     return props.useMapWidgetIds?.length > 0
@@ -153,29 +165,22 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = 'distance'
                   setActiveTool('distance')
+
+                  // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
+                  setOriginalMeasurementResultNode(document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)
+
                   measurementWidget.viewModel.watch('state', (state: string) => {
                     if (state === 'measuring') {
                       (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: string) => {
                         if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] || !m) return
 
-                        // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
-                        const element = document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement
-                        let duplicate
-                        if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value-rounded')[0]) {
-                          duplicate = element.cloneNode(true) as HTMLElement
-                          duplicate.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
-                          element.parentNode.insertBefore(duplicate, element.nextSibling)
-                        } else {
-                          duplicate = document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value-rounded')[0] as HTMLElement
-                        }
-
                         // TODO: this is going to be configurable by Settings
                         // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
                         const mRound = (Math.round(m.length * 2) / 2)
-                        const measurementInnerText = element.innerText
+                        const measurementInnerText = originalMeasurementResultNode.innerText
                         const measurementParts = measurementInnerText.split(/ /)
                         measurementParts[0] = measurementParts[1] === 'km' ? (mRound / 1000).toFixed(2) : mRound.toFixed(1)
-                        duplicate.innerText = measurementParts.join(' ')
+                        duplicateMeasurementResultNode.innerText = measurementParts.join(' ')
                       })
                     } else if (state === 'measured') {
                       // TODO: rounded result has been calculated in "measuring" => correct here
