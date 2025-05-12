@@ -232,7 +232,7 @@ export default function (props: AllWidgetProps<unknown>) {
                         if (!originalMeasurementResultNode?.current || !m) return
 
                         // TODO: this is going to be configurable by Settings
-                        // no need to distinguish by unit: m.area always contains meters, although the widget automatically displays km if m > 3000
+                        // no need to distinguish by unit: m.area always contains squaremeters, although the widget automatically displays km² if m² > 3000000
                         const mRound = (Math.round(m.area * 2) / 2)
                         const measurementInnerText = originalMeasurementResultNode?.current?.innerText
                         const measurementParts = measurementInnerText.split(/ /)
