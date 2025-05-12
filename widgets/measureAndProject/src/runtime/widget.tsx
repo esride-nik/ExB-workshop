@@ -45,6 +45,14 @@ export default function (props: AllWidgetProps<unknown>) {
       })
       setMeasurementWidget(measurement)
 
+      // reset node ref when starting new workflow to recreate result box after it's been removed
+      measurement.viewModel.watch('state', (state: string) => {
+        if (state === 'ready') {
+          originalMeasurementResultNode.current = undefined
+          duplicateMeasurementResultNode.current = undefined
+        }
+      })
+
       // get current mouse position on map as mapm coordinates
       jimuMapView.view.on('pointer-move', (event: any) => {
         fillMeasurementResultNodeRefs()
@@ -174,6 +182,7 @@ export default function (props: AllWidgetProps<unknown>) {
               onClick={() => {
                 if (measurementWidget) {
                   measurementWidget.clear()
+                  originalMeasurementResultNode.current = undefined
                   measurementWidget.activeTool = 'distance'
                   setActiveTool('distance')
 
@@ -207,6 +216,7 @@ export default function (props: AllWidgetProps<unknown>) {
               onClick={() => {
                 if (measurementWidget) {
                   measurementWidget.clear()
+                  originalMeasurementResultNode.current = undefined
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
                 }
@@ -221,6 +231,7 @@ export default function (props: AllWidgetProps<unknown>) {
               onClick={() => {
                 if (activeTool !== 'position' && measurementWidget) {
                   measurementWidget.clear()
+                  originalMeasurementResultNode.current = undefined
                   measurementWidget.activeTool = undefined
                   setActiveTool('position')
                 }
@@ -234,6 +245,8 @@ export default function (props: AllWidgetProps<unknown>) {
               onClick={() => {
                 if (measurementWidget) {
                   measurementWidget.clear()
+                  originalMeasurementResultNode.current = undefined
+                  measurementWidget.activeTool = undefined
                   setActiveTool('none')
                 }
               }}
