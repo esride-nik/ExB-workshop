@@ -230,7 +230,7 @@ export default function (props: AllWidgetProps<unknown>) {
                 : srs === allowedSrs.EPSG25832 // LS310
                   ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
                   : srs === allowedSrs.EPSG8395 // LS320
-                    ? `3${projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2)}`
+                    ? `3${projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2)}` // requirement: "False_Easting",3500000.0 instead of 500000.0, as defined for EPSG:8395
                     : getDmsLongitude(mouseMapPoint) // degrees minutes seconds longitude
                 }</p>
             </div>
