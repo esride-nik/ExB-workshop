@@ -15,15 +15,15 @@ export function displayValuesOnClick (p, epsg) {
     this.measurement.markerLongitude.innerHTML = '' + p.x.toFixed(6)
     this.measurement.markerLatitude.innerHTML = p.y.toFixed(6)
   } else if (epsg === 0) {
-    dd = p.x
-    d = parseInt(dd)
-    m = parseInt((dd - d) * 60)
-    s = parseFloat((dd - d - m / 60) * 3600).toFixed(2)
+    let dd = p.x
+    let d = parseInt(dd)
+    let m = parseInt(((dd - d) * 60).toString())
+    let s = parseFloat(((dd - d - m / 60) * 3600).toString()).toFixed(2)
     this.measurement.markerLongitude.innerHTML = '' + d + '°' + m + "'" + s + '"'
     dd = p.y
     d = parseInt(dd)
-    m = parseInt((dd - d) * 60)
-    s = parseFloat((dd - d - m / 60) * 3600).toFixed(2)
+    m = parseInt(((dd - d) * 60).toString())
+    s = parseFloat(((dd - d - m / 60) * 3600).toString()).toFixed(2)
     this.measurement.markerLatitude.innerHTML = '' + d + '°' + m + "'" + s + '"'
   } else if (epsg === 25832) {
     this.measurement.markerLongitude.innerHTML = p.x.toFixed(2)
@@ -34,29 +34,25 @@ export function displayValuesOnClick (p, epsg) {
   }
 }
 
-export function displayValuesOnMove (p, epsg) {
+export function convertValue (value: number, epsg: number) {
   if (epsg === 4326) {
-    this.measurement.mouseLongitude.innerHTML = '' + p.x.toFixed(6)
-    this.measurement.mouseLatitude.innerHTML = p.y.toFixed(6)
-  } else if (epsg == 0) {
-    dd = p.x
-    d = parseInt(dd)
-    m = parseInt((dd - d) * 60)
-    s = parseFloat((dd - d - m / 60) * 3600).toFixed(2)
-    this.measurement.mouseLongitude.innerHTML = '' + d + '°' + m + "'" + s + '"'
-    dd = p.y
-    d = parseInt(dd)
-    m = parseInt((dd - d) * 60)
-    s = parseFloat((dd - d - m / 60) * 3600).toFixed(2)
-    this.measurement.mouseLatitude.innerHTML = '' + d + '°' + m + "'" + s + '"'
-  } else if (epsg == 25832) {
-    this.measurement.mouseLongitude.innerHTML = p.x.toFixed(2)
-    this.measurement.mouseLatitude.innerHTML = p.y.toFixed(2)
+    return value.toFixed(6)
+  } else if (epsg === 0) {
+    let dd = value
+    let d = parseInt(dd)
+    let m = parseInt(((dd - d) * 60).toString())
+    let s = parseFloat(((dd - d - m / 60) * 3600).toString()).toFixed(2)
+    return '' + d + '°' + m + "'" + s + '"'
+  } else if (epsg === 25832) {
+    return value.toFixed(2)
   } else {
-    this.measurement.mouseLongitude.innerHTML = '3' + p.x.toFixed(2)
-    this.measurement.mouseLatitude.innerHTML = p.y.toFixed(2)
+    this.measurement.markerLongitude.innerHTML = '3' + p.x.toFixed(2)
+    this.measurement.markerLatitude.innerHTML = p.y.toFixed(2)
   }
 }
+
+
+
 
 export function _projectLocation (b) {
   const epsg = this._getProjection()
