@@ -5,7 +5,7 @@
 }
 
 #toolbarDiv button {
-    border: 1px solid #555;
+    width: 50px;
     margin: 3px;
 }
 
@@ -18,7 +18,7 @@
     display: inline-grid;
 }
 .esri-measurement-position-coordinate-number {
-    min-height:70px;
+    min-height:30px;
 }
 
 .esri-measurement-selectsrs {
@@ -35,4 +35,8 @@
 
 .esri-measurement-widget-content__measurement-item__value-rounded {
     font-weight: bold;
+}
+
+.disabled {
+    background-color: #DDD !important;
 }

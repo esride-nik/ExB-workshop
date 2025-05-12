@@ -1,6 +1,6 @@
 import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
-import { Label, Radio } from 'jimu-ui'
+import { Label, Radio, Button } from 'jimu-ui'
 import defaultMessages from './translations/default'
 import { useEffect, useRef, useState } from 'react'
 import Measurement from '@arcgis/core/widgets/Measurement.js'
@@ -25,6 +25,7 @@ export default function (props: AllWidgetProps<unknown>) {
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
+  const [watchHandler, setWatchHandler] = useState<any>(undefined)
   const measurementWidgetNode = useRef(null)
   const measurementPositionNode = useRef(null)
   const originalMeasurementResultNode = useRef(null)
@@ -52,6 +53,7 @@ export default function (props: AllWidgetProps<unknown>) {
           y: event.y
         })
         setMouseMapPoint(mouseMapPoint)
+        console.log('watchHandler', watchHandler) // TODO: Make it work or remove
       })
 
       // in case of lost WebGL context
@@ -61,6 +63,11 @@ export default function (props: AllWidgetProps<unknown>) {
       )
     }
   }, [jimuMapView])
+
+  // TODO: Make it work or remove
+  useEffect(() => {
+    console.log('watchHandler', watchHandler)
+  }, [watchHandler])
 
   const fillMeasurementResultNodeRefs = () => {
     // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
@@ -159,9 +166,10 @@ export default function (props: AllWidgetProps<unknown>) {
           style={{ width: '100%', height: '100%', maxHeight: '800px', overflow: 'auto' }}>
 
           <div id="toolbarDiv" className="esri-component esri-widget">
-            <button
+            <Button
               id="distance"
               className="esri-widget--button esri-interactive esri-icon-measure-line"
+              disabled={activeTool === 'distance'}
               title={defaultMessages.distanceMeasurementTool}
               onClick={() => {
                 if (measurementWidget) {
@@ -171,7 +179,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
                   measurementWidget.viewModel.watch('state', (state: string) => {
                     if (state === 'measuring') {
-                      (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: string) => {
+                      const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: string) => {
                         if (!document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] || !m) return
 
                         // TODO: this is going to be configurable by Settings
@@ -182,24 +190,19 @@ export default function (props: AllWidgetProps<unknown>) {
                         measurementParts[0] = measurementParts[1] === 'km' ? (mRound / 1000).toFixed(2) : mRound.toFixed(1)
                         if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = measurementParts.join(' ')
                       })
+                      setWatchHandler(watchHandler)
                     } else if (state === 'measured') {
-                      // TODO: rounded result has been calculated in "measuring" => correct here
-                      const measurementInnerText = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)?.innerText
-                      const measurementParts = measurementInnerText.split(/ /)
-                      const measurementValue = parseFloat(measurementParts[0])
-                      const measurementValueRound = (Math.round(measurementValue * 2) / 2).toFixed(1)
-                      measurementParts[0] = measurementValueRound;
-                      (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement).innerText = measurementParts.join(' ')
-                    } else {
-                      console.log('distance ' + measurementWidget.viewModel.state, document.getElementsByClassName('esri-measurement-widget-content__measurement'))
+                      // TODO: Why is watchHandler undefined short after being set on the state as a fine object?
+                      // watchHandler.remove()
                     }
                   })
                 }
               }}
-            ></button>
-            <button
+            ></Button>
+            <Button
               id="area"
               className="esri-widget--button esri-interactive esri-icon-measure-area"
+              disabled={activeTool === 'area'}
               title={defaultMessages.areaMeasurementTool}
               onClick={() => {
                 if (measurementWidget) {
@@ -208,22 +211,25 @@ export default function (props: AllWidgetProps<unknown>) {
                   setActiveTool('area')
                 }
               }}
-            ></button>
-            <button
-              id="position"
-              className="esri-widget--button esri-interactive esri-icon-map-pin"
+            ></Button>
+            <Button
+              id='position'
+              className='esri-widget--button esri-interactive esri-icon-map-pin'
+              disabled={activeTool === 'position'}
+              size="default"
               title={defaultMessages.positionTool}
               onClick={() => {
-                if (measurementWidget) {
+                if (activeTool !== 'position' && measurementWidget) {
                   measurementWidget.clear()
                   measurementWidget.activeTool = undefined
                   setActiveTool('position')
                 }
               }}
-            ></button>
-            <button
+            ></Button>
+            <Button
               id="clear"
               className="esri-widget--button esri-interactive esri-icon-trash"
+              disabled={activeTool === 'none'}
               title={defaultMessages.clearMeasurements}
               onClick={() => {
                 if (measurementWidget) {
@@ -231,7 +237,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   setActiveTool('none')
                 }
               }}
-            ></button>
+            ></Button>
           </div>
 
           <div id="measurementWidget" ref={measurementWidgetNode} />
