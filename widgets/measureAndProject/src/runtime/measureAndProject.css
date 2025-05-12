@@ -13,9 +13,12 @@
     padding: 5px;
 }
 
-.esri-measurement-position-number {
+.esri-measurement-position-coordinate {
     width: 50%;
-    display: inline-block;
+    display: inline-grid;
+}
+.esri-measurement-position-coordinate-number {
+    min-height:70px;
 }
 
 .esri-measurement-selectsrs {

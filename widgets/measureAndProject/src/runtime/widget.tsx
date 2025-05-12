@@ -35,12 +35,14 @@ export default function (props: AllWidgetProps<unknown>) {
 
   useEffect(() => {
     if (jimuMapView) {
+      // init Measurement widget
       const measurement = new Measurement({
         view: jimuMapView.view,
         container: measurementWidgetNode.current
       })
       setMeasurementWidget(measurement)
 
+      // get current mouse position on map as mapm coordinates
       jimuMapView.view.on('pointer-move', (event: any) => {
         const mouseMapPoint = jimuMapView.view.toMap({
           x: event.x,
@@ -105,6 +107,28 @@ export default function (props: AllWidgetProps<unknown>) {
     if (longitudeParts.length < 3) return longitude // fallback
     const longitudeFormatted = `${dmsPoint.includes('W') ? '-' : ''}${getDegNoLeadingZeroes(longitudeParts[0])}°${longitudeParts[1]}′${longitudeParts[2].replace(/[E|W]+/, '')}″`
     return longitudeFormatted
+  }
+
+  const getFormattedLatitude = (): string => {
+    return srs === allowedSrs.EPSG4326 // decimal degrees
+      ? formatPointAsDecimalDegrees(mouseMapPoint)?.y.toFixed(2)
+      : srs === allowedSrs.EPSG25832 // LS310
+        ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.y.toFixed(2)
+        : srs === allowedSrs.EPSG8395 // LS320
+          ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.y.toFixed(2)
+          : getDmsLatitude(mouseMapPoint) // degrees minutes seconds latitude
+  }
+
+  const getFormattedLongitude = (): string => {
+    return srs === allowedSrs.EPSG4326 // decimal degrees
+      ? formatPointAsDecimalDegrees(mouseMapPoint)?.x.toFixed(2)
+      : srs === allowedSrs.EPSG25832 // LS310
+        ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
+        : srs === allowedSrs.EPSG8395 // LS320
+          ? mouseMapPoint.x > 200000 && mouseMapPoint.x < 6000000 // bounding box for LS320 validity
+            ? `3${projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2)}` // requirement: "False_Easting",3500000.0 instead of 500000.0, as defined for EPSG:8395
+            : ''
+          : getDmsLongitude(mouseMapPoint) // degrees minutes seconds longitude
   }
 
   const formatPointAsDecimalDegrees = (point: Point): Point => {
@@ -209,30 +233,15 @@ export default function (props: AllWidgetProps<unknown>) {
           </div>
 
           <div id="measurementWidget" ref={measurementWidgetNode} />
-          { activeTool === 'position' && <div id="measurementPosition" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
-            <div id="markerLatitude" className="esri-measurement-position-number">
+          { // this whole block implements the Position tool
+          activeTool === 'position' && <div id="measurementPosition" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
+            <div id="markerLatitude" className="esri-measurement-position-coordinate">
               <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
-              <p>{
-              srs === allowedSrs.EPSG4326 // decimal degrees
-                ? formatPointAsDecimalDegrees(mouseMapPoint)?.y.toFixed(2)
-                : srs === allowedSrs.EPSG25832 // LS310
-                  ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.y.toFixed(2)
-                  : srs === allowedSrs.EPSG8395 // LS320
-                    ? projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.y.toFixed(2)
-                    : getDmsLatitude(mouseMapPoint) // degrees minutes seconds latitude
-                }</p>
+              <p className='esri-measurement-position-coordinate-number'>{getFormattedLatitude()}</p>
             </div>
-            <div id="markerLongitude" className="esri-measurement-position-number">
+            <div id="markerLongitude" className="esri-measurement-position-coordinate">
               <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
-              <p>{
-              srs === allowedSrs.EPSG4326 // decimal degrees
-                ? formatPointAsDecimalDegrees(mouseMapPoint)?.x.toFixed(2)
-                : srs === allowedSrs.EPSG25832 // LS310
-                  ? projectPoint(mouseMapPoint, allowedSrs.EPSG25832)?.x.toFixed(2)
-                  : srs === allowedSrs.EPSG8395 // LS320
-                    ? `3${projectPoint(mouseMapPoint, allowedSrs.EPSG8395)?.x.toFixed(2)}` // requirement: "False_Easting",3500000.0 instead of 500000.0, as defined for EPSG:8395
-                    : getDmsLongitude(mouseMapPoint) // degrees minutes seconds longitude
-                }</p>
+              <p className='esri-measurement-position-coordinate-number'>{getFormattedLongitude()}</p>
             </div>
             <div className="esri-measurement-selectsrs">
               <Label centric className='esri-measurement-selectsrs-radio'>
