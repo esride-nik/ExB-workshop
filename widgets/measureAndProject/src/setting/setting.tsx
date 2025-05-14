@@ -14,11 +14,13 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
   }
 
   const setMeterValueOption = (value: string) => {
-    console.log('setMeterValueOption', value)
     const meterValueOption = MeterValueOption[value]
     props.onSettingChange({
       id: props.id,
-      meterValueOption: meterValueOption
+      config: {
+        ...props.config,
+        meterValueOption
+      }
     })
   }
 
