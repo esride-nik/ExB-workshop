@@ -19,7 +19,15 @@
 */
 import { type ImmutableObject } from 'jimu-core'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Config {}
+export enum MeterValueOption {
+  oneDecimalPlace,
+  twoDecimalPlaces,
+  decimalPlacesRounded,
+  noDecimalPlaces
+}
+
+export interface Config {
+  meterValueOption: MeterValueOption
+}
 
 export type IMConfig = ImmutableObject<Config>

@@ -1,7 +1,8 @@
 System.register([], function (_export) {return {execute: function () {_export({
   selectMapWidget: 'Karten-Widget wählen',
   headerMeterValues: 'Ausgabe der Meter-Werte für Linien- und Flächenmessung',
-  decimalPlaces: 'Dezimalstellen',
+  oneDecimalPlace: '1 Dezimalstelle',
+  twoDecimalPlaces: '2 Dezimalstellen',
   decimalPlacesRounded: 'Dezimalstellen gerundet auf 0,5m',
   noDecimalPlaces: 'Keine Dezimalstellen',
   description: 'Beschreibung',
