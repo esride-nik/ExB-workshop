@@ -11,7 +11,7 @@ import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.
 import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtils.js'
 
 import './measureAndProject.css'
-import Graphic from 'esri/Graphic'
+import type Graphic from 'esri/Graphic'
 
 enum allowedSrs {
   EPSG25832 = 25832,
@@ -26,6 +26,8 @@ export default function (props: AllWidgetProps<unknown>) {
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
+  const [measurementPointGraphic, setMeasurementPointGraphic] = useState<Graphic>(undefined)
+  const [roundedValueString, setRoundedValueString] = useState<string>('')
   const [watchHandler, setWatchHandler] = useState<any>(undefined)
   const measurementWidgetNode = useRef(null)
   const measurementPositionNode = useRef(null)
@@ -38,6 +40,11 @@ export default function (props: AllWidgetProps<unknown>) {
   }, [])
 
   useEffect(() => {
+    if (!measurementPointGraphic) return
+    (measurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
+  }, [measurementPointGraphic, roundedValueString])
+
+  useEffect(() => {
     if (jimuMapView) {
       // init Measurement widget
       const measurement = new Measurement({
@@ -46,21 +53,16 @@ export default function (props: AllWidgetProps<unknown>) {
       })
       setMeasurementWidget(measurement)
 
+      // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
       measurement.watch('activeWidget', (evt: any) => {
         console.info(evt.viewModel)
         const tool = evt.viewModel.tool
-        const manipulatorLayer = tool._manipulatorLayer
         const measurementLayer = tool._measurementLayer
-        // measurementLayer.attributionVisible = false
-        console.log('measurementLayer', measurementLayer)
-        // manipulatorLayer.attributionVisible = false
         measurementLayer.graphics.watch('length', (length: number) => {
-          console.log('measurementLayer.graphics.length', length)
+          if (length === 0) return
           const measurementPointGraphics = measurementLayer.graphics.items.filter((g: Graphic) => g.geometry.type === 'point')
-          console.log('measurementPointGraphics', measurementPointGraphics)
-          measurementPointGraphics[0].symbol.watch('text', (text: string) => {
-            console.log('measurementPointGraphics[0].symbol.text', text)
-          })
+          if (measurementPointGraphics.length === 0) return
+          setMeasurementPointGraphic(measurementPointGraphics[0])
         })
       })
 
@@ -216,7 +218,9 @@ export default function (props: AllWidgetProps<unknown>) {
                           measurementParts[0] = numberFormat.format(mRound)
                           delete measurementParts[1] // remove the unit
                         }
-                        if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = measurementParts.join(' ')
+                        const roundedValueString = measurementParts.join(' ')
+                        setRoundedValueString(roundedValueString)
+                        if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = roundedValueString
                       })
                       setWatchHandler(watchHandler)
                     } else if (state === 'measured') {
@@ -255,6 +259,8 @@ export default function (props: AllWidgetProps<unknown>) {
                           const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal' }) // format as decimal in local number format
                           measurementParts[0] = numberFormat.format(mRound)
                         }
+                        const roundedValueString = measurementParts.join(' ')
+                        setRoundedValueString(roundedValueString)
                         if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = measurementParts.join(' ')
                       })
                       setWatchHandler(watchHandler)
