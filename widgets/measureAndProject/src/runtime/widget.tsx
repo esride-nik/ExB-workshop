@@ -66,22 +66,8 @@ export default function (props: AllWidgetProps<unknown>) {
       })
       setMeasurementWidget(measurement)
 
-      // // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
-      // measurement.watch('activeWidget', (evt: any) => {
-      //   const tool = evt.viewModel.tool
-      //   const measurementLayer = tool._measurementLayer as GraphicsLayer
-      //   measurementLayer.graphics.watch('length', (length: number) => {
-      //     if (length === 0) return
-      //     const measurementPointGraphics = measurementLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
-      //     if (measurementPointGraphics.length === 0) return
-      //     setMeasurementPointGraphic(measurementPointGraphics[0])
-      //     setMeasurementPointGraphicsLayer(measurementLayer)
-      //   })
-      // })
-
       // reset node ref when starting new workflow to recreate result box after it's been removed
       measurement.viewModel.watch('state', async (state: string) => {
-        console.log('state', state)
         // starting / restarting measurement
         if (state === 'ready') {
           originalMeasurementResultNode.current = undefined
