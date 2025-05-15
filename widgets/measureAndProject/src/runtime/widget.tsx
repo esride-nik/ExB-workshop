@@ -40,7 +40,7 @@ export default function (props: AllWidgetProps<unknown>) {
     coordinateFormatter.load()
   }, [])
 
-  // when the roundedValueString updates, exchange the text symbol of the rounded measurement point graphic with the rounded value
+  // when the roundedValueString updates, update the measurement display on the map
   useEffect(() => {
     if (!measurementPointGraphicsLayer || measurementPointGraphicsLayer.graphics.length === 0) return
 
@@ -58,7 +58,7 @@ export default function (props: AllWidgetProps<unknown>) {
     measurementPointGraphicsLayer.add(roundedMeasurementPointGraphic)
   }, [measurementPointGraphicsLayer, roundedValueString])
 
-  // when the roundedValueString updates, update the duplicate measurement result node
+  // when the roundedValueString updates, update the measurement display in the widget
   useEffect(() => {
     if (!duplicateMeasurementResultNode?.current) return
     duplicateMeasurementResultNode.current.innerText = roundedValueString
@@ -106,7 +106,7 @@ export default function (props: AllWidgetProps<unknown>) {
     }
   }, [jimuMapView])
 
-  // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
+  // get the original measurement display node and create a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
   const fillMeasurementResultNodeRefs = () => {
     if (!originalMeasurementResultNode.current &&
       document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 0 &&
