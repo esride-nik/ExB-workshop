@@ -198,17 +198,19 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const roundMeasurement = (locale: string) => {
     measurementWidget.viewModel.watch('state', (state: string) => {
-      if (measurementWidget.activeTool === 'distance' && state === 'measuring') {
+      if ((measurementWidget.activeTool === 'distance' || measurementWidget.activeTool === 'area') && state === 'measuring') {
         const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
           if (!originalMeasurementResultNode?.current || !m) return
 
           // TODO: this is going to be configurable by Settings
           // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
-          const mRound = (Math.round(m.length * 2) / 2)
+          const mRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.area * 2) / 2)
           const measurementInnerText = originalMeasurementResultNode?.current?.innerText
           const measurementParts = measurementInnerText.split(/ /)
 
-          const roundedValueString = formatMeasurementStringDistance(measurementParts, locale, mRound)
+          const roundedValueString = measurementWidget.activeTool === 'distance'
+            ? formatMeasurementStringDistance(measurementParts, locale, mRound)
+            : formatMeasurementStringArea(measurementParts, locale, mRound)
           setRoundedValueString(roundedValueString)
         })
         setWatchHandler(watchHandler)
@@ -253,7 +255,6 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.activeTool = 'distance'
                   setActiveTool('distance')
 
-                  // TODO: refactor with area
                   roundMeasurement(props.locale)
                 }
               }}
@@ -270,28 +271,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
 
-                  // TODO: refactor with distance
-                  measurementWidget.viewModel.watch('state', (state: string) => {
-                    if (measurementWidget.activeTool === 'area' && state === 'measuring') {
-                      const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-                        if (!originalMeasurementResultNode?.current || !m) return
-
-                        // TODO: this is going to be configurable by Settings
-                        // no need to distinguish by unit: m.area always contains squaremeters, although the widget automatically displays km² if m² > 3000000
-                        const mRound = (Math.round(m.area * 2) / 2)
-                        const measurementInnerText = originalMeasurementResultNode?.current?.innerText
-                        const measurementParts = measurementInnerText.split(/ /)
-
-                        const roundedValueString = formatMeasurementStringArea(measurementParts, props.locale, mRound)
-                        setRoundedValueString(roundedValueString)
-                      })
-                      setWatchHandler(watchHandler)
-                    } else if (state === 'measured') {
-                      // TODO: Why is watchHandler undefined short after being set on the state as a fine object?
-                      console.log('removing area watchHandler', watchHandler)
-                      watchHandler?.remove()
-                    }
-                  })
+                  roundMeasurement(props.locale)
                 }
               }}
             ></Button>
