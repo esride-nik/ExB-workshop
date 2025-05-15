@@ -29,7 +29,6 @@ export default function (props: AllWidgetProps<unknown>) {
   const [srs, setSrs] = useState<allowedSrs>(25832)
   const [measurementPointGraphicsLayer, setMeasurementPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedValueString, setRoundedValueString] = useState<string>('')
-  const [watchHandler, setWatchHandler] = useState<any>(undefined)
   const measurementWidgetNode = useRef(null)
   const measurementPositionNode = useRef(null)
   const originalMeasurementResultNode = useRef(null)
@@ -64,7 +63,46 @@ export default function (props: AllWidgetProps<unknown>) {
     duplicateMeasurementResultNode.current.innerText = roundedValueString
   }, [duplicateMeasurementResultNode, roundedValueString])
 
-  // when jimuMapView is available, initialize the measurement widget and setup watchers
+  // setup watchers for display updates and value rounding
+  useEffect(() => {
+    if (!measurementWidget) return
+
+    measurementWidget.viewModel.watch('state', async (state: string) => {
+      console.log('state', state)
+
+      // reset stuff when starting / restarting measurement
+      if (state === 'ready') {
+        // reset node ref when starting new workflow to recreate result box after it's been removed
+        originalMeasurementResultNode.current = undefined
+        duplicateMeasurementResultNode.current = undefined
+
+        // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
+        const tool = (measurementWidget.viewModel.activeViewModel as any).tool
+        const measurementLayer = tool._measurementLayer as GraphicsLayer
+        setMeasurementPointGraphicsLayer(measurementLayer)
+      }
+
+      // observe and round value while measuring
+      if ((measurementWidget.activeTool === 'distance' || measurementWidget.activeTool === 'area') && state === 'measuring') {
+        (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
+          if (!originalMeasurementResultNode?.current || !m) return
+
+          // TODO: this is going to be configurable by Settings
+          // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
+          const mRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.area * 2) / 2)
+          const measurementInnerText = originalMeasurementResultNode?.current?.innerText
+          const measurementParts = measurementInnerText.split(/ /)
+
+          const roundedValueString = measurementWidget.activeTool === 'distance'
+            ? formatMeasurementStringDistance(measurementParts, mRound)
+            : formatMeasurementStringArea(measurementParts, mRound)
+          setRoundedValueString(roundedValueString)
+        })
+      }
+    })
+  }, [measurementWidget])
+
+  // when jimuMapView is available, initialize the measurement widget and setup mouse position tracking
   useEffect(() => {
     if (jimuMapView) {
       // init Measurement widget
@@ -73,20 +111,6 @@ export default function (props: AllWidgetProps<unknown>) {
         container: measurementWidgetNode.current
       })
       setMeasurementWidget(measurement)
-
-      // reset node ref when starting new workflow to recreate result box after it's been removed
-      measurement.viewModel.watch('state', async (state: string) => {
-        // starting / restarting measurement
-        if (state === 'ready') {
-          originalMeasurementResultNode.current = undefined
-          duplicateMeasurementResultNode.current = undefined
-
-          // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
-          const tool = (measurement.viewModel.activeViewModel as any).tool
-          const measurementLayer = tool._measurementLayer as GraphicsLayer
-          setMeasurementPointGraphicsLayer(measurementLayer)
-        }
-      })
 
       // get current mouse position on map as map coordinates
       jimuMapView.view.on('pointer-move', (event: any) => {
@@ -196,40 +220,18 @@ export default function (props: AllWidgetProps<unknown>) {
     return webMercatorUtils.webMercatorToGeographic(point) as Point
   }
 
-  const roundMeasurement = (locale: string) => {
-    measurementWidget.viewModel.watch('state', (state: string) => {
-      if ((measurementWidget.activeTool === 'distance' || measurementWidget.activeTool === 'area') && state === 'measuring') {
-        const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-          if (!originalMeasurementResultNode?.current || !m) return
-
-          // TODO: this is going to be configurable by Settings
-          // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
-          const mRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.area * 2) / 2)
-          const measurementInnerText = originalMeasurementResultNode?.current?.innerText
-          const measurementParts = measurementInnerText.split(/ /)
-
-          const roundedValueString = measurementWidget.activeTool === 'distance'
-            ? formatMeasurementStringDistance(measurementParts, locale, mRound)
-            : formatMeasurementStringArea(measurementParts, locale, mRound)
-          setRoundedValueString(roundedValueString)
-        })
-        setWatchHandler(watchHandler)
-      }
-    })
-  }
-
-  const formatMeasurementStringDistance = (measurementParts: any, locale: string, mRound: number): string => {
+  const formatMeasurementStringDistance = (measurementParts: any, mRound: number): string => {
     if (measurementParts[1] === 'm') {
-      const numberFormat = new Intl.NumberFormat(locale, { style: 'unit', unit: 'meter' }) // format as meters including the unit (because it's in the standard) in local number format
+      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter' }) // format as meters including the unit (because it's in the standard) in local number format
       measurementParts[0] = numberFormat.format(mRound)
       delete measurementParts[1] // remove the unit
     }
     return measurementParts.join(' ')
   }
 
-  const formatMeasurementStringArea = (measurementParts: any, locale: string, mRound: number): string => {
+  const formatMeasurementStringArea = (measurementParts: any, mRound: number): string => {
     if (measurementParts[1] === 'm²') {
-      const numberFormat = new Intl.NumberFormat(locale, { style: 'decimal' }) // format as decimal in local number format
+      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal' }) // format as decimal in local number format
       measurementParts[0] = numberFormat.format(mRound)
     }
     return measurementParts.join(' ')
@@ -254,8 +256,6 @@ export default function (props: AllWidgetProps<unknown>) {
                   originalMeasurementResultNode.current = undefined
                   measurementWidget.activeTool = 'distance'
                   setActiveTool('distance')
-
-                  roundMeasurement(props.locale)
                 }
               }}
             ></Button>
@@ -270,8 +270,6 @@ export default function (props: AllWidgetProps<unknown>) {
                   originalMeasurementResultNode.current = undefined
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
-
-                  roundMeasurement(props.locale)
                 }
               }}
             ></Button>
