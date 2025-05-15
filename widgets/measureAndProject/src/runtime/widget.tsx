@@ -51,6 +51,13 @@ export default function (props: AllWidgetProps<unknown>) {
     measurementPointGraphicsLayer.remove(measurementPointGraphic)
   }, [measurementPointGraphic, measurementPointGraphicsLayer, roundedValueString])
 
+  // when the roundedValueString updates, update the duplicate measurement result node
+  useEffect(() => {
+    if (!duplicateMeasurementResultNode?.current) return
+    duplicateMeasurementResultNode.current.innerText = roundedValueString
+  }, [duplicateMeasurementResultNode, roundedValueString])
+
+  // when jimuMapView is available, initialize the measurement widget and setup watchers
   useEffect(() => {
     if (jimuMapView) {
       // init Measurement widget
@@ -67,7 +74,7 @@ export default function (props: AllWidgetProps<unknown>) {
         const measurementLayer = tool._measurementLayer as GraphicsLayer
         measurementLayer.graphics.watch('length', (length: number) => {
           if (length === 0) return
-          const measurementPointGraphics = measurementLayer.graphics.items.filter((g: Graphic) => g.geometry.type === 'point')
+          const measurementPointGraphics = measurementLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
           if (measurementPointGraphics.length === 0) return
           setMeasurementPointGraphic(measurementPointGraphics[0])
           setMeasurementPointGraphicsLayer(measurementLayer)
@@ -82,7 +89,7 @@ export default function (props: AllWidgetProps<unknown>) {
         }
       })
 
-      // get current mouse position on map as mapm coordinates
+      // get current mouse position on map as map coordinates
       jimuMapView.view.on('pointer-move', (event: any) => {
         fillMeasurementResultNodeRefs()
         const mouseMapPoint = jimuMapView.view.toMap({
@@ -100,8 +107,8 @@ export default function (props: AllWidgetProps<unknown>) {
     }
   }, [jimuMapView])
 
+  // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
   const fillMeasurementResultNodeRefs = () => {
-    // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
     if (!originalMeasurementResultNode.current &&
       document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 0 &&
       document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] !== undefined) {
@@ -116,6 +123,7 @@ export default function (props: AllWidgetProps<unknown>) {
     return props.useMapWidgetIds?.length > 0
   }
 
+  // catching the map view from settings
   const onActiveViewChange = async (jmv: JimuMapView) => {
     if (jmv) {
       setJimuMapView(jmv)
