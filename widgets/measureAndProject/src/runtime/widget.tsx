@@ -42,19 +42,7 @@ export default function (props: AllWidgetProps<unknown>) {
   // when the roundedValueString updates, update the measurement display on the map
   useEffect(() => {
     if (!measurementPointGraphicsLayer || measurementPointGraphicsLayer.graphics.length === 0) return
-
-    // get the text graphic from the layer on every value update because it also affects the graphic position
-    const measurementPointGraphics = measurementPointGraphicsLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
-    if (measurementPointGraphics.length === 0) return
-    const measurementPointGraphic = measurementPointGraphics[0]
-
-    // make a deep copy of the graphic before changing the symbol of the original one
-    const roundedMeasurementPointGraphic = measurementPointGraphic.clone();
-    (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
-
-    // remove original graphic and add the rounded one
-    measurementPointGraphicsLayer.remove(measurementPointGraphic)
-    measurementPointGraphicsLayer.add(roundedMeasurementPointGraphic)
+    updateMeasurementValueOnMap()
   }, [measurementPointGraphicsLayer, roundedValueString])
 
   // when the roundedValueString updates, update the measurement display in the widget
@@ -68,8 +56,6 @@ export default function (props: AllWidgetProps<unknown>) {
     if (!measurementWidget) return
 
     measurementWidget.viewModel.watch('state', async (state: string) => {
-      console.log('state', state)
-
       // reset stuff when starting / restarting measurement
       if (state === 'ready') {
         // reset node ref when starting new workflow to recreate result box after it's been removed
@@ -129,6 +115,22 @@ export default function (props: AllWidgetProps<unknown>) {
       )
     }
   }, [jimuMapView])
+
+  // exchange the map graphic with the original value with a clone that contains the rounded value
+  const updateMeasurementValueOnMap = () => {
+    // get the text graphic from the layer on every value update because it also affects the graphic position
+    const measurementPointGraphics = measurementPointGraphicsLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
+    if (measurementPointGraphics.length === 0) return
+    const measurementPointGraphic = measurementPointGraphics[0]
+
+    // make a deep copy of the graphic before changing the symbol of the original one
+    const roundedMeasurementPointGraphic = measurementPointGraphic.clone();
+    (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
+
+    // remove original graphic and add the rounded one
+    measurementPointGraphicsLayer.remove(measurementPointGraphic)
+    measurementPointGraphicsLayer.add(roundedMeasurementPointGraphic)
+  }
 
   // get the original measurement display node and create a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
   const fillMeasurementResultNodeRefs = () => {
