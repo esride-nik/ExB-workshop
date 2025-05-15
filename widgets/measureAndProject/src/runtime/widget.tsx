@@ -197,6 +197,23 @@ export default function (props: AllWidgetProps<unknown>) {
     return webMercatorUtils.webMercatorToGeographic(point) as Point
   }
 
+  const formatMeasurementStringDistance = (measurementParts: any, locale: string, mRound: number): string => {
+    if (measurementParts[1] === 'm') {
+      const numberFormat = new Intl.NumberFormat(locale, { style: 'unit', unit: 'meter' }) // format as meters including the unit (because it's in the standard) in local number format
+      measurementParts[0] = numberFormat.format(mRound)
+      delete measurementParts[1] // remove the unit
+    }
+    return measurementParts.join(' ')
+  }
+
+  const formatMeasurementStringArea = (measurementParts: any, locale: string, mRound: number): string => {
+    if (measurementParts[1] === 'm²') {
+      const numberFormat = new Intl.NumberFormat(locale, { style: 'decimal' }) // format as decimal in local number format
+      measurementParts[0] = numberFormat.format(mRound)
+    }
+    return measurementParts.join(' ')
+  }
+
   if (!isConfigured()) {
     return <h5><FormattedMessage id="cfgDataSources" defaultMessage={defaultMessages.cfgDataSources} /></h5>
   }
@@ -229,14 +246,8 @@ export default function (props: AllWidgetProps<unknown>) {
                         const measurementInnerText = originalMeasurementResultNode?.current?.innerText
                         const measurementParts = measurementInnerText.split(/ /)
 
-                        if (measurementParts[1] === 'm') {
-                          const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter' }) // format as meters including the unit (because it's in the standard) in local number format
-                          measurementParts[0] = numberFormat.format(mRound)
-                          delete measurementParts[1] // remove the unit
-                        }
-                        const roundedValueString = measurementParts.join(' ')
+                        const roundedValueString = formatMeasurementStringDistance(measurementParts, props.locale, mRound)
                         setRoundedValueString(roundedValueString)
-                        if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = roundedValueString
                       })
                       setWatchHandler(watchHandler)
                     } else if (state === 'measured') {
@@ -271,13 +282,8 @@ export default function (props: AllWidgetProps<unknown>) {
                         const measurementInnerText = originalMeasurementResultNode?.current?.innerText
                         const measurementParts = measurementInnerText.split(/ /)
 
-                        if (measurementParts[1] === 'm²') {
-                          const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal' }) // format as decimal in local number format
-                          measurementParts[0] = numberFormat.format(mRound)
-                        }
-                        const roundedValueString = measurementParts.join(' ')
+                        const roundedValueString = formatMeasurementStringArea(measurementParts, props.locale, mRound)
                         setRoundedValueString(roundedValueString)
-                        if (duplicateMeasurementResultNode?.current) duplicateMeasurementResultNode.current.innerText = measurementParts.join(' ')
                       })
                       setWatchHandler(watchHandler)
                     } else if (state === 'measured') {
@@ -371,3 +377,4 @@ export default function (props: AllWidgetProps<unknown>) {
         </div>
   )
 }
+
