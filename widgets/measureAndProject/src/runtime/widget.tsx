@@ -12,6 +12,7 @@ import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtil
 
 import './measureAndProject.css'
 import type Graphic from 'esri/Graphic'
+import type GraphicsLayer from 'esri/layers/GraphicsLayer'
 
 enum allowedSrs {
   EPSG25832 = 25832,
@@ -27,6 +28,7 @@ export default function (props: AllWidgetProps<unknown>) {
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
   const [measurementPointGraphic, setMeasurementPointGraphic] = useState<Graphic>(undefined)
+  const [measurementPointGraphicsLayer, setMeasurementPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedValueString, setRoundedValueString] = useState<string>('')
   const [watchHandler, setWatchHandler] = useState<any>(undefined)
   const measurementWidgetNode = useRef(null)
@@ -39,10 +41,15 @@ export default function (props: AllWidgetProps<unknown>) {
     coordinateFormatter.load()
   }, [])
 
+  // when the roundedValueString updates, exchange the text symbol of the measurement point graphic with the rounded value
   useEffect(() => {
-    if (!measurementPointGraphic) return
+    if (!measurementPointGraphic || !measurementPointGraphicsLayer) return
     (measurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
-  }, [measurementPointGraphic, roundedValueString])
+    const roundedMeasurementPointGraphic = measurementPointGraphic.clone();
+    (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
+    measurementPointGraphicsLayer.add(roundedMeasurementPointGraphic)
+    measurementPointGraphicsLayer.remove(measurementPointGraphic)
+  }, [measurementPointGraphic, measurementPointGraphicsLayer, roundedValueString])
 
   useEffect(() => {
     if (jimuMapView) {
@@ -57,12 +64,13 @@ export default function (props: AllWidgetProps<unknown>) {
       measurement.watch('activeWidget', (evt: any) => {
         console.info(evt.viewModel)
         const tool = evt.viewModel.tool
-        const measurementLayer = tool._measurementLayer
+        const measurementLayer = tool._measurementLayer as GraphicsLayer
         measurementLayer.graphics.watch('length', (length: number) => {
           if (length === 0) return
           const measurementPointGraphics = measurementLayer.graphics.items.filter((g: Graphic) => g.geometry.type === 'point')
           if (measurementPointGraphics.length === 0) return
           setMeasurementPointGraphic(measurementPointGraphics[0])
+          setMeasurementPointGraphicsLayer(measurementLayer)
         })
       })
 
