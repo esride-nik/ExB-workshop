@@ -53,7 +53,8 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     id: 'oneDecimalPlace',
                     defaultMessage: defaultMessages.oneDecimalPlace
                   })}</Label>
-
+                </SettingRow>
+                <SettingRow>
                   <Radio
                     aria-label='twoDecimalPlaces'
                     checked={props.config.meterValueOption === MeterValueOption.twoDecimalPlaces}
@@ -63,7 +64,8 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     id: 'twoDecimalPlaces',
                     defaultMessage: defaultMessages.twoDecimalPlaces
                   })}</Label>
-
+                  </SettingRow>
+                  <SettingRow>
                   <Radio
                     aria-label='decimalPlacesRounded'
                     checked={props.config.meterValueOption === MeterValueOption.decimalPlacesRounded}
@@ -73,7 +75,8 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     id: 'decimalPlacesRounded',
                     defaultMessage: defaultMessages.decimalPlacesRounded
                   })}</Label>
-
+                  </SettingRow>
+                  <SettingRow>
                   <Radio
                     aria-label='noDecimalPlaces'
                     checked={props.config.meterValueOption === MeterValueOption.noDecimalPlaces}
