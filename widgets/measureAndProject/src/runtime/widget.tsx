@@ -11,6 +11,7 @@ import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.
 import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtils.js'
 
 import './measureAndProject.css'
+import Graphic from 'esri/Graphic'
 
 enum allowedSrs {
   EPSG25832 = 25832,
@@ -45,6 +46,24 @@ export default function (props: AllWidgetProps<unknown>) {
       })
       setMeasurementWidget(measurement)
 
+      measurement.watch('activeWidget', (evt: any) => {
+        console.info(evt.viewModel)
+        const tool = evt.viewModel.tool
+        const manipulatorLayer = tool._manipulatorLayer
+        const measurementLayer = tool._measurementLayer
+        // measurementLayer.attributionVisible = false
+        console.log('measurementLayer', measurementLayer)
+        // manipulatorLayer.attributionVisible = false
+        measurementLayer.graphics.watch('length', (length: number) => {
+          console.log('measurementLayer.graphics.length', length)
+          const measurementPointGraphics = measurementLayer.graphics.items.filter((g: Graphic) => g.geometry.type === 'point')
+          console.log('measurementPointGraphics', measurementPointGraphics)
+          measurementPointGraphics[0].symbol.watch('text', (text: string) => {
+            console.log('measurementPointGraphics[0].symbol.text', text)
+          })
+        })
+      })
+
       // reset node ref when starting new workflow to recreate result box after it's been removed
       measurement.viewModel.watch('state', (state: string) => {
         if (state === 'ready') {
@@ -61,7 +80,6 @@ export default function (props: AllWidgetProps<unknown>) {
           y: event.y
         })
         setMouseMapPoint(mouseMapPoint)
-        console.log('watchHandler', watchHandler) // TODO: Make it work or remove
       })
 
       // in case of lost WebGL context
@@ -71,11 +89,6 @@ export default function (props: AllWidgetProps<unknown>) {
       )
     }
   }, [jimuMapView])
-
-  // TODO: Make it work or remove
-  useEffect(() => {
-    console.log('watchHandler', watchHandler)
-  }, [watchHandler])
 
   const fillMeasurementResultNodeRefs = () => {
     // Getting the original measurement display node and creating a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
@@ -208,7 +221,6 @@ export default function (props: AllWidgetProps<unknown>) {
                       setWatchHandler(watchHandler)
                     } else if (state === 'measured') {
                       // TODO: Why is watchHandler undefined short after being set on the state as a fine object?
-                      console.log('removing distance watchHandler', watchHandler)
                       watchHandler?.remove()
                     }
                   })
