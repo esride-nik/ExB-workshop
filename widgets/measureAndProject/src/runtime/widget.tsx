@@ -27,8 +27,6 @@ export default function (props: AllWidgetProps<unknown>) {
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
-  const [measurementPointGraphic, setMeasurementPointGraphic] = useState<Graphic>(undefined)
-  const [roundedMeasurementPointGraphic, setRoundedMeasurementPointGraphic] = useState<Graphic>(undefined)
   const [measurementPointGraphicsLayer, setMeasurementPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedValueString, setRoundedValueString] = useState<string>('')
   const [watchHandler, setWatchHandler] = useState<any>(undefined)
@@ -44,11 +42,21 @@ export default function (props: AllWidgetProps<unknown>) {
 
   // when the roundedValueString updates, exchange the text symbol of the rounded measurement point graphic with the rounded value
   useEffect(() => {
-    if (!measurementPointGraphic || !roundedMeasurementPointGraphic || !measurementPointGraphicsLayer) return
-    (measurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString;
+    if (!measurementPointGraphicsLayer || measurementPointGraphicsLayer.graphics.length === 0) return
+
+    // get the text graphic from the layer on every value update because it also affects the graphic position
+    const measurementPointGraphics = measurementPointGraphicsLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
+    if (measurementPointGraphics.length === 0) return
+    const measurementPointGraphic = measurementPointGraphics[0]
+
+    // make a deep copy of the graphic before changing the symbol of the original one
+    const roundedMeasurementPointGraphic = measurementPointGraphic.clone();
     (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
+
+    // remove original graphic and add the rounded one
+    measurementPointGraphicsLayer.remove(measurementPointGraphic)
     measurementPointGraphicsLayer.add(roundedMeasurementPointGraphic)
-  }, [measurementPointGraphic, roundedMeasurementPointGraphic, measurementPointGraphicsLayer, roundedValueString])
+  }, [measurementPointGraphicsLayer, roundedValueString])
 
   // when the roundedValueString updates, update the duplicate measurement result node
   useEffect(() => {
@@ -76,18 +84,6 @@ export default function (props: AllWidgetProps<unknown>) {
           // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
           const tool = (measurement.viewModel.activeViewModel as any).tool
           const measurementLayer = tool._measurementLayer as GraphicsLayer
-
-          await reactiveUtils.whenOnce(() => measurementLayer.graphics.length > 0)
-          const measurementPointGraphics = measurementLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
-          if (measurementPointGraphics.length === 0) return
-          const measurementPointGraphic = measurementPointGraphics[0]
-
-          // make a deep copy of the graphic before changing the symbol of the original one
-          setRoundedMeasurementPointGraphic(measurementPointGraphic.clone())
-
-          // make the original measurement point graphic invisible
-          measurementPointGraphic.symbol.color = [0, 0, 0, 0] as unknown as __esri.Color
-          setMeasurementPointGraphic(measurementPointGraphic)
           setMeasurementPointGraphicsLayer(measurementLayer)
         }
       })
