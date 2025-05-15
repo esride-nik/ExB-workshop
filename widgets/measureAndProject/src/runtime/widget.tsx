@@ -69,7 +69,6 @@ export default function (props: AllWidgetProps<unknown>) {
 
       // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
       measurement.watch('activeWidget', (evt: any) => {
-        console.info(evt.viewModel)
         const tool = evt.viewModel.tool
         const measurementLayer = tool._measurementLayer as GraphicsLayer
         measurementLayer.graphics.watch('length', (length: number) => {
@@ -197,6 +196,26 @@ export default function (props: AllWidgetProps<unknown>) {
     return webMercatorUtils.webMercatorToGeographic(point) as Point
   }
 
+  const roundMeasurement = (locale: string) => {
+    measurementWidget.viewModel.watch('state', (state: string) => {
+      if (measurementWidget.activeTool === 'distance' && state === 'measuring') {
+        const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
+          if (!originalMeasurementResultNode?.current || !m) return
+
+          // TODO: this is going to be configurable by Settings
+          // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
+          const mRound = (Math.round(m.length * 2) / 2)
+          const measurementInnerText = originalMeasurementResultNode?.current?.innerText
+          const measurementParts = measurementInnerText.split(/ /)
+
+          const roundedValueString = formatMeasurementStringDistance(measurementParts, locale, mRound)
+          setRoundedValueString(roundedValueString)
+        })
+        setWatchHandler(watchHandler)
+      }
+    })
+  }
+
   const formatMeasurementStringDistance = (measurementParts: any, locale: string, mRound: number): string => {
     if (measurementParts[1] === 'm') {
       const numberFormat = new Intl.NumberFormat(locale, { style: 'unit', unit: 'meter' }) // format as meters including the unit (because it's in the standard) in local number format
@@ -235,26 +254,7 @@ export default function (props: AllWidgetProps<unknown>) {
                   setActiveTool('distance')
 
                   // TODO: refactor with area
-                  measurementWidget.viewModel.watch('state', (state: string) => {
-                    if (measurementWidget.activeTool === 'distance' && state === 'measuring') {
-                      const watchHandler = (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-                        if (!originalMeasurementResultNode?.current || !m) return
-
-                        // TODO: this is going to be configurable by Settings
-                        // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
-                        const mRound = (Math.round(m.length * 2) / 2)
-                        const measurementInnerText = originalMeasurementResultNode?.current?.innerText
-                        const measurementParts = measurementInnerText.split(/ /)
-
-                        const roundedValueString = formatMeasurementStringDistance(measurementParts, props.locale, mRound)
-                        setRoundedValueString(roundedValueString)
-                      })
-                      setWatchHandler(watchHandler)
-                    } else if (state === 'measured') {
-                      // TODO: Why is watchHandler undefined short after being set on the state as a fine object?
-                      watchHandler?.remove()
-                    }
-                  })
+                  roundMeasurement(props.locale)
                 }
               }}
             ></Button>
@@ -377,4 +377,3 @@ export default function (props: AllWidgetProps<unknown>) {
         </div>
   )
 }
-
