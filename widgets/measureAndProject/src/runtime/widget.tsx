@@ -13,6 +13,7 @@ import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.
 import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtils.js'
 
 import './measureAndProject.css'
+import positionPointSymbol from './positionPointSymbol'
 
 enum allowedSrs {
   EPSG25832 = 25832,
@@ -112,16 +113,7 @@ export default function (props: AllWidgetProps<unknown>) {
       positionPointGraphicsLayer.removeAll()
       const positionPointGraphic = new Graphic({
         geometry: clickPoint,
-        symbol: {
-          type: 'simple-marker',
-          style: 'triangle',
-          color: 'red',
-          size: '12px',
-          outline: {
-            color: 'white',
-            width: 2
-          }
-        } as __esri.SimpleMarkerSymbolProperties
+        symbol: positionPointSymbol
       })
       positionPointGraphicsLayer.add(positionPointGraphic)
     }
