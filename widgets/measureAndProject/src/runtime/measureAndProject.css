@@ -9,6 +9,10 @@
     margin: 3px;
 }
 
+#clickCoordinates {
+    background-color: aqua;
+}
+
 .esri-measurement-position {
     padding: 5px;
 }
