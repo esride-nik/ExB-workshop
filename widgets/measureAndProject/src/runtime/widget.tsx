@@ -7,12 +7,12 @@ import Measurement from '@arcgis/core/widgets/Measurement.js'
 import * as projection from '@arcgis/core/geometry/projection.js'
 import { SpatialReference, type Point } from 'esri/geometry'
 import * as reactiveUtils from 'esri/core/reactiveUtils.js'
+import Graphic from 'esri/Graphic'
+import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.js'
 import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtils.js'
 
 import './measureAndProject.css'
-import type Graphic from 'esri/Graphic'
-import type GraphicsLayer from 'esri/layers/GraphicsLayer'
 
 enum allowedSrs {
   EPSG25832 = 25832,
@@ -25,9 +25,11 @@ export default function (props: AllWidgetProps<unknown>) {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
+  const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
-  const [measurementPointGraphicsLayer, setMeasurementPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
+  const [distanceAreaTextGraphicsLayer, setDistanceAreaTextGraphicsLayer] = useState<GraphicsLayer>(undefined)
+  const [positionPointGraphicsLayer, setPositionPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedValueString, setRoundedValueString] = useState<string>('')
   const measurementWidgetNode = useRef(null)
   const measurementPositionNode = useRef(null)
@@ -59,7 +61,7 @@ export default function (props: AllWidgetProps<unknown>) {
   // when the roundedValueString updates, update the measurement display on the map
   useEffect(() => {
     updateMeasurementValueOnMap()
-  }, [measurementPointGraphicsLayer, roundedValueString])
+  }, [distanceAreaTextGraphicsLayer, roundedValueString])
 
   // when the roundedValueString updates, update the measurement display in the widget
   useEffect(() => {
@@ -81,7 +83,7 @@ export default function (props: AllWidgetProps<unknown>) {
         // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
         const tool = (measurementWidget.viewModel.activeViewModel as any).tool
         const measurementLayer = tool._measurementLayer as GraphicsLayer
-        setMeasurementPointGraphicsLayer(measurementLayer)
+        setDistanceAreaTextGraphicsLayer(measurementLayer)
       }
 
       // observe and round value while measuring
@@ -104,6 +106,27 @@ export default function (props: AllWidgetProps<unknown>) {
     })
   }, [measurementWidget])
 
+  useEffect(() => {
+    if (!clickPoint || !positionPointGraphicsLayer) return
+    if (activeTool === 'position') {
+      positionPointGraphicsLayer.removeAll()
+      const positionPointGraphic = new Graphic({
+        geometry: clickPoint,
+        symbol: {
+          type: 'simple-marker',
+          style: 'triangle',
+          color: 'red',
+          size: '12px',
+          outline: {
+            color: 'white',
+            width: 2
+          }
+        } as __esri.SimpleMarkerSymbolProperties
+      })
+      positionPointGraphicsLayer.add(positionPointGraphic)
+    }
+  }, [activeTool, clickPoint, positionPointGraphicsLayer])
+
   // when jimuMapView is available, initialize the measurement widget and setup mouse position tracking
   useEffect(() => {
     if (jimuMapView) {
@@ -114,14 +137,32 @@ export default function (props: AllWidgetProps<unknown>) {
       })
       setMeasurementWidget(measurement)
 
+      // add GraphicsLayer for position tool
+      const positionPointGraphicsLayer = new GraphicsLayer({
+        id: 'measurementPointGraphicsLayer',
+        title: 'Measurement Point Graphics Layer',
+        listMode: 'hide'
+      })
+      jimuMapView.view.map.add(positionPointGraphicsLayer)
+      setPositionPointGraphicsLayer(positionPointGraphicsLayer)
+
       // get current mouse position on map as map coordinates
-      jimuMapView.view.on('pointer-move', (event: any) => {
+      jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
         fillMeasurementResultNodeRefs()
         const mouseMapPoint = jimuMapView.view.toMap({
           x: event.x,
           y: event.y
         })
         setMouseMapPoint(mouseMapPoint)
+      })
+
+      // get click position as map coordinates. To be used by position tool.
+      jimuMapView.view.on('click', (event: __esri.ViewClickEvent) => {
+        const clickPoint = jimuMapView.view.toMap({
+          x: event.x,
+          y: event.y
+        })
+        setClickPoint(clickPoint)
       })
 
       // in case of lost WebGL context
@@ -134,10 +175,10 @@ export default function (props: AllWidgetProps<unknown>) {
 
   // exchange the map graphic with the original value with a clone that contains the rounded value
   const updateMeasurementValueOnMap = () => {
-    if (!measurementPointGraphicsLayer || measurementPointGraphicsLayer.graphics.length === 0) return
+    if (!distanceAreaTextGraphicsLayer || distanceAreaTextGraphicsLayer.graphics.length === 0) return
 
     // get the text graphic from the layer on every value update because it also affects the graphic position
-    const measurementPointGraphics = measurementPointGraphicsLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
+    const measurementPointGraphics = distanceAreaTextGraphicsLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
     if (measurementPointGraphics.length === 0) return
     const measurementPointGraphic = measurementPointGraphics[0]
 
@@ -146,8 +187,8 @@ export default function (props: AllWidgetProps<unknown>) {
     (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
 
     // remove original graphic and add the rounded one
-    measurementPointGraphicsLayer.remove(measurementPointGraphic)
-    measurementPointGraphicsLayer.add(roundedMeasurementPointGraphic)
+    distanceAreaTextGraphicsLayer.remove(measurementPointGraphic)
+    distanceAreaTextGraphicsLayer.add(roundedMeasurementPointGraphic)
   }
 
   // get the original measurement display node and create a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
