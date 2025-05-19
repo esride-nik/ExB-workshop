@@ -9,10 +9,6 @@
     margin: 3px;
 }
 
-#clickCoordinates {
-    background-color: aqua;
-}
-
 .esri-measurement-position {
     padding: 5px;
 }
@@ -22,7 +18,7 @@
     display: inline-grid;
 }
 .esri-measurement-position-coordinate-number {
-    min-height:30px;
+    min-height:20px;
 }
 
 .esri-measurement-selectsrs {

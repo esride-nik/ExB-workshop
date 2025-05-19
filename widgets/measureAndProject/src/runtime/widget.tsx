@@ -360,22 +360,18 @@ export default function (props: AllWidgetProps<unknown>) {
           <div id="measurementWidget" ref={measurementWidgetNode} />
           { // this whole block implements the Position tool
           activeTool === 'position' && <div id="positionTool" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
-            <div id="mouseLatitude" className="esri-measurement-position-coordinate">
-              <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
-              <p className='esri-measurement-position-coordinate-number'>{getFormattedLatitude(mouseMapPoint)}</p>
-            </div>
-            <div id="mouseLongitude" className="esri-measurement-position-coordinate">
-              <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
-              <p className='esri-measurement-position-coordinate-number'>{getFormattedLongitude(mouseMapPoint)}</p>
-            </div>
-            {clickPoint && <div id="clickCoordinates">
-              <div id="clickLatitude" className="esri-measurement-position-coordinate">
-                <p className='esri-measurement-position-coordinate-number'>{getFormattedLatitude(clickPoint)}</p>
+            <div id="coordinates">
+              <div id="latitude" className="esri-measurement-position-coordinate">
+                <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
+                <p className='esri-measurement-position-coordinate-number'>{getFormattedLatitude(mouseMapPoint)}</p>
+                {clickPoint && <p className='esri-measurement-position-coordinate-number'>{getFormattedLatitude(clickPoint)}</p>}
               </div>
-              <div id="clickLongitude" className="esri-measurement-position-coordinate">
-                <p className='esri-measurement-position-coordinate-number'>{getFormattedLongitude(clickPoint)}</p>
+              <div id="longitude" className="esri-measurement-position-coordinate">
+                <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
+                <p className='esri-measurement-position-coordinate-number'>{getFormattedLongitude(mouseMapPoint)}</p>
+                {clickPoint && <p className='esri-measurement-position-coordinate-number'>{getFormattedLongitude(clickPoint)}</p>}
               </div>
-            </div>}
+            </div>
             <div className="esri-measurement-selectsrs">
               <Label centric className='esri-measurement-selectsrs-radio'>
                 <Radio
