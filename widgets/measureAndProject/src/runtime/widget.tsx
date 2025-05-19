@@ -39,21 +39,22 @@ export default function (props: AllWidgetProps<unknown>) {
     coordinateFormatter.load()
   }, [])
 
-  // when the roundedValueString updates, update the measurement display on the map
-  useEffect(() => {
-    if (!measurementPointGraphicsLayer || !jimuMapView) return
+  // TODO: text symbol switches back to original value when the map is clicked. Find a solution!
+  // // when the roundedValueString updates, update the measurement display on the map
+  // useEffect(() => {
+  //   if (!measurementPointGraphicsLayer || !jimuMapView) return
 
-    // TODO: text symbol switches back to original value when the map is clicked. But all of these event handlers don't do the trick. What's the event?
-    // jimuMapView.view.on('click', () => {
-    //   updateMeasurementValueOnMap()
-    // })
-    // jimuMapView.view.on('pointer-down', () => {
-    //   updateMeasurementValueOnMap()
-    // })
-    // jimuMapView.view.on('pointer-up', () => {
-    //   updateMeasurementValueOnMap()
-    // })
-  }, [jimuMapView, measurementPointGraphicsLayer])
+  //   // TODO: text symbol switches back to original value when the map is clicked. But all of these event handlers don't do the trick. What's the event?
+  //   // jimuMapView.view.on('click', () => {
+  //   //   updateMeasurementValueOnMap()
+  //   // })
+  //   // jimuMapView.view.on('pointer-down', () => {
+  //   //   updateMeasurementValueOnMap()
+  //   // })
+  //   // jimuMapView.view.on('pointer-up', () => {
+  //   //   updateMeasurementValueOnMap()
+  //   // })
+  // }, [jimuMapView, measurementPointGraphicsLayer])
 
   // when the roundedValueString updates, update the measurement display on the map
   useEffect(() => {
