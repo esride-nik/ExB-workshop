@@ -275,7 +275,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const formatMeasurementStringDistance = (measurementParts: any, mRound: number): string => {
     if (measurementParts[1] === 'm') {
-      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter' }) // format as meters including the unit (because it's in the standard) in local number format
+      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter', minimumFractionDigits: 1 }) // format as meters including the unit (because it's in the standard) in local number format
       measurementParts[0] = numberFormat.format(mRound)
       delete measurementParts[1] // remove the unit
     }
@@ -284,7 +284,7 @@ export default function (props: AllWidgetProps<unknown>) {
 
   const formatMeasurementStringArea = (measurementParts: any, mRound: number): string => {
     if (measurementParts[1] === 'm²') {
-      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal' }) // format as decimal in local number format
+      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: 1 }) // format as decimal in local number format
       measurementParts[0] = numberFormat.format(mRound)
     }
     return measurementParts.join(' ')
@@ -361,15 +361,20 @@ export default function (props: AllWidgetProps<unknown>) {
           { // this whole block implements the Position tool
           activeTool === 'position' && <div id="positionTool" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
             <div id="coordinates">
+              <div id="coordinateIcon" className="esri-measurement-position-coordinate-icon">
+                <h5></h5>
+                <p><calcite-icon icon="arrow-up-left" className="coordinate-icon" /></p>
+                {clickPoint && <p><calcite-icon icon="pin-tear-f" className="coordinate-icon" /></p>}
+              </div>
               <div id="latitude" className="esri-measurement-position-coordinate">
                 <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
-                <p className='esri-measurement-position-coordinate-number'>{getFormattedLatitude(mouseMapPoint)}</p>
-                {clickPoint && <p className='esri-measurement-position-coordinate-number'>{getFormattedLatitude(clickPoint)}</p>}
+                <p>{getFormattedLatitude(mouseMapPoint)}</p>
+                {clickPoint && <p>{getFormattedLatitude(clickPoint)}</p>}
               </div>
               <div id="longitude" className="esri-measurement-position-coordinate">
                 <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
-                <p className='esri-measurement-position-coordinate-number'>{getFormattedLongitude(mouseMapPoint)}</p>
-                {clickPoint && <p className='esri-measurement-position-coordinate-number'>{getFormattedLongitude(clickPoint)}</p>}
+                <p>{getFormattedLongitude(mouseMapPoint)}</p>
+                {clickPoint && <p>{getFormattedLongitude(clickPoint)}</p>}
               </div>
             </div>
             <div className="esri-measurement-selectsrs">

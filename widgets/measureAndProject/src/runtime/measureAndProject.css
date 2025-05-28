@@ -13,11 +13,17 @@
     padding: 5px;
 }
 
-.esri-measurement-position-coordinate {
-    width: 50%;
+.esri-measurement-position-coordinate-icon {
+    width: 20%;
     display: inline-grid;
 }
-.esri-measurement-position-coordinate-number {
+.coordinate-icon {
+    height: 80%;
+    padding-top: 6px;
+}
+.esri-measurement-position-coordinate {
+    width: 40%;
+    display: inline-grid;
     min-height:20px;
 }
 
