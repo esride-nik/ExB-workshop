@@ -11,7 +11,7 @@ const positionPointSymbol = new CIMSymbol({
           enable: true,
           anchorPoint: {
             x: 0,
-            y: 0,
+            y: -0.5,
             z: 0
           },
           anchorPointUnits: 'Relative',
@@ -306,7 +306,7 @@ const positionPointSymbol = new CIMSymbol({
           enable: true,
           anchorPoint: {
             x: 0,
-            y: 4.5
+            y: 0.5
           },
           anchorPointUnits: 'Relative',
           dominantSizeAxis3D: 'Y',
