@@ -9,5 +9,8 @@ System.register([], function (_export) {return {execute: function () {_export({
   measurementTypes: 'Messarten',
   area: 'Fläche',
   distance: 'Entfernung',
-  location: 'Ort'
+  location: 'Ort',
+  freeText: 'Freitext',
+  headerText: 'Überschrift',
+  copyText: 'Fließtext'
 })}}});

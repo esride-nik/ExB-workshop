@@ -2,9 +2,10 @@ import { React } from 'jimu-core'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import defaultMessages from './translations/default'
-import { Checkbox, Label, Radio, Switch } from 'jimu-ui'
+import { Label, Radio, Switch, TextArea } from 'jimu-ui'
 import { MeterValueOption, type IMConfig } from '../config'
-import { distance } from 'esri/geometry/geometryEngine'
+
+import './measureAndProjectSettings.css'
 
 export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
   const onMapSelected = (useMapWidgetIds: string[]) => {
@@ -31,6 +32,26 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
       config: {
         ...props.config,
         distanceMeasurementEnabled: !props.config.distanceMeasurementEnabled
+      }
+    })
+  }
+
+  const setHeaderText = (headerText: string) => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        headerText
+      }
+    })
+  }
+
+  const setCopyText = (headerText: string) => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        headerText
       }
     })
   }
@@ -117,7 +138,7 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     id: 'noDecimalPlaces',
                     defaultMessage: defaultMessages.noDecimalPlaces
                   })}</Label>
-                </SettingRow>
+              </SettingRow>
             </SettingSection>
 
             <SettingSection
@@ -158,7 +179,39 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     id: 'location',
                     defaultMessage: defaultMessages.location
                   })}</Label>
-                  </SettingRow>
+                </SettingRow>
+            </SettingSection>
+
+            <SettingSection
+                className="text-section"
+                title={props.intl.formatMessage({
+                  id: 'freeText',
+                  defaultMessage: defaultMessages.freeText
+                })}>
+                <SettingRow>
+                  <Label className="text-label">{props.intl.formatMessage({
+                    id: 'headerText',
+                    defaultMessage: defaultMessages.headerText
+                  })}
+                    <TextArea
+                      className="mb-4"
+                      aria-label='headerText'
+                      onAcceptValue={(value: string) => { setHeaderText(value) }}
+                      value={props.config.headerText}
+                    /></Label>
+                </SettingRow>
+                <SettingRow>
+                  <Label className="text-label">{props.intl.formatMessage({
+                    id: 'copyText',
+                    defaultMessage: defaultMessages.copyText
+                  })}
+                  <TextArea
+                    className="mb-4"
+                    aria-label='copyText'
+                    onAcceptValue={(value: string) => { setCopyText(value) }}
+                    value={props.config.copyText}
+                  /></Label>
+                </SettingRow>
             </SettingSection>
         </div>
   )

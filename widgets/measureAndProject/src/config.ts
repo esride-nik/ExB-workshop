@@ -30,6 +30,8 @@ export interface Config {
   distanceMeasurementEnabled: boolean
   areaMeasurementEnabled: boolean
   locationMeasurementEnabled: boolean
+  headerText: string
+  copyText: string
 }
 
 export type IMConfig = ImmutableObject<Config>

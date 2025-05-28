@@ -9,5 +9,8 @@ export default {
   measurementTypes: 'Measurement types',
   area: 'Area',
   distance: 'Distance',
-  location: 'Location'
+  location: 'Location',
+  freeText: 'Free text',
+  headerText: 'Header text',
+  copyText: 'Copy text'
 }

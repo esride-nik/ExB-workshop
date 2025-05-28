@@ -1,0 +1,6 @@
+.text-label {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start !important;
+    width: 100%;
+}

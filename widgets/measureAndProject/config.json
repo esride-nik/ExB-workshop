@@ -2,5 +2,7 @@
   "meterValueOption": 0,
   "distanceMeasurementEnabled": true,
   "areaMeasurementEnabled": true,
-  "locationMeasurementEnabled": true
+  "locationMeasurementEnabled": true,
+  "headerText": "",
+  "copyText": ""
 }
