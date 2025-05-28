@@ -237,7 +237,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   const getDmsLatitude = (point: Point): string => {
     if (!point) return
-    const dmsPoint = formatPointAsDms(mouseMapPoint)
+    const dmsPoint = formatPointAsDms(point)
     const latitude = dmsPoint?.split(/[N|S]/)[0]?.trim()
     const latitudeParts = latitude.split(' ')
     if (latitudeParts.length < 3) return latitude // fallback
@@ -247,7 +247,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   const getDmsLongitude = (point: Point): string => {
     if (!point) return
-    const dmsPoint = formatPointAsDms(mouseMapPoint)
+    const dmsPoint = formatPointAsDms(point)
     const longitude = dmsPoint?.split(/[N|S]/)[1]?.trim()
     const longitudeParts = longitude.split(' ')
     if (longitudeParts.length < 3) return longitude // fallback
