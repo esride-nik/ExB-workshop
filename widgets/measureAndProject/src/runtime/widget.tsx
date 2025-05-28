@@ -363,8 +363,8 @@ export default function (props: AllWidgetProps<unknown>) {
             <div id="coordinates">
               <div id="coordinateIcon" className="esri-measurement-position-coordinate-icon">
                 <h5></h5>
-                <p><calcite-icon icon="arrow-up-left" className="coordinate-icon" /></p>
-                {clickPoint && <p><calcite-icon icon="pin-tear-f" className="coordinate-icon" /></p>}
+                <p><calcite-icon icon="arrow-bold-left" class="coordinate-icon-mouse" /></p>
+                {clickPoint && <p><calcite-icon icon="pin-tear-f" class="coordinate-icon-position" /></p>}
               </div>
               <div id="latitude" className="esri-measurement-position-coordinate">
                 <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>

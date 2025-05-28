@@ -17,9 +17,17 @@
     width: 20%;
     display: inline-grid;
 }
-.coordinate-icon {
-    height: 80%;
+.coordinate-icon-mouse {
+    position: relative;
     padding-top: 6px;
+    left: 7px;
+    transform: rotate(45deg);
+}    
+.coordinate-icon-position {
+    position: relative;
+    bottom: 8px;
+    left: 6px;
+    padding-top: 4px;
 }
 .esri-measurement-position-coordinate {
     width: 40%;
