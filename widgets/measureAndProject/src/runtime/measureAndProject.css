@@ -9,11 +9,7 @@
     margin: 3px;
 }
 
-.esri-measurement-position {
-    padding: 5px;
-}
-
-.esri-measurement-position-coordinate-icon {
+.esri-measurement-location-coordinate-icon {
     width: 20%;
     display: inline-grid;
 }
@@ -23,13 +19,13 @@
     left: 7px;
     transform: rotate(45deg);
 }    
-.coordinate-icon-position {
+.coordinate-icon-location {
     position: relative;
     bottom: 8px;
     left: 6px;
     padding-top: 4px;
 }
-.esri-measurement-position-coordinate {
+.esri-measurement-location-coordinate {
     width: 40%;
     display: inline-grid;
     min-height:20px;

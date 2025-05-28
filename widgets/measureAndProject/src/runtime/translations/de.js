@@ -3,7 +3,7 @@ System.register([], function (_export) {return {execute: function () {_export({
   cfgDataSources: 'Bitte Datenquellen konfigurieren',
   distanceMeasurementTool: 'Distanzmessung',
   areaMeasurementTool: 'Flächenmessung',
-  positionTool: 'Position',
+  locationTool: 'Ortsbestimmung',
   clearMeasurements: 'Messungen löschen',
   latitude: 'Breitengrad',
   longitude: 'Längengrad',

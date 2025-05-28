@@ -13,7 +13,7 @@ import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.
 import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtils.js'
 
 import './measureAndProject.css'
-import positionPointSymbol from './positionPointSymbol'
+import locationPointSymbol from './locationPointSymbol'
 import { MeterValueOption } from '../config'
 
 enum allowedSrs {
@@ -31,10 +31,10 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
   const [distanceAreaTextGraphicsLayer, setDistanceAreaTextGraphicsLayer] = useState<GraphicsLayer>(undefined)
-  const [positionPointGraphicsLayer, setPositionPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
+  const [locationPointGraphicsLayer, setLocationPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedValueString, setRoundedValueString] = useState<string>('')
   const measurementWidgetNode = useRef(null)
-  const measurementPositionNode = useRef(null)
+  const measurementLocationNode = useRef(null)
   const originalMeasurementResultNode = useRef(null)
   const duplicateMeasurementResultNode = useRef(null)
 
@@ -117,16 +117,16 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   }, [measurementWidget])
 
   useEffect(() => {
-    if (!clickPoint || !positionPointGraphicsLayer) return
-    if (activeTool === 'position') {
-      positionPointGraphicsLayer.removeAll()
-      const positionPointGraphic = new Graphic({
+    if (!clickPoint || !locationPointGraphicsLayer) return
+    if (activeTool === 'location') {
+      locationPointGraphicsLayer.removeAll()
+      const locationPointGraphic = new Graphic({
         geometry: clickPoint,
-        symbol: positionPointSymbol
+        symbol: locationPointSymbol
       })
-      positionPointGraphicsLayer.add(positionPointGraphic)
+      locationPointGraphicsLayer.add(locationPointGraphic)
     }
-  }, [activeTool, clickPoint, positionPointGraphicsLayer])
+  }, [activeTool, clickPoint, locationPointGraphicsLayer])
 
   // when jimuMapView is available, initialize the measurement widget and setup mouse position tracking
   useEffect(() => {
@@ -138,14 +138,14 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       })
       setMeasurementWidget(measurement)
 
-      // add GraphicsLayer for position tool
-      const positionPointGraphicsLayer = new GraphicsLayer({
+      // add GraphicsLayer for location tool
+      const locationPointGraphicsLayer = new GraphicsLayer({
         id: 'measurementPointGraphicsLayer',
         title: 'Measurement Point Graphics Layer',
         listMode: 'hide'
       })
-      jimuMapView.view.map.add(positionPointGraphicsLayer)
-      setPositionPointGraphicsLayer(positionPointGraphicsLayer)
+      jimuMapView.view.map.add(locationPointGraphicsLayer)
+      setLocationPointGraphicsLayer(locationPointGraphicsLayer)
 
       // get current mouse position on map as map coordinates
       jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
@@ -157,7 +157,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
         setMouseMapPoint(mouseMapPoint)
       })
 
-      // get click position as map coordinates. To be used by position tool.
+      // get click point as map coordinates. To be used by location tool.
       jimuMapView.view.on('click', (event: __esri.ViewClickEvent) => {
         const clickPoint = jimuMapView.view.toMap({
           x: event.x,
@@ -299,6 +299,12 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     return measurementParts.join(' ')
   }
 
+  const resetMeasurementWidget = () => {
+    locationPointGraphicsLayer?.removeAll()
+    measurementWidget.clear()
+    originalMeasurementResultNode.current = undefined
+  }
+
   if (!isConfigured()) {
     return <h5><FormattedMessage id="cfgDataSources" defaultMessage={defaultMessages.cfgDataSources} /></h5>
   }
@@ -314,8 +320,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
               title={defaultMessages.distanceMeasurementTool}
               onClick={() => {
                 if (measurementWidget) {
-                  measurementWidget.clear()
-                  originalMeasurementResultNode.current = undefined
+                  resetMeasurementWidget()
                   measurementWidget.activeTool = 'distance'
                   setActiveTool('distance')
                 }
@@ -328,25 +333,23 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
               title={defaultMessages.areaMeasurementTool}
               onClick={() => {
                 if (measurementWidget) {
-                  measurementWidget.clear()
-                  originalMeasurementResultNode.current = undefined
+                  resetMeasurementWidget()
                   measurementWidget.activeTool = 'area'
                   setActiveTool('area')
                 }
               }}
             ></Button>
             <Button
-              id='position'
+              id='location'
               className='esri-widget--button esri-interactive esri-icon-map-pin'
-              disabled={activeTool === 'position'}
+              disabled={activeTool === 'location'}
               size="default"
-              title={defaultMessages.positionTool}
+              title={defaultMessages.locationTool}
               onClick={() => {
-                if (activeTool !== 'position' && measurementWidget) {
-                  measurementWidget.clear()
-                  originalMeasurementResultNode.current = undefined
+                if (activeTool !== 'location' && measurementWidget) {
+                  resetMeasurementWidget()
                   measurementWidget.activeTool = undefined
-                  setActiveTool('position')
+                  setActiveTool('location')
                 }
               }}
             ></Button>
@@ -367,20 +370,20 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
           </div>
 
           <div id="measurementWidget" ref={measurementWidgetNode} />
-          { // this whole block implements the Position tool
-          activeTool === 'position' && <div id="positionTool" className="esri-widget esri-component esri-measurement-position" ref={measurementPositionNode}>
+          { // this whole block implements the Location tool
+          activeTool === 'location' && <div id="locationTool" className="esri-widget esri-component esri-measurement-location" ref={measurementLocationNode}>
             <div id="coordinates">
-              <div id="coordinateIcon" className="esri-measurement-position-coordinate-icon">
+              <div id="coordinateIcon" className="esri-measurement-location-coordinate-icon">
                 <h5></h5>
                 <p><calcite-icon icon="arrow-bold-left" class="coordinate-icon-mouse" /></p>
-                {clickPoint && <p><calcite-icon icon="pin-tear-f" class="coordinate-icon-position" /></p>}
+                {clickPoint && <p><calcite-icon icon="pin-tear-f" class="coordinate-icon-location" /></p>}
               </div>
-              <div id="latitude" className="esri-measurement-position-coordinate">
+              <div id="latitude" className="esri-measurement-location-coordinate">
                 <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
                 <p>{getFormattedLatitude(mouseMapPoint)}</p>
                 {clickPoint && <p>{getFormattedLatitude(clickPoint)}</p>}
               </div>
-              <div id="longitude" className="esri-measurement-position-coordinate">
+              <div id="longitude" className="esri-measurement-location-coordinate">
                 <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
                 <p>{getFormattedLongitude(mouseMapPoint)}</p>
                 {clickPoint && <p>{getFormattedLongitude(clickPoint)}</p>}

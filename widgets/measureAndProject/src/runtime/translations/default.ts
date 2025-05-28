@@ -3,7 +3,7 @@ export default {
   cfgDataSources: 'Please configure data sources',
   distanceMeasurementTool: 'Distance Measurement Tool',
   areaMeasurementTool: 'Area Measurement Tool',
-  positionTool: 'Position Tool',
+  locationTool: 'Location Tool',
   clearMeasurements: 'Clear Measurements',
   latitude: 'Latitude',
   longitude: 'Longitude',
