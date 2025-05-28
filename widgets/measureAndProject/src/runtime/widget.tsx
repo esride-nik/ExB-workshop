@@ -430,6 +430,18 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
             </div>
           </div>}
 
+          <div className="text-blocks">
+            {props.config?.headerText &&
+              <div className="esri-widget esri-component esri-measurement-header">
+                <h3>{props.config.headerText}</h3>
+              </div>
+            }
+            {props.config?.copyText &&
+              <div className="esri-widget esri-component esri-measurement-copy-text">
+                {props.config.copyText}
+              </div>
+            }
+          </div>
           <JimuMapViewComponent useMapWidgetId={props.useMapWidgetIds?.[0]} onActiveViewChange={onActiveViewChange} />
         </div>
   )

@@ -50,3 +50,11 @@
 .disabled {
     background-color: #DDD !important;
 }
+
+.text-blocks {
+    padding:10px
+}
+
+.text-blocks div {
+    background: transparent;
+}
