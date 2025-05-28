@@ -14,6 +14,7 @@ import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtil
 
 import './measureAndProject.css'
 import positionPointSymbol from './positionPointSymbol'
+import { MeterValueOption } from '../config'
 
 enum allowedSrs {
   EPSG25832 = 25832,
@@ -22,7 +23,7 @@ enum allowedSrs {
   EPSG0 = 0
 }
 
-export default function (props: AllWidgetProps<unknown>) {
+export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
@@ -47,7 +48,6 @@ export default function (props: AllWidgetProps<unknown>) {
   // useEffect(() => {
   //   if (!measurementPointGraphicsLayer || !jimuMapView) return
 
-  //   // TODO: text symbol switches back to original value when the map is clicked. But all of these event handlers don't do the trick. What's the event?
   //   // jimuMapView.view.on('click', () => {
   //   //   updateMeasurementValueOnMap()
   //   // })
@@ -92,15 +92,24 @@ export default function (props: AllWidgetProps<unknown>) {
         (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
           if (!originalMeasurementResultNode?.current || !m) return
 
-          // TODO: this is going to be configurable by Settings
-          // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
-          const mRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.area * 2) / 2)
+          let mRound = measurementWidget.activeTool === 'distance' ? m.length : m.area
+          // decimalPlacesRounded = round the value to 0.0 or 0.5
+          if (props.config?.meterValueOption as MeterValueOption === MeterValueOption.decimalPlacesRoundedTo05) {
+            // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
+            mRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.area * 2) / 2)
+          }
           const measurementInnerText = originalMeasurementResultNode?.current?.innerText
           const measurementParts = measurementInnerText.split(/ /)
 
+          // round the value and format the string
+          const fractionDigits = props.config?.meterValueOption === MeterValueOption.twoDecimalPlaces
+            ? 2
+            : props.config?.meterValueOption === MeterValueOption.noDecimalPlaces
+              ? 0
+              : 1 // 1 decimal place decimalPlacesRoundedTo05 and oneDecimalPlace
           const roundedValueString = measurementWidget.activeTool === 'distance'
-            ? formatMeasurementStringDistance(measurementParts, mRound)
-            : formatMeasurementStringArea(measurementParts, mRound)
+            ? formatMeasurementStringDistance(measurementParts, mRound, fractionDigits)
+            : formatMeasurementStringArea(measurementParts, mRound, fractionDigits)
           setRoundedValueString(roundedValueString)
         })
       }
@@ -273,18 +282,18 @@ export default function (props: AllWidgetProps<unknown>) {
     return webMercatorUtils.webMercatorToGeographic(point) as Point
   }
 
-  const formatMeasurementStringDistance = (measurementParts: any, mRound: number): string => {
+  const formatMeasurementStringDistance = (measurementParts: any, mRound: number, fractionDigits: number): string => {
     if (measurementParts[1] === 'm') {
-      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter', minimumFractionDigits: 1 }) // format as meters including the unit (because it's in the standard) in local number format
+      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as meters including the unit (because it's in the standard) in local number format
       measurementParts[0] = numberFormat.format(mRound)
       delete measurementParts[1] // remove the unit
     }
     return measurementParts.join(' ')
   }
 
-  const formatMeasurementStringArea = (measurementParts: any, mRound: number): string => {
+  const formatMeasurementStringArea = (measurementParts: any, mRound: number, fractionDigits: number): string => {
     if (measurementParts[1] === 'm²') {
-      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: 1 }) // format as decimal in local number format
+      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as decimal in local number format
       measurementParts[0] = numberFormat.format(mRound)
     }
     return measurementParts.join(' ')

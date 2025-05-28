@@ -119,13 +119,13 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                   </SettingRow>
                   <SettingRow>
                   <Radio
-                    aria-label='decimalPlacesRounded'
-                    checked={props.config.meterValueOption === MeterValueOption.decimalPlacesRounded}
+                    aria-label='decimalPlacesRoundedTo05'
+                    checked={props.config.meterValueOption === MeterValueOption.decimalPlacesRoundedTo05}
                     onClick={(r: any) => { setMeterValueOption(r.target.value) }}
-                    value='decimalPlacesRounded'
+                    value='decimalPlacesRoundedTo05'
                   />&nbsp;<Label>{props.intl.formatMessage({
-                    id: 'decimalPlacesRounded',
-                    defaultMessage: defaultMessages.decimalPlacesRounded
+                    id: 'decimalPlacesRoundedTo05',
+                    defaultMessage: defaultMessages.decimalPlacesRoundedTo05
                   })}</Label>
                   </SettingRow>
                   <SettingRow>

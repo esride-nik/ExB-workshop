@@ -22,7 +22,7 @@ import { type ImmutableObject } from 'jimu-core'
 export enum MeterValueOption {
   oneDecimalPlace,
   twoDecimalPlaces,
-  decimalPlacesRounded,
+  decimalPlacesRoundedTo05,
   noDecimalPlaces
 }
 export interface Config {
