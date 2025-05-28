@@ -36,26 +36,6 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
     })
   }
 
-  const setHeaderText = (headerText: string) => {
-    props.onSettingChange({
-      id: props.id,
-      config: {
-        ...props.config,
-        headerText
-      }
-    })
-  }
-
-  const setCopyText = (headerText: string) => {
-    props.onSettingChange({
-      id: props.id,
-      config: {
-        ...props.config,
-        headerText
-      }
-    })
-  }
-
   const switchAreaMeasurementEnabled = () => {
     props.onSettingChange({
       id: props.id,
@@ -72,6 +52,26 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
       config: {
         ...props.config,
         locationMeasurementEnabled: !props.config.locationMeasurementEnabled
+      }
+    })
+  }
+
+  const setHeaderText = (headerText: string) => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        headerText
+      }
+    })
+  }
+
+  const setCopyText = (copyText: string) => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        copyText
       }
     })
   }
@@ -196,7 +196,7 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     <TextArea
                       className="mb-4"
                       aria-label='headerText'
-                      onAcceptValue={(value: string) => { setHeaderText(value) }}
+                      onChange={(onChangeEvent) => { setHeaderText(onChangeEvent.target.value) }}
                       value={props.config.headerText}
                     /></Label>
                 </SettingRow>
@@ -208,7 +208,7 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                   <TextArea
                     className="mb-4"
                     aria-label='copyText'
-                    onAcceptValue={(value: string) => { setCopyText(value) }}
+                    onChange={(onChangeEvent) => { setCopyText(onChangeEvent.target.value) }}
                     value={props.config.copyText}
                   /></Label>
                 </SettingRow>
