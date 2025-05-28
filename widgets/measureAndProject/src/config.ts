@@ -25,9 +25,11 @@ export enum MeterValueOption {
   decimalPlacesRounded,
   noDecimalPlaces
 }
-
 export interface Config {
   meterValueOption: MeterValueOption
+  distanceMeasurementEnabled: boolean
+  areaMeasurementEnabled: boolean
+  locationMeasurementEnabled: boolean
 }
 
 export type IMConfig = ImmutableObject<Config>

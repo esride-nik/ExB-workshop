@@ -2,8 +2,9 @@ import { React } from 'jimu-core'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import defaultMessages from './translations/default'
-import { Label, Radio } from 'jimu-ui'
+import { Checkbox, Label, Radio, Switch } from 'jimu-ui'
 import { MeterValueOption, type IMConfig } from '../config'
+import { distance } from 'esri/geometry/geometryEngine'
 
 export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
   const onMapSelected = (useMapWidgetIds: string[]) => {
@@ -20,6 +21,36 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
       config: {
         ...props.config,
         meterValueOption
+      }
+    })
+  }
+
+  const switchDistanceMeasurementEnabled = () => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        distanceMeasurementEnabled: !props.config.distanceMeasurementEnabled
+      }
+    })
+  }
+
+  const switchAreaMeasurementEnabled = () => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        areaMeasurementEnabled: !props.config.areaMeasurementEnabled
+      }
+    })
+  }
+
+  const switchLocationMeasurementEnabled = () => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        locationMeasurementEnabled: !props.config.locationMeasurementEnabled
       }
     })
   }
@@ -87,6 +118,47 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     defaultMessage: defaultMessages.noDecimalPlaces
                   })}</Label>
                 </SettingRow>
+            </SettingSection>
+
+            <SettingSection
+                className="functions-section"
+                title={props.intl.formatMessage({
+                  id: 'measurementTypes',
+                  defaultMessage: defaultMessages.measurementTypes
+                })}>
+                <SettingRow>
+                  <Switch
+                    aria-label='distanceMeasurement'
+                    checked={props.config.distanceMeasurementEnabled}
+                    onClick={switchDistanceMeasurementEnabled}
+                    value='distanceMeasurement'
+                  />&nbsp;<Label>{props.intl.formatMessage({
+                    id: 'distance',
+                    defaultMessage: defaultMessages.distance
+                  })}</Label>
+                </SettingRow>
+                <SettingRow>
+                  <Switch
+                    aria-label='areaMeasurement'
+                    checked={props.config.areaMeasurementEnabled}
+                    onClick={switchAreaMeasurementEnabled}
+                    value='areaMeasurement'
+                  />&nbsp;<Label>{props.intl.formatMessage({
+                    id: 'area',
+                    defaultMessage: defaultMessages.area
+                  })}</Label>
+                  </SettingRow>
+                  <SettingRow>
+                  <Switch
+                    aria-label='locationMeasurement'
+                    checked={props.config.locationMeasurementEnabled}
+                    onClick={switchLocationMeasurementEnabled}
+                    value='locationMeasurement'
+                  />&nbsp;<Label>{props.intl.formatMessage({
+                    id: 'location',
+                    defaultMessage: defaultMessages.location
+                  })}</Label>
+                  </SettingRow>
             </SettingSection>
         </div>
   )

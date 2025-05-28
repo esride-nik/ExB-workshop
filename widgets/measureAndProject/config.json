@@ -1,3 +1,6 @@
 {
-  "meterValueOption": 0
+  "meterValueOption": 0,
+  "distanceMeasurementEnabled": true,
+  "areaMeasurementEnabled": true,
+  "locationMeasurementEnabled": true
 }
