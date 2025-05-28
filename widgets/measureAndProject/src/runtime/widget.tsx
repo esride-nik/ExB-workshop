@@ -313,46 +313,52 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
           style={{ width: '100%', height: '100%', maxHeight: '800px', overflow: 'auto' }}>
 
           <div id="toolbarDiv" className="esri-component esri-widget">
-            <Button
-              id="distance"
-              className="esri-widget--button esri-interactive esri-icon-measure-line"
-              disabled={activeTool === 'distance'}
-              title={defaultMessages.distanceMeasurementTool}
-              onClick={() => {
-                if (measurementWidget) {
-                  resetMeasurementWidget()
-                  measurementWidget.activeTool = 'distance'
-                  setActiveTool('distance')
-                }
-              }}
-            ></Button>
-            <Button
-              id="area"
-              className="esri-widget--button esri-interactive esri-icon-measure-area"
-              disabled={activeTool === 'area'}
-              title={defaultMessages.areaMeasurementTool}
-              onClick={() => {
-                if (measurementWidget) {
-                  resetMeasurementWidget()
-                  measurementWidget.activeTool = 'area'
-                  setActiveTool('area')
-                }
-              }}
-            ></Button>
-            <Button
-              id='location'
-              className='esri-widget--button esri-interactive esri-icon-map-pin'
-              disabled={activeTool === 'location'}
-              size="default"
-              title={defaultMessages.locationTool}
-              onClick={() => {
-                if (activeTool !== 'location' && measurementWidget) {
-                  resetMeasurementWidget()
-                  measurementWidget.activeTool = undefined
-                  setActiveTool('location')
-                }
-              }}
-            ></Button>
+            { props.config?.distanceMeasurementEnabled &&
+              <Button
+                id="distance"
+                className="esri-widget--button esri-interactive esri-icon-measure-line"
+                disabled={activeTool === 'distance'}
+                title={defaultMessages.distanceMeasurementTool}
+                onClick={() => {
+                  if (measurementWidget) {
+                    resetMeasurementWidget()
+                    measurementWidget.activeTool = 'distance'
+                    setActiveTool('distance')
+                  }
+                }}
+              ></Button>
+            }
+            { props.config?.areaMeasurementEnabled &&
+              <Button
+                id="area"
+                className="esri-widget--button esri-interactive esri-icon-measure-area"
+                disabled={activeTool === 'area'}
+                title={defaultMessages.areaMeasurementTool}
+                onClick={() => {
+                  if (measurementWidget) {
+                    resetMeasurementWidget()
+                    measurementWidget.activeTool = 'area'
+                    setActiveTool('area')
+                  }
+                }}
+              ></Button>
+            }
+            { props.config?.locationMeasurementEnabled &&
+              <Button
+                id='location'
+                className='esri-widget--button esri-interactive esri-icon-map-pin'
+                disabled={activeTool === 'location'}
+                size="default"
+                title={defaultMessages.locationTool}
+                onClick={() => {
+                  if (activeTool !== 'location' && measurementWidget) {
+                    resetMeasurementWidget()
+                    measurementWidget.activeTool = undefined
+                    setActiveTool('location')
+                  }
+                }}
+              ></Button>
+          }
             <Button
               id="clear"
               className="esri-widget--button esri-interactive esri-icon-trash"
