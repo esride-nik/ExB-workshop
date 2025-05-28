@@ -360,8 +360,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
               title={defaultMessages.clearMeasurements}
               onClick={() => {
                 if (measurementWidget) {
-                  measurementWidget.clear()
-                  originalMeasurementResultNode.current = undefined
+                  resetMeasurementWidget()
                   measurementWidget.activeTool = undefined
                   setActiveTool('none')
                 }
