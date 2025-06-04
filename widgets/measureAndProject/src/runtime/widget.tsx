@@ -257,7 +257,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   const getFormattedLatitude = (point: Point): string => {
     return srs === allowedSrs.EPSG4326 // decimal degrees
-      ? formatPointAsDecimalDegrees(point)?.y.toFixed(2)
+      ? formatPointAsDecimalDegrees(point)?.y.toFixed(6)
       : srs === allowedSrs.EPSG25832 // LS310
         ? projectPoint(point, allowedSrs.EPSG25832)?.y.toFixed(2)
         : srs === allowedSrs.EPSG8395 // LS320
@@ -267,7 +267,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   const getFormattedLongitude = (point: Point): string => {
     return srs === allowedSrs.EPSG4326 // decimal degrees
-      ? formatPointAsDecimalDegrees(point)?.x.toFixed(2)
+      ? formatPointAsDecimalDegrees(point)?.x.toFixed(6)
       : srs === allowedSrs.EPSG25832 // LS310
         ? projectPoint(point, allowedSrs.EPSG25832)?.x.toFixed(2)
         : srs === allowedSrs.EPSG8395 // LS320
