@@ -60,14 +60,14 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     }
   }, [jimuMapView, featureLayerDataSource, featureLayerView])
 
-  const executeAttributiveQuery = async () => {
+  const executeFlDataSourceQuery = async () => {
     const featureLayerDataSource = DataSourceManager.getInstance().getDataSource(props.useDataSources?.[0]?.dataSourceId) as FeatureLayerDataSource
     const fl = featureLayerDataSource.layer
     const flvResults = await fl.queryObjectIds({
       geometry: bufferGraphic.current?.geometry,
       spatialRelationship: 'contains'
     })
-    const whereClause = `objectid in (${flvResults.map((id: number) => id.toString()).join(',')})`
+    const whereClause = `${fl.objectIdField} in (${flvResults.map((id: number) => id.toString()).join(',')})`
     const dsResult = await featureLayerDataSource.query({
       where: whereClause
     })
@@ -126,7 +126,7 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
         // draw initial sketch and buffer graphics
         sketchGeometry.current = evt.graphic.geometry as Geometry
         updateBuffer(bufferDistance, 'meters')
-        executeAttributiveQuery()
+        executeFlDataSourceQuery()
       }
     })
 
@@ -139,7 +139,7 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
         // move sketch and buffer graphics
         sketchGeometry.current = evt.graphics[0].geometry as Geometry
         updateBuffer(bufferDistance, 'meters')
-        executeAttributiveQuery()
+        executeFlDataSourceQuery()
       } else if (evt.state === 'complete') {
         // clear sketch and buffer graphics when tool or selection arrow in Sketch widget are clicked
         clearSketch()
@@ -188,7 +188,7 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
       bufferDistance = distanceNum.current.values[0]
       updateBuffer(bufferDistance, 'meters')
       if (evt.state === 'stop') {
-        executeAttributiveQuery()
+        executeFlDataSourceQuery()
       }
     })
   }
@@ -197,7 +197,7 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   const updateBuffer = (distance: number, unit: __esri.LengthUnit): void => {
     // TODO: clean up buffer when removing the Sketch graphic
     if (distance > 0 && sketchGeometry) {
-      bufferGraphic.current.geometry = geodesicBufferOperator.isLoaded ? geodesicBufferOperator.execute(sketchGeometry.current, distance, {unit}) : sketchGeometry.current
+      bufferGraphic.current.geometry = geodesicBufferOperator.execute(sketchGeometry.current, distance, {unit})
       updateFilter()
     } else {
       bufferGraphic.current.geometry = null
