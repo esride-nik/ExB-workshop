@@ -1,11 +1,11 @@
-import { React, type AllWidgetProps, FormattedMessage, type DataSource, DataSourceComponent, type FeatureLayerQueryParams, DataSourceManager } from 'jimu-core'
-import { JimuMapViewComponent, type JimuMapView, type FeatureLayerDataSource, type FeatureDataRecord } from 'jimu-arcgis'
+import { React, type AllWidgetProps, FormattedMessage, type DataSource, DataSourceComponent, type FeatureLayerQueryParams, DataSourceManager, type FeatureLayerDataSource, type FeatureDataRecord } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
 import Sketch from 'esri/widgets/Sketch'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
-import * as geometryEngine from 'esri/geometry/geometryEngine'
+import * as geodesicBufferOperator from "@arcgis/core/geometry/operators/geodesicBufferOperator.js"
 import Graphic from 'esri/Graphic'
-import type { Geometry, Polygon } from 'esri/geometry'
+import type { Geometry } from 'esri/geometry'
 import type { SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
@@ -35,6 +35,12 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
 
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
+
+  useEffect(async () => {
+    await geodesicBufferOperator.load()
+    console.log('geodesicBufferOperator loaded', geodesicBufferOperator.isLoaded)
+  }
+  , [])
 
   useEffect(() => {
     if (!featureLayerView && featureLayerDataSource) {
@@ -178,7 +184,7 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
     })
 
     // listen to change and input events on UI components
-    distanceNum.current.on('thumb-drag', async (evt: __esri.SliderThumbDragEvent) => {
+    distanceNum.current.on('thumb-drag', (evt: __esri.SliderThumbDragEvent) => {
       bufferDistance = distanceNum.current.values[0]
       updateBuffer(bufferDistance, 'meters')
       if (evt.state === 'stop') {
@@ -188,10 +194,10 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   }
 
   // update the buffer graphic if user is filtering by distance
-  const updateBuffer = (distance: number, unit: __esri.LinearUnits): void => {
+  const updateBuffer = (distance: number, unit: __esri.LengthUnit): void => {
     // TODO: clean up buffer when removing the Sketch graphic
     if (distance > 0 && sketchGeometry) {
-      bufferGraphic.current.geometry = geometryEngine.geodesicBuffer(sketchGeometry.current, distance, unit) as Polygon
+      bufferGraphic.current.geometry = geodesicBufferOperator.isLoaded ? geodesicBufferOperator.execute(sketchGeometry.current, distance, {unit}) : sketchGeometry.current
       updateFilter()
     } else {
       bufferGraphic.current.geometry = null
