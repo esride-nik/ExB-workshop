@@ -43,6 +43,8 @@ For example, when following [this guide](https://doc.arcgis.com/de/experience-bu
   * Create a link, mapping the source folder in the server directory to the apps folder in the repo:
     ``mklink /J <exb_path>\server\public\apps\exb_demo <exb_path>\client\ExB-workshop\apps\exb_demo``
   * The success message: ``Junction created for <exb_path>\server\public\apps\exb_demo <<===>> <exb_path>\client\ExB-workshop\apps\exb_demo``
+  * [Check: Adjust the portalUrl in the app config.json]
+  * On the experiences list page, make sure to show all experiences (not just the ones belonging to you).
 
 ### Extending class-based built-in widgets by inheritance
 As an example, ``widgets/maplyr-ext`` adds custom actions to the standard ``map-layers`` widget.
