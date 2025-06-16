@@ -109,12 +109,12 @@
           "type": "WIDGET",
           "widgetId": "widget_8",
           "bbox": {
-            "left": "0.0%",
-            "right": "96.2%",
+            "left": "-0.0%",
+            "right": "96.3%",
             "top": "0.0%",
-            "bottom": "64.3%",
+            "bottom": "78.6%",
             "width": "48px",
-            "height": "120px"
+            "height": "64px"
           },
           "setting": {
             "autoProps": {
@@ -139,26 +139,27 @@
     },
     "layout_4": {
       "content": {
-        "5": {
+        "4": {
           "type": "WIDGET",
           "widgetId": "widget_10",
           "bbox": {
-            "left": "0%",
-            "right": "0%",
-            "top": "-0.0%",
-            "bottom": "92.5%",
-            "width": "100%",
-            "height": "10.00%"
+            "left": "0.0%",
+            "right": "0.0%",
+            "top": "0.0%",
+            "bottom": "0.0%",
+            "width": "100.0%",
+            "height": "100.0%"
           },
           "setting": {
             "autoProps": {
-              "width": "STRETCH",
-              "height": "CUSTOM",
               "right": false,
               "left": false,
               "top": false,
-              "bottom": true
+              "bottom": false,
+              "height": "STRETCH",
+              "width": "STRETCH"
             },
+            "vCenter": false,
             "hCenter": false
           }
         }
@@ -166,7 +167,7 @@
       "type": "FIXED",
       "label": "First",
       "order": [
-        "5"
+        "4"
       ]
     },
     "layout_5": {
@@ -264,6 +265,38 @@
       },
       "order": [
         "0"
+      ]
+    },
+    "layout_8": {
+      "content": {
+        "0": {
+          "type": "WIDGET",
+          "widgetId": "widget_2",
+          "bbox": {
+            "height": "169px"
+          }
+        },
+        "1": {
+          "type": "WIDGET",
+          "widgetId": "widget_9",
+          "bbox": {
+            "height": "170px"
+          }
+        },
+        "2": {
+          "type": "WIDGET",
+          "widgetId": "widget_11",
+          "bbox": {
+            "height": "400px"
+          }
+        }
+      },
+      "type": "ACCORDION",
+      "label": "Default",
+      "order": [
+        "0",
+        "1",
+        "2"
       ]
     }
   },
@@ -374,6 +407,29 @@
         }
       }
     },
+    "widget_2": {
+      "uri": "widgets/arcgis/swipe/",
+      "version": "1.17.0",
+      "label": "Swipe",
+      "config": {
+        "swipeStyle": "SIMPLE_HORIZONTAL",
+        "swipeMode": "SWIPE_BETWEEN_LAYERS_OF_ONE_MAP",
+        "swipeMapViewList": {
+          "widget_1-dataSource_3": {
+            "leadingLayersId": [
+              "widget_1-dataSource_3-View_Baumgesundheit_Gruppe_1_5693"
+            ],
+            "trailingLayersId": [
+              "widget_1-dataSource_3-View_Baumgesundheit_Gruppe_2_663"
+            ]
+          }
+        }
+      },
+      "id": "widget_2",
+      "useMapWidgetIds": [
+        "widget_1"
+      ]
+    },
     "widget_3": {
       "uri": "widgets/layout/sidebar/",
       "version": "1.17.0",
@@ -382,7 +438,7 @@
         "direction": "VERTICAL",
         "collapseSide": "SECOND",
         "overlay": false,
-        "size": "336px",
+        "size": "300px",
         "divider": {
           "visible": true,
           "lineStyle": {
@@ -538,7 +594,7 @@
       "config": {
         "layersConfig": [
           {
-            "id": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693-6",
+            "id": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693-5",
             "name": "View Baumgesundheit Gruppe 1",
             "useDataSource": {
               "dataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693",
@@ -1209,7 +1265,7 @@
             "layerHonorMode": "WEBMAP"
           },
           {
-            "id": "dataSource_3-View_Baumgesundheit_Gruppe_2_663-7",
+            "id": "dataSource_3-View_Baumgesundheit_Gruppe_2_663-6",
             "name": "View Baumgesundheit Gruppe 2",
             "useDataSource": {
               "dataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_2_663",
@@ -1882,7 +1938,7 @@
             "layerHonorMode": "WEBMAP"
           },
           {
-            "id": "dataSource_3-197797fa7c1-layer-8-8",
+            "id": "dataSource_3-197797fa7c1-layer-8-7",
             "name": "Baumkataster - Köln",
             "useDataSource": {
               "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
@@ -2436,8 +2492,7 @@
               "responsiveType": "FIXED",
               "columnWidth": 200
             },
-            "layerHonorMode": "WEBMAP",
-            "updateText": false
+            "layerHonorMode": "WEBMAP"
           },
           {
             "id": "widget_9-ouput-output-4",
@@ -3179,32 +3234,144 @@
       },
       "id": "widget_8"
     },
-    "widget_10": {
-      "uri": "widgets/common/navigator/",
-      "version": "1.17.0",
-      "label": "Views Navigation 2",
+    "widget_9": {
+      "uri": "widgets/gpxUpload/",
+      "version": "0.3.0",
+      "label": "GPX upload and interpretation",
       "config": {
-        "data": {
-          "type": "AUTO",
-          "section": "section_1",
-          "views": []
-        },
-        "display": {
-          "advanced": false,
-          "vertical": false,
-          "type": "nav",
-          "navStyle": "default",
-          "standard": {
-            "scrollable": true,
-            "textAlign": "center",
-            "gap": "0px",
-            "showText": true,
-            "showIcon": false,
-            "iconPosition": "start"
-          }
-        }
+        "w3wApiKey": "",
+        "w3wOnMap": false,
+        "showW3wSquare": false
       },
-      "id": "widget_10"
+      "id": "widget_9",
+      "useMapWidgetIds": [
+        "widget_1"
+      ],
+      "useDataSourcesEnabled": true,
+      "outputDataSources": [
+        "widget_9-ouput"
+      ],
+      "useDataSources": [
+        {
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3"
+        }
+      ]
+    },
+    "widget_10": {
+      "uri": "widgets/layout/accordion/",
+      "version": "1.15.0",
+      "label": "Accordion",
+      "config": {
+        "gap": 4,
+        "padding": {
+          "number": [
+            0
+          ],
+          "unit": "px"
+        },
+        "header": {
+          "expandIcon": {
+            "svg": "<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'><path d='M7.5 0a.5.5 0 0 0-.5.5V7H.5a.5.5 0 0 0 0 1H7v6.5a.5.5 0 0 0 1 0V8h6.5a.5.5 0 0 0 0-1H8V.5a.5.5 0 0 0-.5-.5'></path></svg>",
+            "properties": {
+              "size": 16,
+              "color": "var(--light)",
+              "inlineSvg": true,
+              "isUploaded": false,
+              "originalName": "outlined/editor/plus.svg",
+              "path": [
+                "general",
+                "add"
+              ]
+            }
+          },
+          "collapseIcon": {
+            "svg": "<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'><path d='M0 7.5A.5.5 0 0 1 .5 7h14a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5'></path></svg>",
+            "properties": {
+              "size": 16,
+              "color": "var(--light)",
+              "inlineSvg": true,
+              "isUploaded": false,
+              "originalName": "outlined/editor/minus.svg",
+              "path": [
+                "editor",
+                "MinusOutlined"
+              ]
+            }
+          },
+          "showWidgetIcon": true,
+          "widgetIconSize": 16,
+          "widgetIconColor": "var(--ref-palette-white)",
+          "textStyle": {
+            "bold": true,
+            "color": "var(--ref-palette-white)",
+            "size": "14px"
+          },
+          "padding": {
+            "number": [
+              8
+            ],
+            "unit": "px"
+          },
+          "borderRadius": {
+            "number": [
+              0
+            ],
+            "unit": "px"
+          },
+          "collapsedColor": "var(--primary-600)",
+          "expandedColor": "var(--primary-700)"
+        },
+        "panel": {
+          "borderRadius": {
+            "number": [
+              0
+            ],
+            "unit": "px"
+          },
+          "padding": {
+            "number": [
+              4
+            ],
+            "unit": "px"
+          },
+          "border": {
+            "color": "var(--primary-600)",
+            "type": "solid",
+            "width": "1px"
+          }
+        },
+        "singleMode": false,
+        "showToggleAll": false,
+        "useQuickStyle": 1
+      },
+      "id": "widget_10",
+      "layouts": {
+        "DEFAULT": {
+          "LARGE": "layout_8"
+        }
+      }
+    },
+    "widget_11": {
+      "uri": "widgets/alternativeSelect/",
+      "version": "0.1.0",
+      "label": "Alternative select",
+      "config": {
+        "radius": 1000
+      },
+      "id": "widget_11",
+      "useMapWidgetIds": [
+        "widget_1"
+      ],
+      "useDataSourcesEnabled": true,
+      "useDataSources": [
+        {
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3"
+        }
+      ]
     }
   },
   "widgetsManifest": {},
@@ -3251,12 +3418,7 @@
           "inlineSvg": true
         }
       },
-      "lazyLoad": true,
-      "backgroundPosition": "fit",
-      "backgroundColor": "#f0f0f0",
-      "backgroundIMage": {
-        "url": ""
-      }
+      "lazyLoad": true
     }
   },
   "sections": {
@@ -3274,9 +3436,23 @@
     "dataSource_3": {
       "id": "dataSource_3",
       "type": "WEB_MAP",
-      "sourceLabel": "Baumkataster - Bürgerpark Nord Köln",
-      "itemId": "d08cfb8dd5ce4fd59c314a9eb5d41eff",
+      "sourceLabel": "Baumkataster  Baumgesundheit - Köln - keine Raster",
+      "itemId": "64c6829d690f47cfb0db53cb01959e3e",
       "portalUrl": "https://esri-de.maps.arcgis.com"
+    },
+    "widget_9-ouput": {
+      "id": "widget_9-ouput",
+      "type": "FEATURE_LAYER",
+      "label": "gpxUpload-output-data-source",
+      "originDataSources": [
+        {
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3"
+        }
+      ],
+      "isDataInDataSourceInstance": true,
+      "isOutputFromWidget": true
     }
   },
   "messageConfigs": {},
@@ -3300,6 +3476,6 @@
       "primary": "#bb07e5"
     }
   },
-  "timestamp": 1750091234204,
-  "publishTimestamp": 1750091234798
+  "timestamp": 1750101393751,
+  "publishTimestamp": 1750101394564
 }
