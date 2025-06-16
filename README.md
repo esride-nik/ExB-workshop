@@ -9,7 +9,7 @@ Some Widgets and a theme.
     - [Install dependencies in subfolders](#install-dependencies-in-subfolders)
     - [Using 3rd party NPM packages in your widgets](#using-3rd-party-npm-packages-in-your-widgets)
     - [Optional: Use the demo app locally](#optional-use-the-demo-app-locally)
-    - [Extending built-in widgets by inheritance](#extending-built-in-widgets-by-inheritance)
+    - [Extending class-based built-in widgets by inheritance](#extending-class-based-built-in-widgets-by-inheritance)
   - [Compiler settings](#compiler-settings)
     - [Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder ^1.12](#cannot-find-arcgis-maps-sdk-for-javascript-modules-in-experience-builder-112)
     - [Using imports in Jest](#using-imports-in-jest)
@@ -44,10 +44,7 @@ For example, when following [this guide](https://doc.arcgis.com/de/experience-bu
     ``mklink /J <exb_path>\server\public\apps\exb_demo <exb_path>\client\ExB-workshop\apps\exb_demo``
   * The success message: ``Junction created for <exb_path>\server\public\apps\exb_demo <<===>> <exb_path>\client\ExB-workshop\apps\exb_demo``
 
-* In the file ``client/tsconfig.json``, include the folder name of the repository in the include array. Or remove / comment out the include array completely from the file.
-* Restart Watcher (call ``npm start`` in the client folder)
-
-### Extending built-in widgets by inheritance
+### Extending class-based built-in widgets by inheritance
 As an example, ``widgets/maplyr-ext`` adds custom actions to the standard ``map-layers`` widget.
 Steps:
 * copy the original class-based widget from ``dist/widgets/arcgis`` into ``<your repo folder>/widgets`` or ``your-extensions/widgets``
@@ -65,6 +62,8 @@ The patch as suggested [here](https://community.esri.com/t5/arcgis-experience-bu
 
 Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download from here](https://github.com/Esri/jsapi-resources/tree/main/typescript/archive), place in ``client/types`` and rename to ``arcgis-js-api.d.ts``.
 
+* In the file ``client/tsconfig.json``, include the folder name of the repository in the include array. Or remove / comment out the include array completely from the file.
+* Restart Watcher (call ``npm start`` in the client folder)
 
 ### Using imports in Jest
 
