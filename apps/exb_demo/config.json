@@ -109,12 +109,12 @@
           "type": "WIDGET",
           "widgetId": "widget_8",
           "bbox": {
-            "left": "-0.0%",
-            "right": "96.3%",
+            "left": "0.0%",
+            "right": "96.2%",
             "top": "0.0%",
-            "bottom": "78.6%",
+            "bottom": "64.3%",
             "width": "48px",
-            "height": "64px"
+            "height": "120px"
           },
           "setting": {
             "autoProps": {
@@ -139,75 +139,34 @@
     },
     "layout_4": {
       "content": {
-        "0": {
+        "5": {
           "type": "WIDGET",
-          "widgetId": "widget_2",
+          "widgetId": "widget_10",
           "bbox": {
-            "left": "0.0%",
-            "right": "0.0%",
-            "top": "0.0%",
-            "bottom": "71.4%",
-            "width": "100.0%",
-            "height": "142.00px"
+            "left": "0%",
+            "right": "0%",
+            "top": "-0.0%",
+            "bottom": "92.5%",
+            "width": "100%",
+            "height": "10.00%"
           },
           "setting": {
             "autoProps": {
+              "width": "STRETCH",
+              "height": "CUSTOM",
               "right": false,
-              "left": true,
+              "left": false,
               "top": false,
               "bottom": true
             },
-            "vCenter": false,
             "hCenter": false
-          }
-        },
-        "2": {
-          "type": "WIDGET",
-          "widgetId": "widget_7",
-          "bbox": {
-            "left": "0.0%",
-            "right": "0.0%",
-            "top": "74.1%",
-            "bottom": "-0.1%",
-            "width": "100.0%",
-            "height": "26.0%"
-          },
-          "setting": {
-            "autoProps": {
-              "right": false,
-              "left": true,
-              "top": true,
-              "bottom": false
-            }
-          }
-        },
-        "3": {
-          "type": "WIDGET",
-          "widgetId": "widget_9",
-          "bbox": {
-            "left": "0.0%",
-            "right": "0.0%",
-            "top": "31.4%",
-            "bottom": "28.3%",
-            "width": "100.0%",
-            "height": "40.3%"
-          },
-          "setting": {
-            "autoProps": {
-              "right": false,
-              "left": true,
-              "top": true,
-              "bottom": false
-            }
           }
         }
       },
       "type": "FIXED",
       "label": "First",
       "order": [
-        "0",
-        "2",
-        "3"
+        "5"
       ]
     },
     "layout_5": {
@@ -308,7 +267,7 @@
       ]
     }
   },
-  "exbVersion": "1.15.0",
+  "exbVersion": "1.17.0",
   "mainSizeMode": "LARGE",
   "theme": "themes/default/",
   "forBuilderAttributes": {
@@ -318,7 +277,7 @@
   "widgets": {
     "widget_1": {
       "uri": "widgets/arcgis/arcgis-map/",
-      "version": "1.15.0",
+      "version": "1.17.0",
       "label": "Map",
       "config": {
         "toolConfig": {
@@ -330,7 +289,10 @@
           "canSelectState": true,
           "canLayers": true
         },
-        "isUseCustomMapState": false
+        "isUseCustomMapState": false,
+        "initialMapDataSourceID": "dataSource_3",
+        "initialMapState": null,
+        "scaleRange": null
       },
       "id": "widget_1",
       "layouts": {
@@ -340,43 +302,87 @@
       },
       "useDataSources": [
         {
-          "dataSourceId": "dataSource_2",
-          "mainDataSourceId": "dataSource_2"
+          "dataSourceId": "dataSource_3",
+          "mainDataSourceId": "dataSource_3"
         }
-      ]
-    },
-    "widget_2": {
-      "uri": "widgets/arcgis/swipe/",
-      "version": "1.15.0",
-      "label": "Swipe",
-      "config": {
-        "swipeStyle": "SIMPLE_HORIZONTAL",
-        "swipeMode": "SWIPE_BETWEEN_LAYERS_OF_ONE_MAP",
-        "swipeMapViewList": {
-          "widget_1-dataSource_2": {
-            "leadingLayersId": [
-              "widget_1-dataSource_2-View_Baumgesundheit_Gruppe_1_5693"
-            ],
-            "trailingLayersId": [
-              "widget_1-dataSource_2-View_Baumgesundheit_Gruppe_2_663"
-            ]
+      ],
+      "dataActions": {
+        "showOnMap": {
+          "config": {
+            "isUseCustomSymbol": true,
+            "isOperationalLayer": true,
+            "symbolOption": {
+              "pointSymbol": {
+                "type": "esriSMS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "angle": 0,
+                "xoffset": 0,
+                "yoffset": 0,
+                "size": 12,
+                "style": "esriSMSCircle",
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                }
+              },
+              "polylineSymbol": {
+                "type": "esriSLS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "width": 0.75,
+                "style": "esriSLSSolid"
+              },
+              "polygonSymbol": {
+                "type": "esriSFS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                },
+                "style": "esriSFSSolid"
+              }
+            }
           }
         }
-      },
-      "id": "widget_2",
-      "useMapWidgetIds": [
-        "widget_1"
-      ]
+      }
     },
     "widget_3": {
       "uri": "widgets/layout/sidebar/",
-      "version": "1.15.0",
+      "version": "1.17.0",
       "label": "Global",
       "config": {
         "direction": "VERTICAL",
         "collapseSide": "SECOND",
         "overlay": false,
-        "size": "300px",
+        "size": "336px",
         "divider": {
           "visible": true,
           "lineStyle": {
@@ -444,7 +450,7 @@
     },
     "widget_4": {
       "uri": "widgets/layout/sidebar/",
-      "version": "1.15.0",
+      "version": "1.17.0",
       "label": "Map & functions",
       "config": {
         "direction": "HORIZONTAL",
@@ -527,17 +533,17 @@
     },
     "widget_5": {
       "uri": "widgets/common/table/",
-      "version": "1.15.0",
+      "version": "1.17.0",
       "label": "Table",
       "config": {
         "layersConfig": [
           {
-            "id": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693-1",
+            "id": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693-6",
             "name": "View Baumgesundheit Gruppe 1",
             "useDataSource": {
-              "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
-              "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
-              "rootDataSourceId": "dataSource_2",
+              "dataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693",
+              "mainDataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693",
+              "rootDataSourceId": "dataSource_3",
               "fields": [
                 "esrignss_speed",
                 "esrignss_direction",
@@ -1180,33 +1186,35 @@
                 "visible": true
               }
             ],
-            "enableAttachements": false,
+            "enableAttachments": false,
             "enableEdit": false,
             "allowCsv": false,
             "enableSearch": false,
             "searchFields": [],
             "enableRefresh": true,
             "enableSelect": true,
+            "enableDelete": false,
             "selectMode": "SINGLE",
+            "showCount": true,
             "headerFontSetting": {
               "backgroundColor": "",
               "fontSize": 14,
               "bold": false,
               "color": ""
             },
-            "layerHonorMode": "WEBMAP",
             "columnSetting": {
               "responsiveType": "FIXED",
               "columnWidth": 200
-            }
+            },
+            "layerHonorMode": "WEBMAP"
           },
           {
-            "id": "dataSource_2-View_Baumgesundheit_Gruppe_2_663-2",
+            "id": "dataSource_3-View_Baumgesundheit_Gruppe_2_663-7",
             "name": "View Baumgesundheit Gruppe 2",
             "useDataSource": {
-              "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
-              "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
-              "rootDataSourceId": "dataSource_2",
+              "dataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_2_663",
+              "mainDataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_2_663",
+              "rootDataSourceId": "dataSource_3",
               "fields": [
                 "esrignss_speed",
                 "esrignss_direction",
@@ -1851,47 +1859,43 @@
                 "visible": true
               }
             ],
-            "enableAttachements": false,
+            "enableAttachments": false,
             "enableEdit": false,
             "allowCsv": false,
             "enableSearch": false,
             "searchFields": [],
             "enableRefresh": true,
             "enableSelect": true,
-            "selectMode": "MULTIPLE",
+            "enableDelete": false,
+            "selectMode": "SINGLE",
+            "showCount": true,
             "headerFontSetting": {
               "backgroundColor": "",
               "fontSize": 14,
               "bold": false,
               "color": ""
             },
-            "layerHonorMode": "WEBMAP",
-            "showCount": true,
             "columnSetting": {
               "responsiveType": "FIXED",
               "columnWidth": 200
-            }
+            },
+            "layerHonorMode": "WEBMAP"
           },
           {
-            "id": "dataSource_2-Köln_Baumkataster_6678-3",
+            "id": "dataSource_3-197797fa7c1-layer-8-8",
             "name": "Baumkataster - Köln",
             "useDataSource": {
-              "dataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-              "mainDataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-              "rootDataSourceId": "dataSource_2",
+              "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "rootDataSourceId": "dataSource_3",
               "fields": [
-                "OBJECTID_1",
-                "objectid",
                 "beschreibu",
                 "schluessel",
                 "objekttyp",
                 "baumnr",
-                "x_koordina",
-                "y_koordina",
                 "StandortNr",
                 "HausNr",
                 "Lagebezeic",
-                "STANDONR",
                 "ANZAHL",
                 "STAMMVON",
                 "STAMMBIS",
@@ -1925,14 +1929,17 @@
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
                 "alias": "objectid",
-                "format": null
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "beschreibu",
                 "name": "beschreibu",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "beschreibu",
+                "alias": "Beschreibung",
                 "format": null
               },
               {
@@ -1940,23 +1947,29 @@
                 "name": "schluessel",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
-                "alias": "schluessel",
-                "format": null
+                "alias": "Schlussel",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "objekttyp",
                 "name": "objekttyp",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
-                "alias": "objekttyp",
-                "format": null
+                "alias": "Objekttyp",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "baumnr",
                 "name": "baumnr",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "baumnr",
+                "alias": "BaumNr",
                 "format": null
               },
               {
@@ -1965,7 +1978,10 @@
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
                 "alias": "x_koordina",
-                "format": null
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "y_koordina",
@@ -1973,7 +1989,10 @@
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
                 "alias": "y_koordina",
-                "format": null
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "StandortNr",
@@ -1981,7 +2000,10 @@
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
                 "alias": "StandortNr",
-                "format": null
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "HausNr",
@@ -1996,7 +2018,7 @@
                 "name": "Lagebezeic",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "Lagebezeic",
+                "alias": "Lagebezeichnung",
                 "format": null
               },
               {
@@ -2004,56 +2026,77 @@
                 "name": "STANDONR",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "STANDONR",
-                "format": null
+                "alias": "Standort nr",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "ANZAHL",
                 "name": "ANZAHL",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "ANZAHL",
-                "format": null
+                "alias": "Anzahl",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "STAMMVON",
                 "name": "STAMMVON",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "STAMMVON",
-                "format": null
+                "alias": "Stamm von",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "STAMMBIS",
                 "name": "STAMMBIS",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "STAMMBIS",
-                "format": null
+                "alias": "Stamm bis",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "KRONE",
                 "name": "KRONE",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "KRONE",
-                "format": null
+                "alias": "Krone",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "H_HE",
                 "name": "H_HE",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "H_HE",
-                "format": null
+                "alias": "Höhe (m)",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "PFLANZJAH",
                 "name": "PFLANZJAH",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "PFLANZJAH",
-                "format": null
+                "alias": "Pflanzjahr",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "ArtNr",
@@ -2061,7 +2104,10 @@
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
                 "alias": "ArtNr",
-                "format": null
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               },
               {
                 "jimuName": "Kurzname",
@@ -2100,7 +2146,7 @@
                 "name": "DeutscherN",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "DeutscherN",
+                "alias": "Deutscher Name",
                 "format": null
               },
               {
@@ -2108,42 +2154,20 @@
                 "name": "LaubNadel",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
-                "alias": "LaubNadel",
-                "format": null
+                "alias": "Laub/Nadel",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                }
               }
             ],
             "tableFields": [
               {
-                "jimuName": "OBJECTID_1",
-                "name": "OBJECTID_1",
-                "type": "NUMBER",
-                "esriType": "esriFieldTypeOID",
-                "alias": "OBJECTID_1",
-                "format": {
-                  "digitSeparator": false,
-                  "places": 0
-                },
-                "editAuthority": false,
-                "editable": false,
-                "visible": true
-              },
-              {
-                "jimuName": "objectid",
-                "name": "objectid",
-                "type": "NUMBER",
-                "esriType": "esriFieldTypeInteger",
-                "alias": "objectid",
-                "format": null,
-                "editAuthority": true,
-                "editable": true,
-                "visible": true
-              },
-              {
                 "jimuName": "beschreibu",
                 "name": "beschreibu",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "beschreibu",
+                "alias": "Beschreibung",
                 "format": null,
                 "editAuthority": true,
                 "editable": true,
@@ -2154,8 +2178,11 @@
                 "name": "schluessel",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
-                "alias": "schluessel",
-                "format": null,
+                "alias": "Schlussel",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2165,8 +2192,11 @@
                 "name": "objekttyp",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
-                "alias": "objekttyp",
-                "format": null,
+                "alias": "Objekttyp",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2176,29 +2206,7 @@
                 "name": "baumnr",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "baumnr",
-                "format": null,
-                "editAuthority": true,
-                "editable": true,
-                "visible": true
-              },
-              {
-                "jimuName": "x_koordina",
-                "name": "x_koordina",
-                "type": "NUMBER",
-                "esriType": "esriFieldTypeInteger",
-                "alias": "x_koordina",
-                "format": null,
-                "editAuthority": true,
-                "editable": true,
-                "visible": true
-              },
-              {
-                "jimuName": "y_koordina",
-                "name": "y_koordina",
-                "type": "NUMBER",
-                "esriType": "esriFieldTypeInteger",
-                "alias": "y_koordina",
+                "alias": "BaumNr",
                 "format": null,
                 "editAuthority": true,
                 "editable": true,
@@ -2210,7 +2218,10 @@
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
                 "alias": "StandortNr",
-                "format": null,
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2231,18 +2242,7 @@
                 "name": "Lagebezeic",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "Lagebezeic",
-                "format": null,
-                "editAuthority": true,
-                "editable": true,
-                "visible": true
-              },
-              {
-                "jimuName": "STANDONR",
-                "name": "STANDONR",
-                "type": "NUMBER",
-                "esriType": "esriFieldTypeDouble",
-                "alias": "STANDONR",
+                "alias": "Lagebezeichnung",
                 "format": null,
                 "editAuthority": true,
                 "editable": true,
@@ -2253,8 +2253,11 @@
                 "name": "ANZAHL",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "ANZAHL",
-                "format": null,
+                "alias": "Anzahl",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2264,8 +2267,11 @@
                 "name": "STAMMVON",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "STAMMVON",
-                "format": null,
+                "alias": "Stamm von",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2275,8 +2281,11 @@
                 "name": "STAMMBIS",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "STAMMBIS",
-                "format": null,
+                "alias": "Stamm bis",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2286,8 +2295,11 @@
                 "name": "KRONE",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "KRONE",
-                "format": null,
+                "alias": "Krone",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2297,8 +2309,11 @@
                 "name": "H_HE",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "H_HE",
-                "format": null,
+                "alias": "Höhe (m)",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2308,8 +2323,11 @@
                 "name": "PFLANZJAH",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeDouble",
-                "alias": "PFLANZJAH",
-                "format": null,
+                "alias": "Pflanzjahr",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2320,7 +2338,10 @@
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
                 "alias": "ArtNr",
-                "format": null,
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
@@ -2374,7 +2395,7 @@
                 "name": "DeutscherN",
                 "type": "STRING",
                 "esriType": "esriFieldTypeString",
-                "alias": "DeutscherN",
+                "alias": "Deutscher Name",
                 "format": null,
                 "editAuthority": true,
                 "editable": true,
@@ -2385,14 +2406,17 @@
                 "name": "LaubNadel",
                 "type": "NUMBER",
                 "esriType": "esriFieldTypeInteger",
-                "alias": "LaubNadel",
-                "format": null,
+                "alias": "Laub/Nadel",
+                "format": {
+                  "digitSeparator": false,
+                  "places": 0
+                },
                 "editAuthority": true,
                 "editable": true,
                 "visible": true
               }
             ],
-            "enableAttachements": false,
+            "enableAttachments": false,
             "enableEdit": false,
             "allowCsv": false,
             "enableSearch": false,
@@ -2401,6 +2425,7 @@
             "enableSelect": true,
             "enableDelete": false,
             "selectMode": "SINGLE",
+            "showCount": true,
             "headerFontSetting": {
               "backgroundColor": "",
               "fontSize": 14,
@@ -2411,7 +2436,8 @@
               "responsiveType": "FIXED",
               "columnWidth": 200
             },
-            "layerHonorMode": "WEBMAP"
+            "layerHonorMode": "WEBMAP",
+            "updateText": false
           },
           {
             "id": "widget_9-ouput-output-4",
@@ -2933,7 +2959,6 @@
                 "visible": true
               }
             ],
-            "enableAttachements": false,
             "enableEdit": false,
             "allowCsv": false,
             "enableSearch": false,
@@ -2953,10 +2978,12 @@
               "columnWidth": 200
             },
             "layerHonorMode": "WEBMAP",
-            "showCount": true
+            "showCount": true,
+            "enableAttachments": false
           }
         ],
-        "arrangeType": "TABS"
+        "arrangeType": "TABS",
+        "tableMode": "LAYER"
       },
       "id": "widget_5",
       "dataActions": {
@@ -3027,9 +3054,9 @@
       },
       "useDataSources": [
         {
-          "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
-          "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_1_5693",
-          "rootDataSourceId": "dataSource_2",
+          "dataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693",
+          "mainDataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693",
+          "rootDataSourceId": "dataSource_3",
           "fields": [
             "esrignss_speed",
             "esrignss_direction",
@@ -3057,9 +3084,9 @@
           ]
         },
         {
-          "dataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
-          "mainDataSourceId": "dataSource_2-View_Baumgesundheit_Gruppe_2_663",
-          "rootDataSourceId": "dataSource_2",
+          "dataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_2_663",
+          "mainDataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_2_663",
+          "rootDataSourceId": "dataSource_3",
           "fields": [
             "esrignss_speed",
             "esrignss_direction",
@@ -3087,54 +3114,17 @@
           ]
         },
         {
-          "dataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "mainDataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "rootDataSourceId": "dataSource_2",
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3",
           "fields": [
-            "OBJECTID_1",
-            "objectid",
             "beschreibu",
             "schluessel",
             "objekttyp",
             "baumnr",
-            "x_koordina",
-            "y_koordina",
             "StandortNr",
             "HausNr",
             "Lagebezeic",
-            "STANDONR",
-            "ANZAHL",
-            "STAMMVON",
-            "STAMMBIS",
-            "KRONE",
-            "H_HE",
-            "PFLANZJAH",
-            "ArtNr",
-            "Kurzname",
-            "Gattung",
-            "Art",
-            "Sorte",
-            "DeutscherN",
-            "LaubNadel"
-          ]
-        },
-        {
-          "dataSourceId": "widget_9-ouput-output",
-          "mainDataSourceId": "widget_9-ouput",
-          "dataViewId": "output",
-          "fields": [
-            "OBJECTID_1",
-            "objectid",
-            "beschreibu",
-            "schluessel",
-            "objekttyp",
-            "baumnr",
-            "x_koordina",
-            "y_koordina",
-            "StandortNr",
-            "HausNr",
-            "Lagebezeic",
-            "STANDONR",
             "ANZAHL",
             "STAMMVON",
             "STAMMBIS",
@@ -3159,27 +3149,9 @@
       "config": null,
       "id": "widget_6"
     },
-    "widget_7": {
-      "uri": "widgets/alternativeSelect/",
-      "version": "0.1.0",
-      "label": "Alternative select",
-      "config": {},
-      "id": "widget_7",
-      "useMapWidgetIds": [
-        "widget_1"
-      ],
-      "useDataSourcesEnabled": true,
-      "useDataSources": [
-        {
-          "dataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "mainDataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "rootDataSourceId": "dataSource_2"
-        }
-      ]
-    },
     "widget_8": {
       "uri": "widgets/common/navigator/",
-      "version": "1.15.0",
+      "version": "1.17.0",
       "label": "Views Navigation",
       "config": {
         "data": {
@@ -3207,33 +3179,32 @@
       },
       "id": "widget_8"
     },
-    "widget_9": {
-      "uri": "widgets/gpxUpload/",
-      "version": "0.3.0",
-      "label": "GPX upload and interpretation",
+    "widget_10": {
+      "uri": "widgets/common/navigator/",
+      "version": "1.17.0",
+      "label": "Views Navigation 2",
       "config": {
-        "w3wApiKey": "",
-        "w3wOnMap": false,
-        "showW3wSquare": false
-      },
-      "id": "widget_9",
-      "useMapWidgetIds": [
-        "widget_1"
-      ],
-      "useDataSourcesEnabled": true,
-      "outputDataSources": [
-        "widget_9-ouput"
-      ],
-      "useDataSources": [
-        {
-          "dataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "mainDataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "rootDataSourceId": "dataSource_2",
-          "fields": [
-            "StandortNr"
-          ]
+        "data": {
+          "type": "AUTO",
+          "section": "section_1",
+          "views": []
+        },
+        "display": {
+          "advanced": false,
+          "vertical": false,
+          "type": "nav",
+          "navStyle": "default",
+          "standard": {
+            "scrollable": true,
+            "textAlign": "center",
+            "gap": "0px",
+            "showText": true,
+            "showIcon": false,
+            "iconPosition": "start"
+          }
         }
-      ]
+      },
+      "id": "widget_10"
     }
   },
   "widgetsManifest": {},
@@ -3280,7 +3251,12 @@
           "inlineSvg": true
         }
       },
-      "lazyLoad": true
+      "lazyLoad": true,
+      "backgroundPosition": "fit",
+      "backgroundColor": "#f0f0f0",
+      "backgroundIMage": {
+        "url": ""
+      }
     }
   },
   "sections": {
@@ -3295,26 +3271,12 @@
   },
   "dialogs": {},
   "dataSources": {
-    "dataSource_2": {
-      "id": "dataSource_2",
+    "dataSource_3": {
+      "id": "dataSource_3",
       "type": "WEB_MAP",
       "sourceLabel": "Baumkataster - Bürgerpark Nord Köln",
       "itemId": "d08cfb8dd5ce4fd59c314a9eb5d41eff",
       "portalUrl": "https://esri-de.maps.arcgis.com"
-    },
-    "widget_9-ouput": {
-      "id": "widget_9-ouput",
-      "type": "FEATURE_LAYER",
-      "label": "gpxUpload-output-data-source",
-      "originDataSources": [
-        {
-          "dataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "mainDataSourceId": "dataSource_2-Köln_Baumkataster_6678",
-          "rootDataSourceId": "dataSource_2"
-        }
-      ],
-      "isDataInDataSourceInstance": true,
-      "isOutputFromWidget": true
     }
   },
   "messageConfigs": {},
@@ -3327,7 +3289,7 @@
     "button": {},
     "logo": {}
   },
-  "originExbVersion": "1.15.0",
+  "originExbVersion": "1.17.0",
   "pageStructure": [
     {
       "page_0": []
@@ -3338,6 +3300,6 @@
       "primary": "#bb07e5"
     }
   },
-  "timestamp": 1725299815092,
-  "publishTimestamp": 1725299816929
+  "timestamp": 1750091234204,
+  "publishTimestamp": 1750091234798
 }
