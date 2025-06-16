@@ -9,7 +9,7 @@ const { join } = require('path');
 
 const initialDir = process.cwd(); // Store the initial working directory
 
-findDirectSubfolders = (dir) => {
+const findDirectSubfolders = (dir) => {
     const subfolders = [];
     const items = readdirSync(dir);
 
@@ -26,7 +26,7 @@ findDirectSubfolders = (dir) => {
     return subfolders;
 }
 
-processSubfolders = (subfolders) => {
+const processSubfolders = (subfolders) => {
     subfolders.forEach(folder => {
         try {
             console.log(`Installing npm packages in ${folder}...`);
