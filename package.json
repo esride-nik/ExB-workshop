@@ -4,7 +4,8 @@
   "description": "themes + widgets in root, own package.json",
   "main": "",
   "scripts": {
-    "insts": "node npm-install-subfolders.js"
+    "insts": "node npm-install-subfolders.js",
+    "instsfix": "node npm-install-subfolders.js -- -af"
   },
   "author": ""
 }

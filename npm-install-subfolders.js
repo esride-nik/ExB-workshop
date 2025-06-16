@@ -1,6 +1,6 @@
 /*
-Run ``npm run install-subfolders`` right in the repository root. This will scan through the widget folders and install all dependencies.
-Run ``npm run install-subfolders -- -af`` to perform an ``npm audit fix`` in the same subfolders.
+Run ``node npm-install-subfolders.js`` right in the repository root. This will scan through the widget folders and install all dependencies.
+Run ``node npm-install-subfolders.js -- -af`` to perform an ``npm audit fix`` in the same subfolders.
 */
 
 const { execSync } = require('child_process');
