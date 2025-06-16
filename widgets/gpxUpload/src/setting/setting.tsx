@@ -79,7 +79,7 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
                     <FieldSelector
                       useDataSources={props.useDataSources}
                       onChange={onFieldChange}
-                      selectedFields={props.useDataSources[0].fields || Immutable.default([])}
+                      selectedFields={props.useDataSources[0].fields || Immutable([])}
                     />
                   }
                 </SettingRow>
