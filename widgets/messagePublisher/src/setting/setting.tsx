@@ -1,5 +1,5 @@
-import { AllDataSourceTypes, type IMFieldSchema, Immutable, React, type UseDataSource } from 'jimu-core'
-import { type AllWidgetSettingProps } from 'jimu-for-builder'
+import { DataSourceTypes, type IMFieldSchema, Immutable, React, type UseDataSource } from 'jimu-core'
+import type { AllWidgetSettingProps } from 'jimu-for-builder'
 import { SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import defaultMessages from './translations/default'
 import { DataSourceSelector, FieldSelector } from 'jimu-ui/advanced/data-source-selector'
@@ -38,7 +38,7 @@ export default function Setting (props: AllWidgetSettingProps<unknown>) {
                   {/* <MapWidgetSelector onSelect={onMapSelected} useMapWidgetIds={props.useMapWidgetIds} /> */}
 
                   <DataSourceSelector
-                      types={Immutable([AllDataSourceTypes.FeatureLayer])}
+                      types={Immutable([DataSourceTypes.FeatureLayer])}
                       useDataSources={props.useDataSources}
                       useDataSourcesEnabled={props.useDataSourcesEnabled}
                       onToggleUseDataEnabled={onToggleUseDataEnabled}

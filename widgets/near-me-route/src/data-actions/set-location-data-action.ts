@@ -1,6 +1,8 @@
-import { AbstractDataAction, type DataRecordSet, MutableStoreManager, DataLevel, DataSourceStatus, type DataSource, type JSAPILayerMixin, getAppStore, AllDataSourceTypes } from 'jimu-core'
+import { AbstractDataAction, type DataRecordSet, MutableStoreManager, DataLevel, DataSourceStatus, type DataSource, type JSAPILayerMixin, getAppStore, DataSourceTypes } from 'jimu-core'
 
 export default class SetLocationDataAction extends AbstractDataAction {
+  // needs to be async because the base class function returns a promise
+  // eslint-disable-next-line @typescript-eslint/require-await
   async isSupported (dataSets: DataRecordSet[], dataLevel: DataLevel): Promise<boolean> {
     if (dataSets.length > 1) {
       return false
@@ -50,7 +52,7 @@ export default class SetLocationDataAction extends AbstractDataAction {
 
     //accept selected records/current features from pupup only
     if ((dataSet.records.length > 0 && dataLevel === DataLevel.Records && (dataSet.type === 'current' || dataSet.type === 'selected')) ||
-     (dataLevel === DataLevel.DataSource && [AllDataSourceTypes.FeatureLayer].includes(dataSet.dataSource.type as any))) {
+     (dataLevel === DataLevel.DataSource && [DataSourceTypes.FeatureLayer].includes(dataSet.dataSource.type as any))) {
       return true
     }
 
@@ -59,6 +61,8 @@ export default class SetLocationDataAction extends AbstractDataAction {
 
   //on selection of the features in other widgets get the data record set by execute method
   //data record set consists of the features which will be used for getting the incident geometry
+  // needs to be async because the base class function returns a promise
+  // eslint-disable-next-line @typescript-eslint/require-await
   async onExecute (dataSets: DataRecordSet[], dataLevel: DataLevel): Promise<boolean> {
     const dataSet = dataSets[0]
     const { records, dataSource } = dataSet

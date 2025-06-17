@@ -18,7 +18,7 @@
   LICENSE file.
 */
 export default {
-  _widgetLabel: 'demo',
+  _widgetLabel: 'Radiate',
   widgetProperties: 'Widget Properties',
   widgetFunctions: 'Widget Functions',
   widgetName: 'widget name:',

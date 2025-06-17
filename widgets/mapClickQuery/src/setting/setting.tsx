@@ -1,5 +1,5 @@
-import { React, UseDataSource } from 'jimu-core'
-import { AllWidgetSettingProps } from 'jimu-for-builder'
+import { React, type UseDataSource } from 'jimu-core'
+import type { AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import defaultMessages from './translations/default'
 
@@ -18,6 +18,7 @@ export default function Setting (props: AllWidgetSettingProps<{}>) {
     })
   }
 
+  // TODO: clean up the commented code
   const onToggleUseDataEnabled = (useDataSourcesEnabled: boolean) => {
     props.onSettingChange({
       id: props.id,
@@ -45,7 +46,7 @@ export default function Setting (props: AllWidgetSettingProps<{}>) {
                 </SettingRow>
             </SettingSection>
             {/* <DataSourceSelector
-                types={Immutable([AllDataSourceTypes.WebMap])}
+                types={Immutable([DataSourceTypes.WebMap])}
                 useDataSources={props.useDataSources}
                 useDataSourcesEnabled={props.useDataSourcesEnabled}
                 onToggleUseDataEnabled={onToggleUseDataEnabled}

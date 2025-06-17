@@ -1,5 +1,5 @@
 /** @jsx jsx */ // <-- make sure to include the jsx pragma
-import { React, jsx, type IntlShape, type IMThemeVariables, urlUtils, type IMFieldSchema, Immutable, OrderRule, type DataSource, type Expression, classNames, getAppStore, DataSourceManager, DataSourceTypes, ArcGISDataSourceTypes, type UseDataSource, lodash } from 'jimu-core'
+import { React, jsx, type IntlShape, type IMThemeVariables, urlUtils, type IMFieldSchema, Immutable, OrderRule, type DataSource, type Expression, classNames, getAppStore, DataSourceManager, DataSourceTypes, type UseDataSource, lodash } from 'jimu-core'
 import { Button, defaultMessages as jimuUIDefaultMessages, Icon, Switch, TextInput, Radio, Label, Tooltip, Checkbox, Alert } from 'jimu-ui'
 import { SettingRow, SettingSection, SidePopper } from 'jimu-ui/advanced/setting-components'
 import { type ColorMatches, type CurrentLayer, type LayerDsId, type LayersInfo, type SelectedExpressionInfo, type SelectedLayers, type SummaryExpressionFieldInfo, type SummaryFieldsInfo, AnalysisTypeName } from '../../config'
@@ -15,7 +15,7 @@ import { SettingOutlined } from 'jimu-icons/outlined/application/setting'
 import SidepopperBackArrow from './sidepopper-back-arrow'
 import ColorSettingPopper from './color-setting-selector-popper'
 import { InfoOutlined } from 'jimu-icons/outlined/suggested/info'
-import { AllDataSourceTypes, DataSourceSelector, FieldSelector } from 'jimu-ui/advanced/data-source-selector'
+import { DataSourceSelector, FieldSelector } from 'jimu-ui/advanced/data-source-selector'
 import { SortAscendingOutlined } from 'jimu-icons/outlined/directional/sort-ascending'
 import { SortDescendingOutlined } from 'jimu-icons/outlined/directional/sort-descending'
 import { getSelectedLayerInstance, getDisplayField } from '../../common/utils'
@@ -87,7 +87,7 @@ interface State {
 }
 
 export default class EditAnalysisPopper extends React.PureComponent<Props, State> {
-  supportedDsTypes = Immutable([AllDataSourceTypes.FeatureLayer])
+  supportedDsTypes = Immutable([DataSourceTypes.FeatureLayer])
   items = []
   backRef = React.createRef<SidepopperBackArrow>()
   colorSidePopperTrigger = React.createRef<HTMLDivElement>()
@@ -347,7 +347,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
   updateItemValue = (isEdited?: boolean, layerLabel?: string, useDataSource?: UseDataSource) => {
     const analysisSettings = this.state.analysisListSettings
     let updatedSettings
-    // eslint-disable-next-line
+    // eslint-disable-next-line array-callback-return
     analysisSettings.some((analysisInfos, index) => {
       const layerObj: any = getSelectedLayerInstance(useDataSource?.dataSourceId ? useDataSource?.dataSourceId : this.props.editCurrentLayer.layerDsId)
       if ((analysisInfos?.useDataSource?.dataSourceId === useDataSource?.dataSourceId || this.props.editCurrentLayer.layerDsId) && (this.state.analysisType === AnalysisTypeName.Closest) && (this.props.analysisIndex === index)) {
@@ -1291,7 +1291,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
     const widgetJson = appConfig
     const rootIds = []
     const ds = widgetJson.dataSources[this.props.activeDs]
-    if (ds?.type === ArcGISDataSourceTypes.WebMap || ds?.type === ArcGISDataSourceTypes.WebScene) { // is root ds
+    if (ds?.type === DataSourceTypes.WebMap || ds?.type === DataSourceTypes.WebScene) { // is root ds
       rootIds.push(this.props.activeDs)
     }
 
@@ -1356,7 +1356,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
 
   render () {
     const ds = DataSourceManager.getInstance().getDataSource(this.props.activeDs)
-    const childDs = ds?.getChildDataSources()
+    const childDs = ds?.getLocalDataSources()
     let dsAdded = false
     const dsRootIdsArr = []
     if (childDs) {
@@ -1426,7 +1426,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
       <SettingSection>
         <SettingRow>
           <Label className='w-100 d-flex'>
-            <div className='flex-grow-1 text-break setting-text-level-1'>
+            <div className='flex-grow-1 text-break title2 hint-paper'>
               {this.nls('analysisTypeLabel')}
             </div>
           </Label>
@@ -1452,7 +1452,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
           </Label>
           <Tooltip role={'tooltip'} tabIndex={0} aria-label={this.nls('closestAnalysisTypeTooltip')}
             title={this.nls('closestAnalysisTypeTooltip')} showArrow placement='top'>
-            <div className='setting-text-level-2 d-inline'>
+            <div className='title3 text-default d-inline'>
               <InfoOutlined />
             </div>
           </Tooltip>
@@ -1484,7 +1484,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
           </Label>
           <Tooltip role={'tooltip'} tabIndex={0} aria-label={this.nls('proximityAnalysisTypeTooltip')}
             title={this.nls('proximityAnalysisTypeTooltip')} showArrow placement='top'>
-            <div className='setting-text-level-2 d-inline'>
+            <div className='title3 text-default d-inline'>
               <InfoOutlined />
             </div>
           </Tooltip>
@@ -1508,7 +1508,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
           </Label>
           <Tooltip role={'tooltip'} tabIndex={0} aria-label={this.nls('summaryAnalysisTypeTooltip')}
             title={this.nls('summaryAnalysisTypeTooltip')} showArrow placement='top'>
-            <div className='setting-text-level-2 d-inline'>
+            <div className='title3 text-default d-inline'>
               <InfoOutlined />
             </div>
           </Tooltip>
@@ -1524,7 +1524,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
             <SettingRow flow={'wrap'}>
               <Label tabIndex={0} aria-label={this.nls('sortFeaturesLabel')} title={this.nls('sortFeaturesLabel')}
                 className='w-100 d-flex'>
-                <div className='text-truncate flex-grow-1 setting-text-level-3'>
+                <div className='text-truncate flex-grow-1 title3 hint-default'>
                   {this.nls('sortFeaturesLabel')}
                 </div>
               </Label>
@@ -1656,7 +1656,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
               </div>
               {this.state.summaryFieldsList.length === 0 &&
                 <Label tabIndex={0} aria-label={this.nls('addSummaryHintMsg')} className='font-italic w-100 d-flex'>
-                  <div className='flex-grow-1 text-break setting-text-level-3'>
+                  <div className='flex-grow-1 text-break title3 hint-default'>
                     {this.nls('addSummaryHintMsg')}
                   </div>
                 </Label>}
@@ -1729,7 +1729,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
                             ? this.nls('sumOfAreaTooltip')
                             : '')} showArrow placement='top'>
 
-                      <div className='setting-text-level-2 ml-2 d-inline'>
+                      <div className='title3 text-default ml-2 d-inline'>
                         <InfoOutlined />
                       </div>
                     </Tooltip>
@@ -1832,7 +1832,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
               toggle={this.closeAddSummaryFieldPanel}
               trigger={this.summaryFieldsSidePopperTrigger?.current}
               backToFocusNode={this.state.popperFocusNode}>
-              <div className='bg-light-300 border-color-gray-400' css={getSidePanelStyle(this.props.theme)}>
+              <div className='bg-default border-color-gray-400' css={getSidePanelStyle(this.props.theme)}>
                 <SidepopperBackArrow
                   theme={this.props.theme}
                   intl={this.props.intl}
@@ -1854,7 +1854,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
 
             {/* Sidepopper for editing summary fields color */}
             <SidePopper isOpen={this.state.showSummaryColorSettings && !urlUtils.getAppIdPageIdFromUrl().pageId} position='right' toggle={this.closeColorSettingsPanel} trigger={this.colorSidePopperTrigger?.current}>
-              <div className='bg-light-300 border-color-gray-400' css={getSidePanelStyle(this.props.theme)}>
+              <div className='bg-default border-color-gray-400' css={getSidePanelStyle(this.props.theme)}>
                 <SidepopperBackArrow
                   theme={this.props.theme}
                   intl={this.props.intl}
@@ -1932,7 +1932,7 @@ export default class EditAnalysisPopper extends React.PureComponent<Props, State
               </div>
               <Tooltip role={'tooltip'} tabIndex={0} aria-label={this.nls('expandListTooltip')}
                 title={this.nls('expandListTooltip')} showArrow placement='top'>
-                <div className='setting-text-level-2 d-inline' onClick={(e) => { e.preventDefault() }}>
+                <div className='title3 text-default d-inline' onClick={(e) => { e.preventDefault() }}>
                   <InfoOutlined />
                 </div>
               </Tooltip>

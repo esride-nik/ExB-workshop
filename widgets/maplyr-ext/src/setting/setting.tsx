@@ -9,7 +9,7 @@ import {
   jsx,
   getAppStore,
   type UseDataSource,
-  AllDataSourceTypes
+  DataSourceTypes
 } from 'jimu-core'
 import { Switch, Radio, Label, Alert, Checkbox } from 'jimu-ui'
 import {
@@ -19,8 +19,8 @@ import {
   MultipleJimuMapConfig
 } from 'jimu-ui/advanced/setting-components'
 import { DataSourceSelector } from 'jimu-ui/advanced/data-source-selector'
-import { type AllWidgetSettingProps } from 'jimu-for-builder'
-import { type IMConfig } from '../config'
+import type { AllWidgetSettingProps } from 'jimu-for-builder'
+import type { IMConfig } from '../config'
 import defaultMessages from './translations/default'
 import MapThumb from './components/map-thumb'
 import { getStyle } from './lib/style'
@@ -46,8 +46,8 @@ AllWidgetSettingProps<IMConfig> & ExtraProps,
 WidgetSettingState
 > {
   supportedDsTypes = Immutable([
-    AllDataSourceTypes.WebMap,
-    AllDataSourceTypes.WebScene
+    DataSourceTypes.WebMap,
+    DataSourceTypes.WebScene
   ])
 
   customizeLayersRef: HTMLDivElement

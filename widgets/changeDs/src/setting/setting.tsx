@@ -1,7 +1,7 @@
-import { type AllWidgetSettingProps } from 'jimu-for-builder'
-import { type IMConfig } from '../config'
+import type { AllWidgetSettingProps } from 'jimu-for-builder'
+import type { IMConfig } from '../config'
 import { DataSourceSelector } from 'jimu-ui/advanced/data-source-selector'
-import { React, AllDataSourceTypes, Immutable, type UseDataSource } from 'jimu-core'
+import { React, DataSourceTypes, Immutable, type UseDataSource } from 'jimu-core'
 
 const Setting = (props: AllWidgetSettingProps<IMConfig>) => {
   const onDataSourceChange = (useDataSources: UseDataSource[]) => {
@@ -13,7 +13,7 @@ const Setting = (props: AllWidgetSettingProps<IMConfig>) => {
 
   return <div className="use-feature-layer-setting p-2">
     <DataSourceSelector
-      types={Immutable([AllDataSourceTypes.FeatureLayer])}
+      types={Immutable([DataSourceTypes.FeatureLayer])}
       useDataSources={props.useDataSources}
       useDataSourcesEnabled={true}
       onChange={onDataSourceChange}
