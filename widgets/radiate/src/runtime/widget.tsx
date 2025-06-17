@@ -2,16 +2,16 @@
 import { type AllWidgetProps, FormattedMessage, jsx, BaseWidget } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
-import { type IMConfig } from '../config'
+import type { IMConfig } from '../config'
 
-import webMercatorUtils from 'esri/geometry/support/webMercatorUtils'
+import * as webMercatorUtils from 'esri/geometry/support/webMercatorUtils'
 import Point from 'esri/geometry/Point'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import Graphic from 'esri/Graphic'
 import Polygon from 'esri/geometry/Polygon'
 import { Button, NumericInput } from 'jimu-ui'
-import { type Polyline } from 'esri/geometry'
-import geometryEngine from 'esri/geometry/geometryEngine'
+import type { Polyline } from 'esri/geometry'
+import * as geometryEngine from 'esri/geometry/geometryEngine'
 import SpatialReference from 'esri/geometry/SpatialReference'
 import SimpleLineSymbol from 'esri/symbols/SimpleLineSymbol'
 import Color from 'esri/Color'
@@ -73,7 +73,7 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
       },
       size: 150,
       angle: this.state.angle
-    }
+    } as unknown as __esri.SimpleMarkerSymbol
   }
 
   getPointSym (size: number) {
@@ -106,7 +106,9 @@ export default class Widget extends BaseWidget<AllWidgetProps<IMConfig>, State> 
     })
   }
 
-  drawMast = async () => {
+  // TODO: why are we drawing using the form values instead of a map click?
+  // TODO: redraw doesn not refresh properly.
+  drawMast = () => {
     if (!this.state.inputValid) return
     // jimuMapView.view.on('click', this.handleMapClick);
 
