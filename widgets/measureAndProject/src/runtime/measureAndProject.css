@@ -58,3 +58,8 @@
 .text-blocks div {
     background:white;
 }
+
+#measurementWidget {
+    --calcite-color-brand: #767676;
+    --calcite-color-brand-hover: #666;
+}
