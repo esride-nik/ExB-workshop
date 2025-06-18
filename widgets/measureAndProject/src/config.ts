@@ -32,6 +32,7 @@ export interface Config {
   locationMeasurementEnabled: boolean
   headerText: string
   copyText: string
+  disclaimerText: string
 }
 
 export type IMConfig = ImmutableObject<Config>

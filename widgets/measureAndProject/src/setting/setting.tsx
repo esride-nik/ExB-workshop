@@ -76,6 +76,16 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
     })
   }
 
+  const setDisclaimerText = (disclaimerText: string) => {
+    props.onSettingChange({
+      id: props.id,
+      config: {
+        ...props.config,
+        disclaimerText
+      }
+    })
+  }
+
   return (
         <div className="use-feature-layer-setting p-2">
             <SettingSection
@@ -210,6 +220,18 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                     aria-label='copyText'
                     onChange={(onChangeEvent) => { setCopyText(onChangeEvent.target.value) }}
                     value={props.config.copyText}
+                  /></Label>
+                </SettingRow>
+                <SettingRow>
+                  <Label className="text-label">{props.intl.formatMessage({
+                    id: 'disclaimerText',
+                    defaultMessage: defaultMessages.disclaimerText
+                  })}
+                  <TextArea
+                    className="mb-4"
+                    aria-label='disclaimerText'
+                    onChange={(onChangeEvent) => { setDisclaimerText(onChangeEvent.target.value) }}
+                    value={props.config.disclaimerText}
                   /></Label>
                 </SettingRow>
             </SettingSection>

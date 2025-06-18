@@ -433,12 +433,17 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
           <div className="text-blocks">
             {props.config?.headerText &&
               <div className="esri-widget esri-component esri-measurement-header">
-                <h3>{props.config.headerText}</h3>
+                <b>{props.config.headerText}</b>
               </div>
             }
-            {props.config?.copyText &&
+            {(props.config?.copyText && activeTool !== 'none') &&
               <div className="esri-widget esri-component esri-measurement-copy-text">
                 {props.config.copyText}
+              </div>
+            }
+            {(props.config?.disclaimerText && activeTool === 'none') &&
+              <div className="esri-widget esri-component esri-measurement-disclaimer-text">
+                {props.config.disclaimerText}
               </div>
             }
           </div>

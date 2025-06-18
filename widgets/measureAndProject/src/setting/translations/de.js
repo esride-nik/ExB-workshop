@@ -12,5 +12,6 @@ System.register([], function (_export) {return {execute: function () {_export({
   location: 'Ort',
   freeText: 'Freitext',
   headerText: 'Überschrift',
-  copyText: 'Fließtext'
+  copyText: 'Fließtext',
+  disclaimerText: 'Messtext'
 })}}});

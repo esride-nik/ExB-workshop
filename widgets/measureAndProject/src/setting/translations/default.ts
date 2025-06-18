@@ -12,5 +12,6 @@ export default {
   location: 'Location',
   freeText: 'Free text',
   headerText: 'Header text',
-  copyText: 'Copy text'
+  copyText: 'Copy text',
+  disclaimerText: 'Disclaimer text'
 }

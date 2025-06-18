@@ -4,5 +4,6 @@
   "areaMeasurementEnabled": true,
   "locationMeasurementEnabled": true,
   "headerText": "",
-  "copyText": ""
+  "copyText": "",
+  "disclaimerText": ""
 }
