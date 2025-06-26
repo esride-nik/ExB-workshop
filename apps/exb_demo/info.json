@@ -2,7 +2,7 @@
   "created": 1725104031093,
   "description": "",
   "id": "exb_demo",
-  "modified": 1750102189807,
+  "modified": 1750162062672,
   "owner": "nik_esri_de",
   "tags": "",
   "thumbnail": null,
@@ -13,9 +13,9 @@
     "Web Experience",
     "Ready To Use",
     "JavaScript",
-    "status: Changed",
+    "status: Published",
     "version:1.17.0",
-    "publishVersion:1.15.0"
+    "publishVersion:1.17.0"
   ],
   "portalUrl": "https://esri-de.maps.arcgis.com",
   "username": "nik_esri_de",

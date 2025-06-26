@@ -242,12 +242,12 @@
           "type": "WIDGET",
           "widgetId": "widget_6",
           "bbox": {
-            "left": "0%",
-            "right": "0%",
-            "top": "0%",
-            "bottom": "0%",
-            "width": "100%",
-            "height": "100%"
+            "left": "0.0%",
+            "right": "0.0%",
+            "top": "0.0%",
+            "bottom": "0.0%",
+            "width": "100.0%",
+            "height": "100.0%"
           },
           "setting": {
             "autoProps": {
@@ -289,6 +289,20 @@
           "bbox": {
             "height": "400px"
           }
+        },
+        "3": {
+          "type": "WIDGET",
+          "widgetId": "widget_12",
+          "bbox": {
+            "height": "496px"
+          }
+        },
+        "4": {
+          "type": "WIDGET",
+          "widgetId": "widget_13",
+          "bbox": {
+            "height": "400px"
+          }
         }
       },
       "type": "ACCORDION",
@@ -296,7 +310,9 @@
       "order": [
         "0",
         "1",
-        "2"
+        "2",
+        "3",
+        "4"
       ]
     }
   },
@@ -2492,7 +2508,8 @@
               "responsiveType": "FIXED",
               "columnWidth": 200
             },
-            "layerHonorMode": "WEBMAP"
+            "layerHonorMode": "WEBMAP",
+            "updateText": false
           },
           {
             "id": "widget_9-ouput-output-4",
@@ -3041,72 +3058,6 @@
         "tableMode": "LAYER"
       },
       "id": "widget_5",
-      "dataActions": {
-        "showOnMap": {
-          "config": {
-            "isUseCustomSymbol": true,
-            "symbolOption": {
-              "pointSymbol": {
-                "type": "esriSMS",
-                "color": [
-                  255,
-                  255,
-                  0,
-                  150
-                ],
-                "angle": 0,
-                "xoffset": 0,
-                "yoffset": 0,
-                "size": 12,
-                "style": "esriSMSCircle",
-                "outline": {
-                  "type": "esriSLS",
-                  "color": [
-                    255,
-                    255,
-                    0,
-                    150
-                  ],
-                  "width": 1,
-                  "style": "esriSLSSolid"
-                }
-              },
-              "polylineSymbol": {
-                "type": "esriSLS",
-                "color": [
-                  255,
-                  255,
-                  0,
-                  150
-                ],
-                "width": 0.75,
-                "style": "esriSLSSolid"
-              },
-              "polygonSymbol": {
-                "type": "esriSFS",
-                "color": [
-                  255,
-                  255,
-                  0,
-                  150
-                ],
-                "outline": {
-                  "type": "esriSLS",
-                  "color": [
-                    255,
-                    255,
-                    0,
-                    150
-                  ],
-                  "width": 1,
-                  "style": "esriSLSSolid"
-                },
-                "style": "esriSFSSolid"
-              }
-            }
-          }
-        }
-      },
       "useDataSources": [
         {
           "dataSourceId": "dataSource_3-View_Baumgesundheit_Gruppe_1_5693",
@@ -3195,7 +3146,74 @@
             "LaubNadel"
           ]
         }
-      ]
+      ],
+      "dataActions": {
+        "showOnMap": {
+          "config": {
+            "isUseCustomSymbol": true,
+            "isOperationalLayer": true,
+            "symbolOption": {
+              "pointSymbol": {
+                "type": "esriSMS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "angle": 0,
+                "xoffset": 0,
+                "yoffset": 0,
+                "size": 12,
+                "style": "esriSMSCircle",
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                }
+              },
+              "polylineSymbol": {
+                "type": "esriSLS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "width": 0.75,
+                "style": "esriSLSSolid"
+              },
+              "polygonSymbol": {
+                "type": "esriSFS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                },
+                "style": "esriSFSSolid"
+              }
+            }
+          }
+        }
+      }
     },
     "widget_6": {
       "uri": "widgets/excelExport/",
@@ -3358,7 +3376,7 @@
       "version": "0.1.0",
       "label": "Alternative select",
       "config": {
-        "radius": 1000
+        "radius": 150
       },
       "id": "widget_11",
       "useMapWidgetIds": [
@@ -3372,6 +3390,256 @@
           "rootDataSourceId": "dataSource_3"
         }
       ]
+    },
+    "widget_12": {
+      "uri": "widgets/simple/",
+      "version": "1.17.0",
+      "label": "Simple",
+      "config": {
+        "exampleConfigProperty": "hello rwe",
+        "_defaultstr": "{\"exampleConfigProperty\":\"hello rwe\"}"
+      },
+      "id": "widget_12"
+    },
+    "widget_13": {
+      "uri": "widgets/arcgis/near-me/",
+      "version": "1.17.0",
+      "label": "Near Me",
+      "config": {
+        "useMapWidget": false,
+        "generalSettings": {
+          "highlightColor": "#72048c",
+          "noResultsFoundText": "No results found.",
+          "noResultMsgStyleSettings": {
+            "fontFamily": "Avenir Next",
+            "fontBold": false,
+            "fontItalic": false,
+            "fontUnderline": false,
+            "fontStrike": false,
+            "fontColor": "var(--black)",
+            "fontSize": "12px"
+          },
+          "promptTextMessage": "",
+          "promptTextMsgStyleSettings": {
+            "fontFamily": "Avenir Next",
+            "fontBold": false,
+            "fontItalic": false,
+            "fontUnderline": false,
+            "fontStrike": false,
+            "fontColor": "var(--black)",
+            "fontSize": "12px"
+          }
+        },
+        "configInfo": {
+          "dataSource_3": {
+            "analysisSettings": {
+              "layersInfo": [
+                {
+                  "useDataSource": {
+                    "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+                    "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+                    "rootDataSourceId": "dataSource_3"
+                  },
+                  "label": "Baumkataster - Köln",
+                  "analysisInfo": {
+                    "analysisId": "4784023967892015",
+                    "analysisType": "closest",
+                    "expandOnOpen": true,
+                    "returnIntersectedPolygons": false,
+                    "highlightResultsOnMap": true,
+                    "highlightColorOnMap": "#f507f5",
+                    "fieldsToExport": [
+                      "OBJECTID_1",
+                      "objectid",
+                      "beschreibu",
+                      "schluessel",
+                      "objekttyp",
+                      "baumnr",
+                      "x_koordina",
+                      "y_koordina",
+                      "StandortNr",
+                      "HausNr",
+                      "Lagebezeic",
+                      "STANDONR",
+                      "ANZAHL",
+                      "STAMMVON",
+                      "STAMMBIS",
+                      "KRONE",
+                      "H_HE",
+                      "PFLANZJAH",
+                      "ArtNr",
+                      "Kurzname",
+                      "Gattung",
+                      "Art",
+                      "Sorte",
+                      "DeutscherN",
+                      "LaubNadel"
+                    ],
+                    "includeApproxDistance": false
+                  }
+                }
+              ],
+              "displayFeatureCount": true,
+              "displayAnalysisIcon": false,
+              "displayMapSymbols": false,
+              "showDistFromInputLocation": true,
+              "onlyShowLayersResult": false,
+              "displayAllLayersResult": false,
+              "enableProximitySearch": false,
+              "saveFeatures": {
+                "saveInputLocation": false,
+                "pointFeature": {
+                  "enabled": false,
+                  "useDataSource": null
+                },
+                "polylineFeature": {
+                  "enabled": false,
+                  "useDataSource": null
+                },
+                "polygonFeature": {
+                  "enabled": false,
+                  "useDataSource": null
+                },
+                "searchAreaFeature": {
+                  "enabled": false,
+                  "useDataSource": null
+                }
+              }
+            },
+            "searchSettings": {
+              "headingLabel": "Location",
+              "bufferDistance": 1,
+              "distanceUnits": "",
+              "showDistanceSettings": true,
+              "sketchTools": {
+                "showPoint": true,
+                "showPolyline": true,
+                "showPolygon": true
+              },
+              "searchByActiveMapArea": false,
+              "includeFeaturesOutsideMapArea": false,
+              "headingLabelStyle": {
+                "fontFamily": "Avenir Next",
+                "fontBold": false,
+                "fontItalic": false,
+                "fontUnderline": false,
+                "fontStrike": false,
+                "fontColor": "var(--ref-palette-black)",
+                "fontSize": "13px"
+              },
+              "showInputAddress": true
+            }
+          }
+        }
+      },
+      "id": "widget_13",
+      "outputDataSources": [
+        "widget_13_output_closest_4784023967892015"
+      ],
+      "useMapWidgetIds": [
+        "widget_1"
+      ],
+      "useDataSources": [
+        {
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3",
+          "fields": [
+            "OBJECTID_1",
+            "objectid",
+            "beschreibu",
+            "schluessel",
+            "objekttyp",
+            "baumnr",
+            "x_koordina",
+            "y_koordina",
+            "StandortNr",
+            "HausNr",
+            "Lagebezeic",
+            "STANDONR",
+            "ANZAHL",
+            "STAMMVON",
+            "STAMMBIS",
+            "KRONE",
+            "H_HE",
+            "PFLANZJAH",
+            "ArtNr",
+            "Kurzname",
+            "Gattung",
+            "Art",
+            "Sorte",
+            "DeutscherN",
+            "LaubNadel"
+          ]
+        }
+      ],
+      "dataActions": {
+        "showOnMap": {
+          "config": {
+            "isUseCustomSymbol": true,
+            "isOperationalLayer": true,
+            "symbolOption": {
+              "pointSymbol": {
+                "type": "esriSMS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "angle": 0,
+                "xoffset": 0,
+                "yoffset": 0,
+                "size": 12,
+                "style": "esriSMSCircle",
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                }
+              },
+              "polylineSymbol": {
+                "type": "esriSLS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "width": 0.75,
+                "style": "esriSLSSolid"
+              },
+              "polygonSymbol": {
+                "type": "esriSFS",
+                "color": [
+                  255,
+                  255,
+                  0,
+                  150
+                ],
+                "outline": {
+                  "type": "esriSLS",
+                  "color": [
+                    255,
+                    255,
+                    0,
+                    150
+                  ],
+                  "width": 1,
+                  "style": "esriSLSSolid"
+                },
+                "style": "esriSFSSolid"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "widgetsManifest": {},
@@ -3453,9 +3721,342 @@
       ],
       "isDataInDataSourceInstance": true,
       "isOutputFromWidget": true
+    },
+    "dataSource_4": {
+      "id": "dataSource_4",
+      "type": "WEB_MAP",
+      "sourceLabel": "PLZs",
+      "itemId": "116b401f81eb44d1afaec98ac74b589a",
+      "portalUrl": "https://esri-de.maps.arcgis.com"
+    },
+    "widget_13_output_closest_4784023967892015": {
+      "id": "widget_13_output_closest_4784023967892015",
+      "type": "FEATURE_LAYER",
+      "label": "Baumkataster - Köln (Closest Feature)",
+      "isOutputFromWidget": true,
+      "schema": {
+        "idField": "OBJECTID_1",
+        "fields": {
+          "OBJECTID_1": {
+            "jimuName": "OBJECTID_1",
+            "name": "OBJECTID_1",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeOID",
+            "alias": "OBJECTID_1",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "objectid": {
+            "jimuName": "objectid",
+            "name": "objectid",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "objectid",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "beschreibu": {
+            "jimuName": "beschreibu",
+            "name": "beschreibu",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "Beschreibung",
+            "format": null
+          },
+          "schluessel": {
+            "jimuName": "schluessel",
+            "name": "schluessel",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "Schlussel",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "objekttyp": {
+            "jimuName": "objekttyp",
+            "name": "objekttyp",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "Objekttyp",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "baumnr": {
+            "jimuName": "baumnr",
+            "name": "baumnr",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "BaumNr",
+            "format": null
+          },
+          "x_koordina": {
+            "jimuName": "x_koordina",
+            "name": "x_koordina",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "x_koordina",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "y_koordina": {
+            "jimuName": "y_koordina",
+            "name": "y_koordina",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "y_koordina",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "StandortNr": {
+            "jimuName": "StandortNr",
+            "name": "StandortNr",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "StandortNr",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "HausNr": {
+            "jimuName": "HausNr",
+            "name": "HausNr",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "HausNr",
+            "format": null
+          },
+          "Lagebezeic": {
+            "jimuName": "Lagebezeic",
+            "name": "Lagebezeic",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "Lagebezeichnung",
+            "format": null
+          },
+          "STANDONR": {
+            "jimuName": "STANDONR",
+            "name": "STANDONR",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeDouble",
+            "alias": "Standort nr",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "ANZAHL": {
+            "jimuName": "ANZAHL",
+            "name": "ANZAHL",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeDouble",
+            "alias": "Anzahl",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "STAMMVON": {
+            "jimuName": "STAMMVON",
+            "name": "STAMMVON",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeDouble",
+            "alias": "Stamm von",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "STAMMBIS": {
+            "jimuName": "STAMMBIS",
+            "name": "STAMMBIS",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeDouble",
+            "alias": "Stamm bis",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "KRONE": {
+            "jimuName": "KRONE",
+            "name": "KRONE",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeDouble",
+            "alias": "Krone",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "H_HE": {
+            "jimuName": "H_HE",
+            "name": "H_HE",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeDouble",
+            "alias": "Höhe (m)",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "PFLANZJAH": {
+            "jimuName": "PFLANZJAH",
+            "name": "PFLANZJAH",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeDouble",
+            "alias": "Pflanzjahr",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "ArtNr": {
+            "jimuName": "ArtNr",
+            "name": "ArtNr",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "ArtNr",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          },
+          "Kurzname": {
+            "jimuName": "Kurzname",
+            "name": "Kurzname",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "Kurzname",
+            "format": null
+          },
+          "Gattung": {
+            "jimuName": "Gattung",
+            "name": "Gattung",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "Gattung",
+            "format": null
+          },
+          "Art": {
+            "jimuName": "Art",
+            "name": "Art",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "Art",
+            "format": null
+          },
+          "Sorte": {
+            "jimuName": "Sorte",
+            "name": "Sorte",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "Sorte",
+            "format": null
+          },
+          "DeutscherN": {
+            "jimuName": "DeutscherN",
+            "name": "DeutscherN",
+            "type": "STRING",
+            "esriType": "esriFieldTypeString",
+            "alias": "Deutscher Name",
+            "format": null
+          },
+          "LaubNadel": {
+            "jimuName": "LaubNadel",
+            "name": "LaubNadel",
+            "type": "NUMBER",
+            "esriType": "esriFieldTypeInteger",
+            "alias": "Laub/Nadel",
+            "format": {
+              "digitSeparator": false,
+              "places": 0
+            }
+          }
+        }
+      },
+      "geometryType": "esriGeometryPoint"
     }
   },
-  "messageConfigs": {},
+  "messageConfigs": {
+    "messageConfig_1": {
+      "id": "messageConfig_1",
+      "widgetId": "widget_13",
+      "messageType": "DATA_RECORDS_SELECTION_CHANGE",
+      "actions": [
+        {
+          "actionId": "widget_1-zoomToFeature-1750162026940",
+          "widgetId": "widget_1",
+          "messageWidgetId": "widget_13",
+          "actionName": "zoomToFeature",
+          "description": null,
+          "config": {
+            "useDataSource": {
+              "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "rootDataSourceId": "dataSource_3"
+            },
+            "useDataSources": [
+              {
+                "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+                "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+                "rootDataSourceId": "dataSource_3"
+              }
+            ],
+            "goToInitialMapExtentWhenSelectionCleared": false,
+            "useAnyTriggerData": true
+          },
+          "version": "1.17.0",
+          "useDataSources": [
+            {
+              "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "rootDataSourceId": "dataSource_3"
+            }
+          ]
+        },
+        {
+          "actionId": "widget_1-flash-1750162056430",
+          "widgetId": "widget_1",
+          "messageWidgetId": "widget_13",
+          "actionName": "flash",
+          "description": null,
+          "config": {
+            "useAnyTriggerData": true,
+            "messageUseDataSource": {
+              "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "rootDataSourceId": "dataSource_3"
+            },
+            "actionUseDataSource": null,
+            "sqlExprObj": null,
+            "enabledDataRelationShip": true,
+            "connectionType": "SET_CUSTOM_FIELDS"
+          },
+          "version": "1.17.0",
+          "useDataSources": [
+            {
+              "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+              "rootDataSourceId": "dataSource_3"
+            }
+          ]
+        }
+      ]
+    }
+  },
   "attributes": {
     "portalUrl": "https://esri-de.maps.arcgis.com"
   },
@@ -3476,6 +4077,6 @@
       "primary": "#bb07e5"
     }
   },
-  "timestamp": 1750101393751,
-  "publishTimestamp": 1750101394564
+  "timestamp": 1750162060848,
+  "publishTimestamp": 1750162062667
 }
