@@ -1,10 +1,10 @@
-import { React, AllWidgetProps, FormattedMessage } from 'jimu-core'
-import { JimuMapViewComponent, JimuMapView } from 'jimu-arcgis'
+import { React, type AllWidgetProps, FormattedMessage } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import defaultMessages from './translations/default'
-import { Point } from 'esri/geometry'
+import type { Point } from 'esri/geometry'
 import Graphic from 'esri/Graphic'
 import LineOfSight from 'esri/widgets/LineOfSight'
-import LineOfSightTarget from 'esri/widgets/LineOfSight/LineOfSightTarget'
+import type LineOfSightTarget from 'esri/widgets/LineOfSight/LineOfSightTarget'
 
 const { useState, useRef, useEffect } = React
 
