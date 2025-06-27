@@ -1,0 +1,24 @@
+{
+  "name": "excelExportActionOnly",
+  "label": "Excel Action",
+  "type": "widget",
+  "dependency": "jimu-arcgis",
+  "version": "0.9.1",
+  "exbVersion": "1.13.0",
+  "author": "Niklas Köhn, Esri Deutschland",
+  "description": "This widget exports records from a Data Action to an Excel Sheet.",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "dataActions": [
+    {
+      "name": "excelExport",
+      "label": "Excel Export",
+      "uri": "data-actions/excel-export",
+      "icon": "runtime/assets/icons/excel.svg"
+    }
+  ],
+  "translatedLocales": [
+    "en",
+    "de"
+  ]
+}
