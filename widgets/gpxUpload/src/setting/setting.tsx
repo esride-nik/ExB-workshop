@@ -3,8 +3,9 @@ import type { AllWidgetSettingProps } from 'jimu-for-builder'
 import { MapWidgetSelector, SettingRow, SettingSection } from 'jimu-ui/advanced/setting-components'
 import defaultMessages from './translations/default'
 import { DataSourceSelector, FieldSelector } from 'jimu-ui/advanced/data-source-selector'
+import type { Config } from '../config'
 
-export default function Setting (props: AllWidgetSettingProps<unknown>) {
+export default function Setting (props: AllWidgetSettingProps<Config>) {
   const onMapSelected = (useMapWidgetIds: string[]) => {
     props.onSettingChange({
       id: props.id,

@@ -5,12 +5,9 @@ import type { AllWidgetSettingProps } from 'jimu-for-builder'
 import { DataSourceSelector } from 'jimu-ui/advanced/data-source-selector'
 import defaultMessages from './translations/default'
 import { NumericInput } from 'jimu-ui'
+import type { Config } from '../config'
 
-export interface AlternativeSelectProps {
-  radius: number
-}
-
-export default function Setting (props: AllWidgetSettingProps<AlternativeSelectProps>): React.ReactElement {
+export default function Setting (props: AllWidgetSettingProps<Config>): React.ReactElement {
   const onMapSelected = (useMapWidgetIds: string[]) => {
     props.onSettingChange({
       id: props.id,
