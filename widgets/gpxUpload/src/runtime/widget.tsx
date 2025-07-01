@@ -32,10 +32,6 @@ export default function (props: AllWidgetProps<Config>) {
     const [gpxLayer, setGpxLayer] = useState<GraphicsLayer>(undefined);
     const [bufferPolygon, setBufferPolygon] = useState<Polygon>(undefined);
 
-    useEffect(() => {
-        console.log(color);
-    }, [color]);
-
     // draw bufferGraphic
     useEffect(() => {
         if (!gpxLayer || !bufferPolygon || !color) return
@@ -60,7 +56,6 @@ export default function (props: AllWidgetProps<Config>) {
     useEffect(() => {
       setSourceRecordsToOutputDs(bufferPolygon)
     }, [bufferPolygon]);
-
 
     const isConfigured = () => {
         return props.useDataSourcesEnabled && props.useDataSources?.length > 0 && props.useMapWidgetIds?.length > 0;
