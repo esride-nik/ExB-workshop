@@ -36,11 +36,13 @@ export default function (props: AllWidgetProps<AlternativeSelectProps>) {
   let bufferDistance = 100
   let featureFilter: __esri.FeatureFilter = null
 
-  useEffect(async () => {
-    await geodesicBufferOperator.load()
-    console.log('geodesicBufferOperator loaded', geodesicBufferOperator.isLoaded)
-  }
-  , [])
+  useEffect(() => {
+    const loadGeodesicBufferOperator = async() => {
+      await geodesicBufferOperator.load()
+      console.log('geodesicBufferOperator loaded', geodesicBufferOperator.isLoaded)
+    }
+    loadGeodesicBufferOperator()
+  }, [])
 
   useEffect(() => {
     if (!featureLayerView && featureLayerDataSource) {
