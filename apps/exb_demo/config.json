@@ -276,13 +276,6 @@
             "height": "169px"
           }
         },
-        "1": {
-          "type": "WIDGET",
-          "widgetId": "widget_9",
-          "bbox": {
-            "height": "170px"
-          }
-        },
         "2": {
           "type": "WIDGET",
           "widgetId": "widget_11",
@@ -303,13 +296,20 @@
           "bbox": {
             "height": "400px"
           }
+        },
+        "5": {
+          "type": "WIDGET",
+          "widgetId": "widget_15",
+          "bbox": {
+            "height": "200px"
+          }
         }
       },
       "type": "ACCORDION",
       "label": "Default",
       "order": [
         "0",
-        "1",
+        "5",
         "2",
         "3",
         "4"
@@ -3252,31 +3252,6 @@
       },
       "id": "widget_8"
     },
-    "widget_9": {
-      "uri": "widgets/gpxUpload/",
-      "version": "0.3.0",
-      "label": "GPX upload and interpretation",
-      "config": {
-        "w3wApiKey": "",
-        "w3wOnMap": false,
-        "showW3wSquare": false
-      },
-      "id": "widget_9",
-      "useMapWidgetIds": [
-        "widget_1"
-      ],
-      "useDataSourcesEnabled": true,
-      "outputDataSources": [
-        "widget_9-ouput"
-      ],
-      "useDataSources": [
-        {
-          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
-          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
-          "rootDataSourceId": "dataSource_3"
-        }
-      ]
-    },
     "widget_10": {
       "uri": "widgets/layout/accordion/",
       "version": "1.15.0",
@@ -3640,6 +3615,30 @@
           }
         }
       }
+    },
+    "widget_15": {
+      "uri": "widgets/gpxUpload/",
+      "version": "0.3.0",
+      "label": "GPX upload and interpretation",
+      "config": {},
+      "id": "widget_15",
+      "useMapWidgetIds": [
+        "widget_1"
+      ],
+      "useDataSourcesEnabled": true,
+      "outputDataSources": [
+        "widget_15-ouput"
+      ],
+      "useDataSources": [
+        {
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3",
+          "fields": [
+            "baumnr"
+          ]
+        }
+      ]
     }
   },
   "widgetsManifest": {},
@@ -3707,20 +3706,6 @@
       "sourceLabel": "Baumkataster  Baumgesundheit - Köln - keine Raster",
       "itemId": "64c6829d690f47cfb0db53cb01959e3e",
       "portalUrl": "https://esri-de.maps.arcgis.com"
-    },
-    "widget_9-ouput": {
-      "id": "widget_9-ouput",
-      "type": "FEATURE_LAYER",
-      "label": "gpxUpload-output-data-source",
-      "originDataSources": [
-        {
-          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
-          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
-          "rootDataSourceId": "dataSource_3"
-        }
-      ],
-      "isDataInDataSourceInstance": true,
-      "isOutputFromWidget": true
     },
     "dataSource_4": {
       "id": "dataSource_4",
@@ -3988,6 +3973,20 @@
         }
       },
       "geometryType": "esriGeometryPoint"
+    },
+    "widget_15-ouput": {
+      "id": "widget_15-ouput",
+      "type": "FEATURE_LAYER",
+      "label": "gpxUpload-output-data-source",
+      "originDataSources": [
+        {
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3"
+        }
+      ],
+      "isDataInDataSourceInstance": true,
+      "isOutputFromWidget": true
     }
   },
   "messageConfigs": {
@@ -4077,6 +4076,6 @@
       "primary": "#bb07e5"
     }
   },
-  "timestamp": 1750162060848,
-  "publishTimestamp": 1750162062667
+  "timestamp": 1751362072501,
+  "publishTimestamp": 1751362079854
 }
