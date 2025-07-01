@@ -12,6 +12,7 @@ Some Widgets and a theme.
     - [Extending class-based built-in widgets by inheritance](#extending-class-based-built-in-widgets-by-inheritance)
   - [Compiler settings](#compiler-settings)
     - [Cannot find ArcGIS Maps SDK for Javascript modules in Experience Builder ^1.12](#cannot-find-arcgis-maps-sdk-for-javascript-modules-in-experience-builder-112)
+    - [Error caused by ``.js`` import](#error-caused-by-js-import)
     - [Using imports in Jest](#using-imports-in-jest)
     - [Path resolution of ``shared-code``](#path-resolution-of-shared-code)
     - [Using shared code in multiple web-extension-repos](#using-shared-code-in-multiple-web-extension-repos)
@@ -66,6 +67,10 @@ Additionally, in ExB 1.12, the TypeScript definition file is missing. [Download 
 
 * In the file ``client/tsconfig.json``, include the folder name of the repository in the include array. Or remove / comment out the include array completely from the file.
 * Restart Watcher (call ``npm start`` in the client folder)
+
+### Error caused by ``.js`` import
+
+Issuey may be caused by ``.js`` imports, because the TC compiler checks the imported files (like in the ``d3`` widget in the offical Esri samples repository https://github.com/Esri/arcgis-experience-builder-sdk-resources). To avoid this, set ``"allowJs": false`` in your ``tsconfig.json``.
 
 ### Using imports in Jest
 
