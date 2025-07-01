@@ -28,7 +28,7 @@ const { useCallback } = React;
 
 export default function (props: AllWidgetProps<Config>) {
     const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined);
-    const [color, setColor] = useState<string>('#000000');
+    const [color, setColor] = useState<string>('#000000ff');
     const [gpxLayer, setGpxLayer] = useState<GraphicsLayer>(undefined);
     const [bufferPolygon, setBufferPolygon] = useState<Polygon>(undefined);
 
@@ -250,7 +250,7 @@ export default function (props: AllWidgetProps<Config>) {
                   setColor(e.target.value as string)
                 }}
                 value={color}
-                alphaChannel={false}
+                alphaChannel={true}
                 scale="s"
                 style={{ margin: '10px 0' }}
             />
