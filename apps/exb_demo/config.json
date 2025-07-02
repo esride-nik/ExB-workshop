@@ -324,6 +324,18 @@
           "bbox": {
             "height": "200px"
           }
+        },
+        "6": {
+          "type": "WIDGET",
+          "widgetId": "widget_18",
+          "bbox": {
+            "height": "54px"
+          },
+          "setting": {
+            "autoProps": {
+              "height": "AUTO"
+            }
+          }
         }
       },
       "type": "ACCORDION",
@@ -333,7 +345,8 @@
         "5",
         "2",
         "3",
-        "4"
+        "4",
+        "6"
       ]
     }
   },
@@ -3792,6 +3805,85 @@
       "useMapWidgetIds": [
         "widget_1"
       ]
+    },
+    "widget_18": {
+      "uri": "widgets/common/filter/",
+      "version": "1.17.0",
+      "label": "Filter",
+      "config": {
+        "logicalOperator": "AND",
+        "filterItems": [
+          {
+            "type": "SINGLE",
+            "name": "Baumkataster - Köln",
+            "useDataSources": [
+              {
+                "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+                "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+                "rootDataSourceId": "dataSource_3",
+                "fields": [
+                  "Gattung"
+                ]
+              }
+            ],
+            "icon": {
+              "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 16 16\"><path fill=\"#000\" fill-rule=\"evenodd\" d=\"M15 1.53V0H1v1.53h.07l5.374 5.288v6.121l2.26 2.224a.5.5 0 0 0 .852-.356V6.825l5.382-5.295zM2 1h12v.049L8.556 6.406l-.001 7.207-1.111-1.093V6.399L2 1.042z\" clip-rule=\"evenodd\"></path></svg>",
+              "properties": {
+                "color": "",
+                "filename": "Filter",
+                "originalName": "filter.svg",
+                "inlineSvg": true,
+                "size": 14
+              }
+            },
+            "sqlExprObj": {
+              "logicalOperator": "AND",
+              "parts": [
+                {
+                  "type": "SINGLE",
+                  "jimuFieldName": "Gattung",
+                  "operator": "STRING_OPERATOR_IS",
+                  "valueOptions": {
+                    "isValid": true,
+                    "sourceType": "UNIQUE",
+                    "inputEditor": "SIMPLE_SELECT",
+                    "value": [
+                      {
+                        "value": "Crataegus",
+                        "label": "Crataegus"
+                      }
+                    ]
+                  },
+                  "displayType": "NONE",
+                  "askForValueOptions": null,
+                  "displayLabel": null,
+                  "caseSensitive": false
+                }
+              ],
+              "sql": "Gattung = 'Crataegus'",
+              "displaySQL": "(Gattung = 'Crataegus')"
+            },
+            "autoApplyWhenWidgetOpen": false,
+            "collapseFilterExprs": false
+          }
+        ],
+        "arrangeType": "BLOCK",
+        "triggerType": "TOGGLE",
+        "omitInternalStyle": false,
+        "resetAll": false,
+        "turnOffAll": false
+      },
+      "id": "widget_18",
+      "useDataSources": [
+        {
+          "dataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "mainDataSourceId": "dataSource_3-197797fa7c1-layer-8",
+          "rootDataSourceId": "dataSource_3",
+          "fields": [
+            "Gattung"
+          ]
+        }
+      ]
     }
   },
   "widgetsManifest": {},
@@ -4229,6 +4321,6 @@
       "primary": "#bb07e5"
     }
   },
-  "timestamp": 1751440977122,
-  "publishTimestamp": 1751440978708
+  "timestamp": 1751447835457,
+  "publishTimestamp": 1751448075545
 }

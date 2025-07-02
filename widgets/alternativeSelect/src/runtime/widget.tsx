@@ -9,12 +9,12 @@ import type { Geometry } from 'esri/geometry'
 import type { SimpleFillSymbol } from 'esri/symbols'
 import Slider from 'esri/widgets/Slider'
 import type FeatureLayerView from 'esri/views/layers/FeatureLayerView'
-import type { AlternativeSelectProps } from '../setting/setting'
 import './alternativeSelect.css'
+import type { Config } from '../config'
 
 const { useState, useRef, useEffect } = React
 
-export default function (props: AllWidgetProps<AlternativeSelectProps>) {
+export default function (props: AllWidgetProps<Config>) {
   const apiSketchWidgetContainer = useRef<HTMLDivElement>()
   const apiSliderWidgetContainer = useRef<HTMLDivElement>()
   const sketchGraphicsLayer = useRef<GraphicsLayer>()
