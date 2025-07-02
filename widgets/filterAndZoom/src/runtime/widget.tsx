@@ -1,5 +1,5 @@
-import { DataSourceManager, React, type AllWidgetProps } from 'jimu-core'
-import { type FeatureLayerDataSource, JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
+import { DataSourceManager, React, type AllWidgetProps, type FeatureLayerDataSource } from 'jimu-core'
+import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import Graphic from 'esri/Graphic'
 
 /**
@@ -58,7 +58,7 @@ export default function Widget (props: AllWidgetProps<{ Config }>) {
         color: [255, 255, 255],
         width: 2
       }
-    }
+    } as unknown as __esri.SimpleFillSymbol
     const polygonGraphic = new Graphic({
       geometry: polygon,
       symbol: fillSymbol

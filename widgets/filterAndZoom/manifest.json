@@ -10,8 +10,8 @@
   "copyright": "Esri Deutschland GmbH, 2024",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "defaultSize": {
-    "width": 400,
-    "height": 400
+    "width": 0,
+    "height": 0
   },
   "translatedLocales": ["en", "de"]
 }
