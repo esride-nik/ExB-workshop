@@ -71,7 +71,26 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   // }, [jimuMapView, measurementPointGraphicsLayer])
 
   useEffect(() => {
-    if (!originalLengthResultNode?.current || !measurementValue) return
+    if (!measurementValue) return
+
+    const lengthToolAtPos = activeTool === 'distance' ? 0 : 1
+
+    if (!originalLengthResultNode.current &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > lengthToolAtPos &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[lengthToolAtPos] !== undefined) {
+      originalLengthResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[lengthToolAtPos] as HTMLElement)
+      duplicateLengthResultNode.current = originalLengthResultNode.current.cloneNode(true) as HTMLElement
+      duplicateLengthResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+      originalLengthResultNode.current.parentNode.insertBefore(duplicateLengthResultNode.current, originalLengthResultNode.current.nextSibling)
+    }
+    if (activeTool === 'area' && !originalAreaResultNode.current &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 0 &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] !== undefined) {
+      originalAreaResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)
+      duplicateAreaResultNode.current = originalAreaResultNode.current.cloneNode(true) as HTMLElement
+      duplicateAreaResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+      originalAreaResultNode.current.parentNode.insertBefore(duplicateAreaResultNode.current, originalAreaResultNode.current.nextSibling)
+    }
 
     let mLengthRound = activeTool === 'distance' ? measurementValue.length : measurementValue.perimeter
     let mAreaRound = activeTool === 'distance' ? undefined : measurementValue.area
@@ -116,6 +135,11 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   useEffect(() => {
     // reset stuff when starting / restarting measurement
     if (measurementWidgetState === 'ready') {
+      originalLengthResultNode.current = undefined
+      originalAreaResultNode.current = undefined
+      duplicateLengthResultNode.current = undefined
+      duplicateAreaResultNode.current = undefined
+
       // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
       const tool = (measurementWidget.viewModel.activeViewModel as any).tool
       const measurementLayer = tool._measurementLayer as GraphicsLayer
@@ -130,25 +154,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: MeasurementValue) => {
         setMeasurementValue(m)
       })
-    }
-
-    const lengthToolAtPos = activeTool === 'distance' ? 0 : 1
-
-    if (!originalLengthResultNode.current &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > lengthToolAtPos &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[lengthToolAtPos] !== undefined) {
-      originalLengthResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[lengthToolAtPos] as HTMLElement)
-      duplicateLengthResultNode.current = originalLengthResultNode.current.cloneNode(true) as HTMLElement
-      duplicateLengthResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
-      originalLengthResultNode.current.parentNode.insertBefore(duplicateLengthResultNode.current, originalLengthResultNode.current.nextSibling)
-    }
-    if (activeTool === 'area' && !originalAreaResultNode.current &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 0 &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] !== undefined) {
-      originalAreaResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)
-      duplicateAreaResultNode.current = originalAreaResultNode.current.cloneNode(true) as HTMLElement
-      duplicateAreaResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
-      originalAreaResultNode.current.parentNode.insertBefore(duplicateAreaResultNode.current, originalAreaResultNode.current.nextSibling)
     }
   }, [activeTool, measurementWidgetState])
 
