@@ -54,22 +54,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     coordinateFormatter.load()
   }, [])
 
-  // TODO: text symbol switches back to original value when the map is clicked. Find a solution!
-  // // when the roundedValueString updates, update the measurement display on the map
-  // useEffect(() => {
-  //   if (!measurementPointGraphicsLayer || !jimuMapView) return
-
-  //   // jimuMapView.view.on('click', () => {
-  //   //   updateMeasurementValueOnMap()
-  //   // })
-  //   // jimuMapView.view.on('pointer-down', () => {
-  //   //   updateMeasurementValueOnMap()
-  //   // })
-  //   // jimuMapView.view.on('pointer-up', () => {
-  //   //   updateMeasurementValueOnMap()
-  //   // })
-  // }, [jimuMapView, measurementPointGraphicsLayer])
-
   useEffect(() => {
     if (!measurementValue) return
 
@@ -322,6 +306,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   }
 
   const formatMeasurementStringDistance = (mRound: number, fractionDigits: number): string => {
+    // implemented just like the original measurement widget behaves => could be changed or made configurable
     mRound = mRound > 3000 ? mRound / 1000 : mRound
     const unit = mRound >= 3 ? 'km' : 'm'
     const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as meters including the unit (because it's in the standard) in local number format
@@ -329,6 +314,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   }
 
   const formatMeasurementStringArea = (mRound: number, fractionDigits: number): string => {
+    // implemented just like the original measurement widget behaves => could be changed or made configurable
     mRound = mRound > 3000000 ? mRound / 1000000 : mRound
     const unit = mRound >= 3 ? 'km²' : 'm²'
     const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as decimal in local number format
