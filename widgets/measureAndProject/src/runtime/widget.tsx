@@ -11,10 +11,11 @@ import Graphic from 'esri/Graphic'
 import GraphicsLayer from 'esri/layers/GraphicsLayer'
 import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.js'
 import * as webMercatorUtils from '@arcgis/core/geometry/support/webMercatorUtils.js'
+import locationPointSymbol from './locationPointSymbol'
+import lengthLineSymbol from './lengthLineSymbol'
+import { MeterValueOption } from '../config'
 
 import './measureAndProject.css'
-import locationPointSymbol from './locationPointSymbol'
-import { MeterValueOption } from '../config'
 
 interface MeasurementValue {
   length: number
@@ -34,6 +35,9 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [measurementWidgetState, setMeasurementWidgetState] = useState<string>(undefined)
   const [measurementValue, setMeasurementValue] = useState<MeasurementValue>(undefined)
+  const [measurementValueWatchHandle, setMeasurementValueWatchHandle] = useState<any>(undefined)
+  const [pointerMoveHandle, setPointerMoveHandle] = useState<any>(undefined)
+  const [clickHandle, setClickHandle] = useState<any>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
@@ -123,31 +127,55 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       originalAreaResultNode.current = undefined
       duplicateLengthResultNode.current = undefined
       duplicateAreaResultNode.current = undefined
+      measurementValueWatchHandle?.remove()
+      pointerMoveHandle?.remove()
+      clickHandle?.remove()
 
       // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
       const tool = (measurementWidget.viewModel.activeViewModel as any).tool
       const measurementLayer = tool._measurementLayer as GraphicsLayer
-      // ToDo: if hiding text is too complicated: hide the whole measurementLayer and draw lines manually
-      // measurementLayer.visible = false
+      measurementLayer.visible = false
       setDistanceAreaTextGraphicsLayer(measurementLayer)
     }
 
     // observe and round value while measuring
     if (measurementWidgetState === 'measuring' &&
         (activeTool === 'distance' || activeTool === 'area')) {
-      (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: MeasurementValue) => {
-        setMeasurementValue(m)
+      const measurementValueWatchHandle = reactiveUtils.watch(
+        () => measurementWidget.viewModel.activeViewModel.measurement, 
+        () => {
+          setMeasurementValue(measurementWidget.viewModel.activeViewModel.measurement as unknown as MeasurementValue)
+        }
+      )
+      setMeasurementValueWatchHandle(measurementValueWatchHandle)
+      const pointerMoveHandle = jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
+        const mouseMapPoint = jimuMapView.view.toMap({
+          x: event.x,
+          y: event.y
+        })
+        setMouseMapPoint(mouseMapPoint)
       })
-    }
+      setPointerMoveHandle(pointerMoveHandle)
+      const clickHandle = jimuMapView.view.on('click', (event: __esri.ViewClickEvent) => {
+        const clickPoint = jimuMapView.view.toMap({
+          x: event.x,
+          y: event.y
+        })
+        setClickPoint(clickPoint)
+      })
+      setClickHandle(clickHandle)
   }, [activeTool, measurementWidgetState])
 
   // setup watchers for display updates and value rounding
   useEffect(() => {
     if (!measurementWidget) return
 
-    measurementWidget.viewModel.watch('state', async (state: string) => {
-      setMeasurementWidgetState(state)
-    })
+    reactiveUtils.watch(
+      () => measurementWidget.viewModel.state,
+      () => {
+        setMeasurementWidgetState(measurementWidget.viewModel.state)
+      }
+    )
   }, [measurementWidget])
 
   useEffect(() => {
@@ -224,7 +252,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
     // remove original graphic and add the rounded one
     distanceAreaTextGraphicsLayer.remove(measurementPointGraphic)
-    distanceAreaTextGraphicsLayer.add(roundedMeasurementPointGraphic)
+    // distanceAreaTextGraphicsLayer.add(roundedMeasurementPointGraphic)
   }
 
   const isConfigured = () => {
@@ -336,7 +364,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   return (
         <div className="widget-measure-and-project"
           style={{ width: '100%', height: '100%', maxHeight: '800px', overflow: 'auto' }}>
-{measurementWidgetState}
           <div id="toolbarDiv" className="esri-component esri-widget measurement-toolbar">
             { props.config?.distanceMeasurementEnabled &&
               <Button
