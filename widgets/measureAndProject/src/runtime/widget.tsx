@@ -16,6 +16,12 @@ import './measureAndProject.css'
 import locationPointSymbol from './locationPointSymbol'
 import { MeterValueOption } from '../config'
 
+interface MeasurementValue {
+  length: number
+  perimeter: number
+  area: number
+}
+
 enum allowedSrs {
   EPSG25832 = 25832,
   EPSG8395 = 8395,
@@ -27,6 +33,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [measurementWidgetState, setMeasurementWidgetState] = useState<string>(undefined)
+  const [measurementValue, setMeasurementValue] = useState<MeasurementValue>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
@@ -63,6 +70,32 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   //   // })
   // }, [jimuMapView, measurementPointGraphicsLayer])
 
+  useEffect(() => {
+    if (!originalLengthResultNode?.current || !measurementValue) return
+
+    let mLengthRound = activeTool === 'distance' ? measurementValue.length : measurementValue.perimeter
+    let mAreaRound = activeTool === 'distance' ? undefined : measurementValue.area
+    // decimalPlacesRounded = round the value to 0.0 or 0.5
+    if (props.config?.meterValueOption as MeterValueOption === MeterValueOption.decimalPlacesRoundedTo05) {
+      // m.length and m.perimeter always contain meters, m.area contains square meters
+      mLengthRound = activeTool === 'distance' ? (Math.round(measurementValue.length * 2) / 2) : (Math.round(measurementValue.perimeter * 2) / 2)
+      mAreaRound = activeTool === 'distance' ? undefined : (Math.round(measurementValue.area * 2) / 2)
+    }
+
+    // round the value and format the string
+    const fractionDigits = props.config?.meterValueOption === MeterValueOption.twoDecimalPlaces
+      ? 2
+      : props.config?.meterValueOption === MeterValueOption.noDecimalPlaces
+        ? 0
+        : 1 // 1 decimal place decimalPlacesRoundedTo05 and oneDecimalPlace
+    const roundedLengthString = formatMeasurementStringDistance(mLengthRound, fractionDigits)
+    setRoundedLengthString(roundedLengthString)
+    if (measurementWidget.activeTool === 'area') {
+      const roundedAreaString = formatMeasurementStringArea(mAreaRound, fractionDigits)
+      setRoundedAreaString(roundedAreaString)
+    }
+  }, [measurementValue])
+
   // when the roundedValueString updates, update the measurement display on the map
   useEffect(() => {
     // TODO: distinguish for area / remove label
@@ -94,30 +127,8 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     // observe and round value while measuring
     if (measurementWidgetState === 'measuring' &&
         (activeTool === 'distance' || activeTool === 'area')) {
-      (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-        if (!originalLengthResultNode?.current || !m) return
-
-        let mLengthRound = activeTool === 'distance' ? m.length : m.perimeter
-        let mAreaRound = activeTool === 'distance' ? undefined : m.area
-        // decimalPlacesRounded = round the value to 0.0 or 0.5
-        if (props.config?.meterValueOption as MeterValueOption === MeterValueOption.decimalPlacesRoundedTo05) {
-          // m.length and m.perimeter always contain meters, m.area contains square meters
-          mLengthRound = activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.perimeter * 2) / 2)
-          mAreaRound = activeTool === 'distance' ? undefined : (Math.round(m.area * 2) / 2)
-        }
-
-        // round the value and format the string
-        const fractionDigits = props.config?.meterValueOption === MeterValueOption.twoDecimalPlaces
-          ? 2
-          : props.config?.meterValueOption === MeterValueOption.noDecimalPlaces
-            ? 0
-            : 1 // 1 decimal place decimalPlacesRoundedTo05 and oneDecimalPlace
-        const roundedLengthString = formatMeasurementStringDistance(mLengthRound, fractionDigits)
-        setRoundedLengthString(roundedLengthString)
-        if (measurementWidget.activeTool === 'area') {
-          const roundedAreaString = formatMeasurementStringArea(mAreaRound, fractionDigits)
-          setRoundedAreaString(roundedAreaString)
-        }
+      (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: MeasurementValue) => {
+        setMeasurementValue(m)
       })
     }
 
