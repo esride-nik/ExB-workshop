@@ -313,7 +313,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
         <div className="widget-measure-and-project"
           style={{ width: '100%', height: '100%', maxHeight: '800px', overflow: 'auto' }}>
 
-          <div id="toolbarDiv" className="esri-component esri-widget">
+          <div id="toolbarDiv" className="esri-component esri-widget measurement-toolbar">
             { props.config?.distanceMeasurementEnabled &&
               <Button
                 id="distance"

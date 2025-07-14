@@ -41,6 +41,9 @@
 
 .widget-measure-and-project {
     background-color: white !important;
+}
+
+.measurement-toolbar,.text-blocks {
     padding:10px
 }
 
