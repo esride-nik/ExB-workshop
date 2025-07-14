@@ -26,6 +26,7 @@ enum allowedSrs {
 export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [jimuMapView, setJimuMapView] = useState<JimuMapView>(undefined)
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
+  const [measurementWidgetState, setMeasurementWidgetState] = useState<string>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
@@ -78,57 +79,74 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     duplicateAreaResultNode.current.innerText = roundedAreaString
   }, [duplicateAreaResultNode, roundedAreaString])
 
+  // get the original measurement display node and create a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
+  useEffect(() => {
+    // reset stuff when starting / restarting measurement
+    if (measurementWidgetState === 'ready') {
+      // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
+      const tool = (measurementWidget.viewModel.activeViewModel as any).tool
+      const measurementLayer = tool._measurementLayer as GraphicsLayer
+      // ToDo: if hiding text is too complicated: hide the whole measurementLayer and draw lines manually
+      // measurementLayer.visible = false
+      setDistanceAreaTextGraphicsLayer(measurementLayer)
+    }
+
+    // observe and round value while measuring
+    if (measurementWidgetState === 'measuring' &&
+        (activeTool === 'distance' || activeTool === 'area')) {
+      (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
+        if (!originalLengthResultNode?.current || !m) return
+
+        let mLengthRound = activeTool === 'distance' ? m.length : m.perimeter
+        let mAreaRound = activeTool === 'distance' ? undefined : m.area
+        // decimalPlacesRounded = round the value to 0.0 or 0.5
+        if (props.config?.meterValueOption as MeterValueOption === MeterValueOption.decimalPlacesRoundedTo05) {
+          // m.length and m.perimeter always contain meters, m.area contains square meters
+          mLengthRound = activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.perimeter * 2) / 2)
+          mAreaRound = activeTool === 'distance' ? undefined : (Math.round(m.area * 2) / 2)
+        }
+
+        // round the value and format the string
+        const fractionDigits = props.config?.meterValueOption === MeterValueOption.twoDecimalPlaces
+          ? 2
+          : props.config?.meterValueOption === MeterValueOption.noDecimalPlaces
+            ? 0
+            : 1 // 1 decimal place decimalPlacesRoundedTo05 and oneDecimalPlace
+        const roundedLengthString = formatMeasurementStringDistance(mLengthRound, fractionDigits)
+        setRoundedLengthString(roundedLengthString)
+        if (measurementWidget.activeTool === 'area') {
+          const roundedAreaString = formatMeasurementStringArea(mAreaRound, fractionDigits)
+          setRoundedAreaString(roundedAreaString)
+        }
+      })
+    }
+
+    const lengthToolAtPos = activeTool === 'distance' ? 0 : 1
+
+    if (!originalLengthResultNode.current &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > lengthToolAtPos &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[lengthToolAtPos] !== undefined) {
+      originalLengthResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[lengthToolAtPos] as HTMLElement)
+      duplicateLengthResultNode.current = originalLengthResultNode.current.cloneNode(true) as HTMLElement
+      duplicateLengthResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+      originalLengthResultNode.current.parentNode.insertBefore(duplicateLengthResultNode.current, originalLengthResultNode.current.nextSibling)
+    }
+    if (activeTool === 'area' && !originalAreaResultNode.current &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 0 &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] !== undefined) {
+      originalAreaResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)
+      duplicateAreaResultNode.current = originalAreaResultNode.current.cloneNode(true) as HTMLElement
+      duplicateAreaResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+      originalAreaResultNode.current.parentNode.insertBefore(duplicateAreaResultNode.current, originalAreaResultNode.current.nextSibling)
+    }
+  }, [activeTool, measurementWidgetState])
+
   // setup watchers for display updates and value rounding
   useEffect(() => {
     if (!measurementWidget) return
 
     measurementWidget.viewModel.watch('state', async (state: string) => {
-      // reset stuff when starting / restarting measurement
-      if (state === 'ready') {
-        // reset node ref when starting new workflow to recreate result box after it's been removed
-        originalLengthResultNode.current = undefined
-        duplicateLengthResultNode.current = undefined
-        originalAreaResultNode.current = undefined
-        duplicateAreaResultNode.current = undefined
-
-        // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
-        const tool = (measurementWidget.viewModel.activeViewModel as any).tool
-        const measurementLayer = tool._measurementLayer as GraphicsLayer
-        // ToDo: if hiding text is too complicated: hide the whole measurementLayer and draw lines manually
-        // measurementLayer.visible = false
-        setDistanceAreaTextGraphicsLayer(measurementLayer)
-      }
-
-      // observe and round value while measuring
-      if ((measurementWidget.activeTool === 'distance' || measurementWidget.activeTool === 'area') && state === 'measuring') {
-        (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-          if (!originalLengthResultNode?.current || !m) return
-
-          let mLengthRound = measurementWidget.activeTool === 'distance' ? m.length : m.perimeter
-          let mAreaRound = measurementWidget.activeTool === 'distance' ? undefined : m.area
-          // decimalPlacesRounded = round the value to 0.0 or 0.5
-          if (props.config?.meterValueOption as MeterValueOption === MeterValueOption.decimalPlacesRoundedTo05) {
-            // m.length and m.perimeter always contain meters, m.area contains square meters
-            mLengthRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.perimeter * 2) / 2)
-            mAreaRound = measurementWidget.activeTool === 'distance' ? undefined : (Math.round(m.area * 2) / 2)
-          }
-          const measurementInnerText = originalLengthResultNode?.current?.innerText
-          const measurementParts = measurementInnerText.split(/ /)
-
-          // round the value and format the string
-          const fractionDigits = props.config?.meterValueOption === MeterValueOption.twoDecimalPlaces
-            ? 2
-            : props.config?.meterValueOption === MeterValueOption.noDecimalPlaces
-              ? 0
-              : 1 // 1 decimal place decimalPlacesRoundedTo05 and oneDecimalPlace
-          const roundedLengthString = formatMeasurementStringDistance(measurementParts, mLengthRound, fractionDigits)
-          setRoundedLengthString(roundedLengthString)
-          if (measurementWidget.activeTool === 'area') {
-            const roundedAreaString = formatMeasurementStringArea(measurementParts, mAreaRound, fractionDigits)
-            setRoundedAreaString(roundedAreaString)
-          }
-        })
-      }
+      setMeasurementWidgetState(state)
     })
   }, [measurementWidget])
 
@@ -167,7 +185,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
       // get current mouse position on map as map coordinates
       jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
-        fillMeasurementResultNodeRefs()
         const mouseMapPoint = jimuMapView.view.toMap({
           x: event.x,
           y: event.y
@@ -208,26 +225,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     // remove original graphic and add the rounded one
     distanceAreaTextGraphicsLayer.remove(measurementPointGraphic)
     distanceAreaTextGraphicsLayer.add(roundedMeasurementPointGraphic)
-  }
-
-  // get the original measurement display node and create a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
-  const fillMeasurementResultNodeRefs = () => {
-    if (!originalLengthResultNode.current &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 0 &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] !== undefined) {
-      originalLengthResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)
-      duplicateLengthResultNode.current = originalLengthResultNode.current.cloneNode(true) as HTMLElement
-      duplicateLengthResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
-      originalLengthResultNode.current.parentNode.insertBefore(duplicateLengthResultNode.current, originalLengthResultNode.current.nextSibling)
-    }
-    if (!originalAreaResultNode.current &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 1 &&
-      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[1] !== undefined) {
-      originalAreaResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[1] as HTMLElement)
-      duplicateAreaResultNode.current = originalAreaResultNode.current.cloneNode(true) as HTMLElement
-      duplicateAreaResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
-      originalAreaResultNode.current.parentNode.insertBefore(duplicateAreaResultNode.current, originalAreaResultNode.current.nextSibling)
-    }
   }
 
   const isConfigured = () => {
@@ -308,27 +305,23 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     return webMercatorUtils.webMercatorToGeographic(point) as Point
   }
 
-  const formatMeasurementStringDistance = (measurementParts: any, mRound: number, fractionDigits: number): string => {
-    if (measurementParts[1] === 'm') {
-      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as meters including the unit (because it's in the standard) in local number format
-      measurementParts[0] = numberFormat.format(mRound)
-      delete measurementParts[1] // remove the unit
-    }
-    return measurementParts.join(' ')
+  const formatMeasurementStringDistance = (mRound: number, fractionDigits: number): string => {
+    const numberFormat = new Intl.NumberFormat(props.locale, { style: 'unit', unit: 'meter', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as meters including the unit (because it's in the standard) in local number format
+    return numberFormat.format(mRound)
   }
 
-  const formatMeasurementStringArea = (measurementParts: any, mRound: number, fractionDigits: number): string => {
-    if (measurementParts[1] === 'm²') {
-      const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as decimal in local number format
-      measurementParts[0] = numberFormat.format(mRound)
-    }
-    return measurementParts.join(' ')
+  const formatMeasurementStringArea = (mRound: number, fractionDigits: number): string => {
+    const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as decimal in local number format
+    return `${numberFormat.format(mRound)} m²`
   }
 
   const resetMeasurementWidget = () => {
     locationPointGraphicsLayer?.removeAll()
     measurementWidget.clear()
     originalLengthResultNode.current = undefined
+    originalAreaResultNode.current = undefined
+    duplicateLengthResultNode.current = undefined
+    duplicateAreaResultNode.current = undefined
   }
 
   if (!isConfigured()) {
@@ -337,7 +330,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   return (
         <div className="widget-measure-and-project"
           style={{ width: '100%', height: '100%', maxHeight: '800px', overflow: 'auto' }}>
-
+{measurementWidgetState}
           <div id="toolbarDiv" className="esri-component esri-widget measurement-toolbar">
             { props.config?.distanceMeasurementEnabled &&
               <Button
