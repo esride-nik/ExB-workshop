@@ -32,11 +32,14 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [srs, setSrs] = useState<allowedSrs>(25832)
   const [distanceAreaTextGraphicsLayer, setDistanceAreaTextGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [locationPointGraphicsLayer, setLocationPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
-  const [roundedValueString, setRoundedValueString] = useState<string>('')
+  const [roundedLengthString, setRoundedLengthString] = useState<string>('')
+  const [roundedAreaString, setRoundedAreaString] = useState<string>('')
   const measurementWidgetNode = useRef(null)
   const measurementLocationNode = useRef(null)
-  const originalMeasurementResultNode = useRef(null)
-  const duplicateMeasurementResultNode = useRef(null)
+  const originalLengthResultNode = useRef(null)
+  const originalAreaResultNode = useRef(null)
+  const duplicateLengthResultNode = useRef(null)
+  const duplicateAreaResultNode = useRef(null)
 
   useEffect(() => {
     projection.load()
@@ -61,14 +64,19 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   // when the roundedValueString updates, update the measurement display on the map
   useEffect(() => {
+    // TODO: distinguish for area / remove label
     updateMeasurementValueOnMap()
-  }, [distanceAreaTextGraphicsLayer, roundedValueString])
+  }, [distanceAreaTextGraphicsLayer, roundedLengthString])
 
-  // when the roundedValueString updates, update the measurement display in the widget
+  // update the measurement display in the widget
   useEffect(() => {
-    if (!duplicateMeasurementResultNode?.current) return
-    duplicateMeasurementResultNode.current.innerText = roundedValueString
-  }, [duplicateMeasurementResultNode, roundedValueString])
+    if (!duplicateLengthResultNode?.current) return
+    duplicateLengthResultNode.current.innerText = roundedLengthString
+  }, [duplicateLengthResultNode, roundedLengthString])
+  useEffect(() => {
+    if (!duplicateAreaResultNode?.current) return
+    duplicateAreaResultNode.current.innerText = roundedAreaString
+  }, [duplicateAreaResultNode, roundedAreaString])
 
   // setup watchers for display updates and value rounding
   useEffect(() => {
@@ -78,28 +86,33 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       // reset stuff when starting / restarting measurement
       if (state === 'ready') {
         // reset node ref when starting new workflow to recreate result box after it's been removed
-        originalMeasurementResultNode.current = undefined
-        duplicateMeasurementResultNode.current = undefined
+        originalLengthResultNode.current = undefined
+        duplicateLengthResultNode.current = undefined
+        originalAreaResultNode.current = undefined
+        duplicateAreaResultNode.current = undefined
 
         // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
         const tool = (measurementWidget.viewModel.activeViewModel as any).tool
         const measurementLayer = tool._measurementLayer as GraphicsLayer
-        measurementLayer.visible = false
+        // ToDo: if hiding text is too complicated: hide the whole measurementLayer and draw lines manually
+        // measurementLayer.visible = false
         setDistanceAreaTextGraphicsLayer(measurementLayer)
       }
 
       // observe and round value while measuring
       if ((measurementWidget.activeTool === 'distance' || measurementWidget.activeTool === 'area') && state === 'measuring') {
         (measurementWidget.viewModel.activeViewModel as any).watch('measurement', (m: any) => {
-          if (!originalMeasurementResultNode?.current || !m) return
+          if (!originalLengthResultNode?.current || !m) return
 
-          let mRound = measurementWidget.activeTool === 'distance' ? m.length : m.area
+          let mLengthRound = measurementWidget.activeTool === 'distance' ? m.length : m.perimeter
+          let mAreaRound = measurementWidget.activeTool === 'distance' ? undefined : m.area
           // decimalPlacesRounded = round the value to 0.0 or 0.5
           if (props.config?.meterValueOption as MeterValueOption === MeterValueOption.decimalPlacesRoundedTo05) {
-            // no need to distinguish by unit: m.length always contains meters, although the widget automatically displays km if m > 3000
-            mRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.area * 2) / 2)
+            // m.length and m.perimeter always contain meters, m.area contains square meters
+            mLengthRound = measurementWidget.activeTool === 'distance' ? (Math.round(m.length * 2) / 2) : (Math.round(m.perimeter * 2) / 2)
+            mAreaRound = measurementWidget.activeTool === 'distance' ? undefined : (Math.round(m.area * 2) / 2)
           }
-          const measurementInnerText = originalMeasurementResultNode?.current?.innerText
+          const measurementInnerText = originalLengthResultNode?.current?.innerText
           const measurementParts = measurementInnerText.split(/ /)
 
           // round the value and format the string
@@ -108,10 +121,12 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
             : props.config?.meterValueOption === MeterValueOption.noDecimalPlaces
               ? 0
               : 1 // 1 decimal place decimalPlacesRoundedTo05 and oneDecimalPlace
-          const roundedValueString = measurementWidget.activeTool === 'distance'
-            ? formatMeasurementStringDistance(measurementParts, mRound, fractionDigits)
-            : formatMeasurementStringArea(measurementParts, mRound, fractionDigits)
-          setRoundedValueString(roundedValueString)
+          const roundedLengthString = formatMeasurementStringDistance(measurementParts, mLengthRound, fractionDigits)
+          setRoundedLengthString(roundedLengthString)
+          if (measurementWidget.activeTool === 'area') {
+            const roundedAreaString = formatMeasurementStringArea(measurementParts, mAreaRound, fractionDigits)
+            setRoundedAreaString(roundedAreaString)
+          }
         })
       }
     })
@@ -135,7 +150,9 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       // init Measurement widget
       const measurement = new Measurement({
         view: jimuMapView.view,
-        container: measurementWidgetNode.current
+        container: measurementWidgetNode.current,
+        linearUnit: 'meters',
+        areaUnit: 'square-meters'
       })
       setMeasurementWidget(measurement)
 
@@ -186,7 +203,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
     // make a deep copy of the graphic before changing the symbol of the original one
     const roundedMeasurementPointGraphic = measurementPointGraphic.clone();
-    (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedValueString
+    (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedLengthString
 
     // remove original graphic and add the rounded one
     distanceAreaTextGraphicsLayer.remove(measurementPointGraphic)
@@ -195,13 +212,21 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   // get the original measurement display node and create a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
   const fillMeasurementResultNodeRefs = () => {
-    if (!originalMeasurementResultNode.current &&
+    if (!originalLengthResultNode.current &&
       document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 0 &&
       document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] !== undefined) {
-      originalMeasurementResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)
-      duplicateMeasurementResultNode.current = originalMeasurementResultNode.current.cloneNode(true) as HTMLElement
-      duplicateMeasurementResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
-      originalMeasurementResultNode.current.parentNode.insertBefore(duplicateMeasurementResultNode.current, originalMeasurementResultNode.current.nextSibling)
+      originalLengthResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[0] as HTMLElement)
+      duplicateLengthResultNode.current = originalLengthResultNode.current.cloneNode(true) as HTMLElement
+      duplicateLengthResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+      originalLengthResultNode.current.parentNode.insertBefore(duplicateLengthResultNode.current, originalLengthResultNode.current.nextSibling)
+    }
+    if (!originalAreaResultNode.current &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')?.length > 1 &&
+      document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[1] !== undefined) {
+      originalAreaResultNode.current = (document.getElementsByClassName('esri-measurement-widget-content__measurement-item__value')[1] as HTMLElement)
+      duplicateAreaResultNode.current = originalAreaResultNode.current.cloneNode(true) as HTMLElement
+      duplicateAreaResultNode.current.className = 'esri-measurement-widget-content__measurement-item__value-rounded'
+      originalAreaResultNode.current.parentNode.insertBefore(duplicateAreaResultNode.current, originalAreaResultNode.current.nextSibling)
     }
   }
 
@@ -303,7 +328,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const resetMeasurementWidget = () => {
     locationPointGraphicsLayer?.removeAll()
     measurementWidget.clear()
-    originalMeasurementResultNode.current = undefined
+    originalLengthResultNode.current = undefined
   }
 
   if (!isConfigured()) {
