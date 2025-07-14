@@ -375,66 +375,68 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
             ></Button>
           </div>
 
-          <div id="measurementWidget" ref={measurementWidgetNode} />
-          { // this whole block implements the Location tool
-          activeTool === 'location' && <div id="locationTool" className="esri-widget esri-component esri-measurement-location" ref={measurementLocationNode}>
-            <div id="coordinates">
-              <div id="coordinateIcon" className="esri-measurement-location-coordinate-icon">
-                <h5></h5>
-                <p><calcite-icon icon="arrow-bold-left" class="coordinate-icon-mouse" /></p>
-                {clickPoint && <p><calcite-icon icon="pin-tear-f" class="coordinate-icon-location" /></p>}
+          <div className="measurement-widget-space">
+            <div id="measurementWidget" ref={measurementWidgetNode} />
+            { // this whole block implements the Location tool
+            activeTool === 'location' && <div id="locationTool" className="esri-widget esri-component esri-measurement-location" ref={measurementLocationNode}>
+              <div id="coordinates">
+                <div id="coordinateIcon" className="esri-measurement-location-coordinate-icon">
+                  <h5></h5>
+                  <p><calcite-icon icon="arrow-bold-left" class="coordinate-icon-mouse" /></p>
+                  {clickPoint && <p><calcite-icon icon="pin-tear-f" class="coordinate-icon-location" /></p>}
+                </div>
+                <div id="latitude" className="esri-measurement-location-coordinate">
+                  <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
+                  <p>{getFormattedLatitude(mouseMapPoint)}</p>
+                  {clickPoint && <p>{getFormattedLatitude(clickPoint)}</p>}
+                </div>
+                <div id="longitude" className="esri-measurement-location-coordinate">
+                  <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
+                  <p>{getFormattedLongitude(mouseMapPoint)}</p>
+                  {clickPoint && <p>{getFormattedLongitude(clickPoint)}</p>}
+                </div>
               </div>
-              <div id="latitude" className="esri-measurement-location-coordinate">
-                <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>
-                <p>{getFormattedLatitude(mouseMapPoint)}</p>
-                {clickPoint && <p>{getFormattedLatitude(clickPoint)}</p>}
+              <div className="esri-measurement-selectsrs">
+                <Label centric className='esri-measurement-selectsrs-radio'>
+                  <Radio
+                    checked={srs === allowedSrs.EPSG25832}
+                    id="LS310" value="25832"
+                    onChange={() => { setSrs(allowedSrs.EPSG25832) }}
+                  />{' '}
+                  <FormattedMessage id="srs25832" defaultMessage={defaultMessages.srs25832} />
+                </Label>
+                <Label centric className='esri-measurement-selectsrs-radio'>
+                  <Radio
+                    checked={srs === allowedSrs.EPSG8395}
+                    id="LS320" value="8395"
+                    onChange={() => { setSrs(allowedSrs.EPSG8395) }}
+                  />{' '}
+                  <FormattedMessage id="srs8395" defaultMessage={defaultMessages.srs8395} />
+                </Label>
+                <Label centric className='esri-measurement-selectsrs-radio'>
+                  <Radio
+                    checked={srs === allowedSrs.EPSG4326}
+                    id="GRAD" value="4326"
+                    onChange={() => { setSrs(allowedSrs.EPSG4326) }}
+                  />{' '}
+                  <FormattedMessage id="srs4326" defaultMessage={defaultMessages.srs4326} />
+                </Label>
+                <Label centric className='esri-measurement-selectsrs-radio'>
+                  <Radio
+                    checked={srs === allowedSrs.EPSG0}
+                    id="DMS" value="0"
+                    onChange={() => { setSrs(allowedSrs.EPSG0) }}
+                  />{' '}
+                  <FormattedMessage id="srs0" defaultMessage={defaultMessages.srs0} />
+                </Label>
               </div>
-              <div id="longitude" className="esri-measurement-location-coordinate">
-                <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
-                <p>{getFormattedLongitude(mouseMapPoint)}</p>
-                {clickPoint && <p>{getFormattedLongitude(clickPoint)}</p>}
-              </div>
-            </div>
-            <div className="esri-measurement-selectsrs">
-              <Label centric className='esri-measurement-selectsrs-radio'>
-                <Radio
-                  checked={srs === allowedSrs.EPSG25832}
-                  id="LS310" value="25832"
-                  onChange={() => { setSrs(allowedSrs.EPSG25832) }}
-                />{' '}
-                <FormattedMessage id="srs25832" defaultMessage={defaultMessages.srs25832} />
-              </Label>
-              <Label centric className='esri-measurement-selectsrs-radio'>
-                <Radio
-                  checked={srs === allowedSrs.EPSG8395}
-                  id="LS320" value="8395"
-                  onChange={() => { setSrs(allowedSrs.EPSG8395) }}
-                />{' '}
-                <FormattedMessage id="srs8395" defaultMessage={defaultMessages.srs8395} />
-              </Label>
-              <Label centric className='esri-measurement-selectsrs-radio'>
-                <Radio
-                  checked={srs === allowedSrs.EPSG4326}
-                  id="GRAD" value="4326"
-                  onChange={() => { setSrs(allowedSrs.EPSG4326) }}
-                />{' '}
-                <FormattedMessage id="srs4326" defaultMessage={defaultMessages.srs4326} />
-              </Label>
-              <Label centric className='esri-measurement-selectsrs-radio'>
-                <Radio
-                  checked={srs === allowedSrs.EPSG0}
-                  id="DMS" value="0"
-                  onChange={() => { setSrs(allowedSrs.EPSG0) }}
-                />{' '}
-                <FormattedMessage id="srs0" defaultMessage={defaultMessages.srs0} />
-              </Label>
-            </div>
-          </div>}
+            </div>}
+          </div>
 
           <div className="text-blocks">
             {props.config?.headerText &&
               <div className="esri-widget esri-component esri-measurement-header">
-                <b>{props.config.headerText}</b>
+                {props.config.headerText}
               </div>
             }
             {props.config?.disclaimerText &&

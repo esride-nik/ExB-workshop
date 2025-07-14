@@ -39,6 +39,20 @@
     display:block;
 }
 
+.widget-measure-and-project {
+    background-color: white !important;
+    padding:10px
+}
+
+.measurement-widget-space {
+    min-height: 250px;
+}
+
+.esri-measurement-header {
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
 .esri-measurement-widget-content__measurement-item__value {
     display: none;
 }
@@ -49,14 +63,6 @@
 
 .disabled {
     background-color: #DDD !important;
-}
-
-.text-blocks {
-    padding:10px
-}
-
-.text-blocks div {
-    background:white;
 }
 
 #measurementWidget {
