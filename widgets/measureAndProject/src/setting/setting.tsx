@@ -212,18 +212,6 @@ export default function Setting (props: AllWidgetSettingProps<IMConfig>) {
                 </SettingRow>
                 <SettingRow>
                   <Label className="text-label">{props.intl.formatMessage({
-                    id: 'copyText',
-                    defaultMessage: defaultMessages.copyText
-                  })}
-                  <TextArea
-                    className="mb-4"
-                    aria-label='copyText'
-                    onChange={(onChangeEvent) => { setCopyText(onChangeEvent.target.value) }}
-                    value={props.config.copyText}
-                  /></Label>
-                </SettingRow>
-                <SettingRow>
-                  <Label className="text-label">{props.intl.formatMessage({
                     id: 'disclaimerText',
                     defaultMessage: defaultMessages.disclaimerText
                   })}

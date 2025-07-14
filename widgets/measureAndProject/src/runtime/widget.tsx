@@ -84,6 +84,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
         // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
         const tool = (measurementWidget.viewModel.activeViewModel as any).tool
         const measurementLayer = tool._measurementLayer as GraphicsLayer
+        measurementLayer.visible = false
         setDistanceAreaTextGraphicsLayer(measurementLayer)
       }
 
@@ -436,13 +437,8 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
                 <b>{props.config.headerText}</b>
               </div>
             }
-            {(props.config?.copyText && activeTool !== 'none') &&
-              <div className="esri-widget esri-component esri-measurement-copy-text">
-                {props.config.copyText}
-              </div>
-            }
-            {(props.config?.disclaimerText && activeTool === 'none') &&
-              <div className="esri-widget esri-component esri-measurement-disclaimer-text">
+            {props.config?.disclaimerText &&
+              <div className="esri-widget esri-component esri-measurement-disclaimer-text" style={{ whiteSpace: 'pre-wrap' }}>
                 {props.config.disclaimerText}
               </div>
             }

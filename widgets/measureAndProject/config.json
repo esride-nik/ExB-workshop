@@ -3,7 +3,6 @@
   "distanceMeasurementEnabled": true,
   "areaMeasurementEnabled": true,
   "locationMeasurementEnabled": true,
-  "headerText": "",
-  "copyText": "",
-  "disclaimerText": ""
+  "headerText": "Die Maße dürfen nicht für detaillierte Planungen genutzt werden. Alle Maße sind im Bedarfsfall zu überprüfen.",
+  "disclaimerText": "Werte in Meter sind auf 0,5 m gerundet.\nDie gemessenen Werte unterliegen Ungenauigkeiten, die u.a. durch folgende Faktoren beeinflusst werden:\n\t• Maßstab\n\t• Eingabegenauigkeit und Anzahl der digitalisierten Punkte\n\t• Strecke der Messlinie bzw. Größe der Messfläche\n\t• Bildschirmauflösung"
 }

@@ -12,7 +12,6 @@ export interface Config {
   areaMeasurementEnabled: boolean
   locationMeasurementEnabled: boolean
   headerText: string
-  copyText: string
   disclaimerText: string
 }
 
