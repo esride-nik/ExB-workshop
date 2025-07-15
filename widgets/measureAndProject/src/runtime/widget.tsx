@@ -15,9 +15,8 @@ import locationPointSymbol from './locationPointSymbol'
 import lengthLineSymbol from './lengthLineSymbol'
 import areaOutlineSymbol from './areaOutlineSymbol'
 import areaFillSymbol from './areaFillSymbol'
-import * as manipulatorPointSymbol from './manipulatorPointSymbol.json'
+import manipulatorPointSymbol from './manipulatorPointSymbol'
 import { MeterValueOption } from '../config'
-import CIMSymbol from '@arcgis/core/symbols/CIMSymbol'
 
 
 import './measureAndProject.css'
@@ -140,7 +139,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
       const tool = (measurementWidget.viewModel.activeViewModel as any).tool
       const measurementLayer = tool._measurementLayer as GraphicsLayer
-      // measurementLayer.visible = false
+      measurementLayer.visible = false
       setMeasurementLayer(measurementLayer)
     }
 
@@ -258,43 +257,44 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     roundedMeasurementPointGraphic.symbol = manipulatorPointSymbol as unknown as __esri.Symbol
     // (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = 'Hallihallo'
 
-    // // Create a polygon geometry
-    // const geometry = {
-    //   type: 'polygon',
-    //   rings: [[
-    //     [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y],
-    //     [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y + 5000],
-    //     [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y + 5000],
-    //     [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y],
-    //     [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y]
-    //   ]],
-    //   spatialReference: measurementPointGraphic.geometry.spatialReference
-    // }
-    const geometry = {
-      type: 'polyline',
-      paths: [
-        [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y],
-        [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y + 5000],
-        [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y + 5000],
-        [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y]
-      ],
-      spatialReference: measurementPointGraphic.geometry.spatialReference
+    // TODO debug graphic
+    let geometry
+    let graphic
+
+    if (activeTool === 'distance') {
+      geometry = {
+        type: 'polyline',
+        paths: [
+          [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y],
+          [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y + 5000],
+          [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y + 5000],
+          [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y]
+        ],
+        spatialReference: measurementPointGraphic.geometry.spatialReference
+      }
+      graphic = new Graphic({
+        geometry: geometry as unknown as __esri.Geometry,
+        symbol: lengthLineSymbol
+      })
+    } else if (activeTool === 'area') {
+      geometry = {
+        type: 'polygon',
+        rings: [[
+          [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y],
+          [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y + 5000],
+          [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y + 5000],
+          [measurementPointGraphic.geometry.x + 5000, measurementPointGraphic.geometry.y],
+          [measurementPointGraphic.geometry.x, measurementPointGraphic.geometry.y]
+        ]],
+        spatialReference: measurementPointGraphic.geometry.spatialReference
+      }
+      const polySymbol = areaFillSymbol as unknown as __esri.Symbol
+      polySymbol.outline = areaOutlineSymbol
+      graphic = new Graphic({
+        geometry: geometry as unknown as __esri.Geometry,
+        symbol: polySymbol
+      })
     }
-
-    // const polySymbol = areaFillSymbol as unknown as __esri.Symbol
-    // polySymbol.color.a = 0
-    // polySymbol.outline = measurementLayer.graphics.items[0].symbol as __esri.Symbol
-    // polySymbol.outline = jsonLengthLineSymbol
-    // polySymbol.outline = lengthLineSymbol
-
-    // polySymbol.outline = areaOutlineSymbol as unknown as __esri.Symbol
-
-    // Add the geometry and symbol to a new graphic
-    const graphic = new Graphic({
-      geometry: geometry as unknown as __esri.Geometry,
-      symbol: lengthLineSymbol
-      // symbol: measurementLayer.graphics.items[0].symbol as __esri.Symbol
-    })
 
     if (!debugLayer) {
       const testGrL = new GraphicsLayer({
@@ -306,11 +306,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       jimuMapView.view.map.add(testGrL)
     }
     debugLayer?.add(graphic)
-    // jimuMapView.view.goTo({ target: polygonGraphic.geometry })
-
-    // remove original graphic and add the rounded one
-    // measurementLayer.remove(measurementPointGraphic)
-    // distanceAreaTextGraphicsLayer.add(roundedMeasurementPointGraphic)
   }
 
   const isConfigured = () => {
