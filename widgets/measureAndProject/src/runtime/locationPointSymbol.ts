@@ -1,6 +1,6 @@
 import CIMSymbol from '@arcgis/core/symbols/CIMSymbol'
 
-const positionPointSymbol = new CIMSymbol({
+const locationPointSymbol = new CIMSymbol({
   data: {
     type: 'CIMSymbolReference',
     symbol: {
@@ -508,4 +508,4 @@ const positionPointSymbol = new CIMSymbol({
   }
 })
 
-export default positionPointSymbol
+export default locationPointSymbol
