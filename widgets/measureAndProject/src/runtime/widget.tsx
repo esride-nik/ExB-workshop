@@ -130,9 +130,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       originalAreaResultNode.current = undefined
       duplicateLengthResultNode.current = undefined
       duplicateAreaResultNode.current = undefined
-      measurementValueWatchHandle?.remove()
-      pointerMoveHandle?.remove()
-      clickHandle?.remove()
 
       // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
       const tool = (measurementWidget.viewModel.activeViewModel as any).tool
@@ -175,8 +172,9 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   // when jimuMapView is available:
   // initialize the measurement widget
-  // setup mouse position tracking
   // sync measurementWidget state to React state
+  // setup mouse position tracking
+  // add GraphicsLayer for custom graphics
   useEffect(() => {
     if (jimuMapView) {
       // init Measurement widget
@@ -223,9 +221,14 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   // reset the measurement widget and related variables. used when switching tools or clearing measurements.
   const resetMeasurementWidget = () => {
-    customMeasurementGraphicsLayer?.removeAll()
+    // remove handles
     measurementValueWatchHandle?.remove()
+    pointerMoveHandle?.remove()
+    clickHandle?.remove()
+    // remove graphics
+    customMeasurementGraphicsLayer?.removeAll()
     measurementWidget.clear()
+    // reset DOM refs
     originalLengthResultNode.current = undefined
     originalAreaResultNode.current = undefined
     duplicateLengthResultNode.current = undefined
