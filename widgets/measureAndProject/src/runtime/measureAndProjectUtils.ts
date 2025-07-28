@@ -15,8 +15,7 @@ const projectPoint = (point: Point, epsg: number): Point => {
   const outSr = new SpatialReference({
     wkid: epsg
   })
-  const geogtran = projection.getTransformation(point?.spatialReference, outSr)
-  const projectedPoint = projection.project(point, outSr, geogtran)
+  const projectedPoint = projection.project(point, outSr)
   return projectedPoint as Point
 }
 
