@@ -153,6 +153,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       originalAreaResultNode.current = undefined
       duplicateLengthResultNode.current = undefined
       duplicateAreaResultNode.current = undefined
+      customMeasurementGraphicsLayer.removeAll()
 
       // Get the measurementLayer from the activeWidget, as soon as a tool is activated. The measurementLayer is needed to hide the point graphic with text symbol that contains the original (un-rounded) measurement value.
       const tool = (measurementWidget.viewModel.activeViewModel as any).tool
