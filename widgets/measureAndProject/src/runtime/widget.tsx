@@ -127,7 +127,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     if (measurementWidgetState === 'measuring' &&
         (activeTool === 'distance' || activeTool === 'area')) {
       const measurementValueWatchHandle = reactiveUtils.watch(
-        () => measurementWidget.viewModel.activeViewModel.measurement,
+        () => measurementWidget?.viewModel?.activeViewModel?.measurement,
         () => {
           setMeasurementValue(measurementWidget.viewModel.activeViewModel.measurement as unknown as MeasurementValue)
         }
@@ -236,6 +236,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   const resetMeasurementWidget = () => {
     locationPointGraphicsLayer?.removeAll()
+    measurementValueWatchHandle?.remove()
     measurementWidget.clear()
     originalLengthResultNode.current = undefined
     originalAreaResultNode.current = undefined
