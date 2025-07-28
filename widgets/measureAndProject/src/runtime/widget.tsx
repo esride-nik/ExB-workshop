@@ -27,9 +27,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [measurementWidgetState, setMeasurementWidgetState] = useState<string>(undefined)
   const [measurementValue, setMeasurementValue] = useState<MeasurementValue>(undefined)
-  const [measurementValueWatchHandle, setMeasurementValueWatchHandle] = useState<any>(undefined)
-  const [pointerMoveHandle, setPointerMoveHandle] = useState<any>(undefined)
-  const [clickHandle, setClickHandle] = useState<any>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
@@ -136,38 +133,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       const measurementLayer = tool._measurementLayer as GraphicsLayer
       measurementLayer.visible = false
     }
-
-    if (measurementWidgetState === 'measuring' &&
-        (activeTool === 'distance' || activeTool === 'area')) {
-      // sync measurement value to React state
-      const measurementValueWatchHandle = reactiveUtils.watch(
-        () => measurementWidget?.viewModel?.activeViewModel?.measurement,
-        () => {
-          setMeasurementValue(measurementWidget.viewModel.activeViewModel.measurement as unknown as MeasurementValue)
-        }
-      )
-      setMeasurementValueWatchHandle(measurementValueWatchHandle)
-
-      // sync mouse position to React state
-      const pointerMoveHandle = jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
-        const mouseMapPoint = jimuMapView.view.toMap({
-          x: event.x,
-          y: event.y
-        })
-        setMouseMapPoint(mouseMapPoint)
-      })
-      setPointerMoveHandle(pointerMoveHandle)
-
-      // sync click point to React state
-      const clickHandle = jimuMapView.view.on('click', (event: __esri.ViewClickEvent) => {
-        const clickPoint = jimuMapView.view.toMap({
-          x: event.x,
-          y: event.y
-        })
-        setClickPoint(clickPoint)
-      })
-      setClickHandle(clickHandle)
-    }
   }, [activeTool, measurementWidgetState])
 
   // when jimuMapView is available:
@@ -192,8 +157,35 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
             setMeasurementWidgetState(measurement.viewModel.state)
           }
         )
+
+        // sync measurement value to React state.
+        // It's okay to do this right in the beginning, even if no viewModel is active at the start. The watcher will work when it becomes active and measurement values are being updated.
+        reactiveUtils.watch(
+          () => measurement?.viewModel?.activeViewModel?.measurement,
+          () => {
+            setMeasurementValue(measurement?.viewModel?.activeViewModel?.measurement as unknown as MeasurementValue)
+          }
+        )
       })
       setMeasurementWidget(measurement)
+
+      // sync mouse position to React state
+      jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
+        const mouseMapPoint = jimuMapView.view.toMap({
+          x: event.x,
+          y: event.y
+        })
+        setMouseMapPoint(mouseMapPoint)
+      })
+
+      // sync click point to React state
+      jimuMapView.view.on('click', (event: __esri.ViewClickEvent) => {
+        const clickPoint = jimuMapView.view.toMap({
+          x: event.x,
+          y: event.y
+        })
+        setClickPoint(clickPoint)
+      })
 
       // add GraphicsLayer for custom graphics
       const customMeasurementGraphics = new GraphicsLayer({
@@ -221,10 +213,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   // reset the measurement widget and related variables. used when switching tools or clearing measurements.
   const resetMeasurementWidget = () => {
-    // remove handles
-    measurementValueWatchHandle?.remove()
-    pointerMoveHandle?.remove()
-    clickHandle?.remove()
     // remove graphics
     customMeasurementGraphicsLayer?.removeAll()
     measurementWidget.clear()
