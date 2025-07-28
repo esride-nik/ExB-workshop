@@ -12,9 +12,11 @@ import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.
 import locationPointSymbol from './locationPointSymbol'
 import { MeterValueOption } from '../config'
 import { allowedSrs, formatMeasurementStringArea, formatMeasurementStringDistance, getFormattedLatitude, getFormattedLongitude } from './measureAndProjectUtils'
-import { type Point } from 'esri/geometry'
+import { type Polyline, type Point } from 'esri/geometry'
 
 import './measureAndProject.css'
+import { distance } from 'esri/geometry/geometryEngine'
+import distanceLineSymbol from './distanceLineSymbol'
 
 interface MeasurementValue {
   length: number
@@ -27,10 +29,12 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [measurementWidgetState, setMeasurementWidgetState] = useState<string>(undefined)
   const [measurementValue, setMeasurementValue] = useState<MeasurementValue>(undefined)
+  const [distanceLineGeometry, setDistanceLineGeometry] = useState<Polyline>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
+  const [measurementLayer, setMeasurementLayer] = useState<GraphicsLayer>(undefined)
   const [customMeasurementGraphicsLayer, setCustomMeasurementGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedLengthString, setRoundedLengthString] = useState<string>('')
   const [roundedAreaString, setRoundedAreaString] = useState<string>('')
@@ -106,7 +110,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   // location tool: draw point
   // TODO Other tools: draw measurement graphics
   useEffect(() => {
-    if (!clickPoint || !customMeasurementGraphicsLayer) return
+    if (!clickPoint || !customMeasurementGraphicsLayer || !activeTool) return
     if (activeTool === 'location') {
       customMeasurementGraphicsLayer.removeAll()
       const locationPointGraphic = new Graphic({
@@ -115,7 +119,33 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       })
       customMeasurementGraphicsLayer.add(locationPointGraphic)
     }
-  }, [activeTool, clickPoint, customMeasurementGraphicsLayer])
+  }, [clickPoint])
+
+  // react to mouseMapPoint change:
+  // Distance and area tools: copy measurement graphics from invisible measurementLayer to customMeasurementGraphicsLayer, skip text graphic
+  // Why not just remove the text graphic from the original measurementLayer?
+  // => Because there are more events involved that draw the text and it's hard to catch them all, plus it causes flickering.
+  useEffect(() => {
+    if (!mouseMapPoint || !customMeasurementGraphicsLayer || !activeTool) return
+    if (activeTool === 'distance') {
+      const polylines = measurementLayer.graphics.filter((g: Graphic) => g?.geometry?.type === 'polyline')
+      if (polylines?.length > 0) {
+        customMeasurementGraphicsLayer.removeAll()
+        customMeasurementGraphicsLayer.add(polylines.getItemAt(0))
+      }
+    } else if (activeTool === 'area') {
+      const polylines = measurementLayer.graphics.filter((g: Graphic) => g?.geometry?.type === 'polyline')
+      if (polylines?.length > 0) {
+        customMeasurementGraphicsLayer.remove(customMeasurementGraphicsLayer.graphics.find((g: Graphic) => g?.geometry?.type === 'polyline'))
+        customMeasurementGraphicsLayer.add(polylines.getItemAt(0))
+      }
+      const polygons = measurementLayer.graphics.filter((g: Graphic) => g?.geometry?.type === 'polygon')
+      if (polygons?.length > 0) {
+        customMeasurementGraphicsLayer.remove(customMeasurementGraphicsLayer.graphics.find((g: Graphic) => g?.geometry?.type === 'polygon'))
+        customMeasurementGraphicsLayer.add(polygons.getItemAt(0))
+      }
+    }
+  }, [mouseMapPoint])
 
   // when state and active tool change:
   // reset the measurement widget and related variables
@@ -132,6 +162,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       const tool = (measurementWidget.viewModel.activeViewModel as any).tool
       const measurementLayer = tool._measurementLayer as GraphicsLayer
       measurementLayer.visible = false
+      setMeasurementLayer(measurementLayer)
     }
   }, [activeTool, measurementWidgetState])
 
