@@ -34,7 +34,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
-  const [distanceAreaTextGraphicsLayer, setDistanceAreaTextGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [locationPointGraphicsLayer, setLocationPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedLengthString, setRoundedLengthString] = useState<string>('')
   const [roundedAreaString, setRoundedAreaString] = useState<string>('')
@@ -95,11 +94,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     }
   }, [measurementValue])
 
-  // when the roundedValueString updates, update the measurement display on the map
-  useEffect(() => {
-    updateMeasurementValueOnMap()
-  }, [distanceAreaTextGraphicsLayer, roundedLengthString])
-
   // update the measurement display in the widget
   useEffect(() => {
     if (!duplicateLengthResultNode?.current) return
@@ -127,7 +121,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       const tool = (measurementWidget.viewModel.activeViewModel as any).tool
       const measurementLayer = tool._measurementLayer as GraphicsLayer
       measurementLayer.visible = false
-      setDistanceAreaTextGraphicsLayer(measurementLayer)
     }
 
     // observe and round value while measuring
@@ -229,24 +222,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       )
     }
   }, [jimuMapView])
-
-  // exchange the map graphic with the original value with a clone that contains the rounded value
-  const updateMeasurementValueOnMap = () => {
-    if (!distanceAreaTextGraphicsLayer || distanceAreaTextGraphicsLayer.graphics.length === 0) return
-
-    // get the text graphic from the layer on every value update because it also affects the graphic position
-    const measurementPointGraphics = distanceAreaTextGraphicsLayer.graphics.toArray().filter((g: Graphic) => g.geometry.type === 'point')
-    if (measurementPointGraphics.length === 0) return
-    const measurementPointGraphic = measurementPointGraphics[0]
-
-    // make a deep copy of the graphic before changing the symbol of the original one
-    const roundedMeasurementPointGraphic = measurementPointGraphic.clone();
-    (roundedMeasurementPointGraphic.symbol as __esri.TextSymbol).text = roundedLengthString
-
-    // remove original graphic and add the rounded one
-    distanceAreaTextGraphicsLayer.remove(measurementPointGraphic)
-    // distanceAreaTextGraphicsLayer.add(roundedMeasurementPointGraphic)
-  }
 
   const isConfigured = () => {
     return props.useMapWidgetIds?.length > 0
@@ -353,8 +328,8 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
                 </div>
                 <div id="longitude" className="esri-measurement-location-coordinate">
                   <h5><FormattedMessage id="longitude" defaultMessage={defaultMessages.longitude} /></h5>
-                  <p>{getFormattedLongitude(mouseMapPoint)}</p>
-                  {clickPoint && <p>{getFormattedLongitude(clickPoint)}</p>}
+                  <p>{getFormattedLongitude(srs, mouseMapPoint)}</p>
+                  {clickPoint && <p>{getFormattedLongitude(srs, clickPoint)}</p>}
                 </div>
               </div>
               <div className="esri-measurement-selectsrs">
