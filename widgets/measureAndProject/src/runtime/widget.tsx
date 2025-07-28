@@ -34,7 +34,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
   const [srs, setSrs] = useState<allowedSrs>(25832)
-  const [locationPointGraphicsLayer, setLocationPointGraphicsLayer] = useState<GraphicsLayer>(undefined)
+  const [customMeasurementGraphicsLayer, setCustomMeasurementGraphicsLayer] = useState<GraphicsLayer>(undefined)
   const [roundedLengthString, setRoundedLengthString] = useState<string>('')
   const [roundedAreaString, setRoundedAreaString] = useState<string>('')
   const measurementWidgetNode = useRef(null)
@@ -165,16 +165,16 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   }, [measurementWidget])
 
   useEffect(() => {
-    if (!clickPoint || !locationPointGraphicsLayer) return
+    if (!clickPoint || !customMeasurementGraphicsLayer) return
     if (activeTool === 'location') {
-      locationPointGraphicsLayer.removeAll()
+      customMeasurementGraphicsLayer.removeAll()
       const locationPointGraphic = new Graphic({
         geometry: clickPoint,
         symbol: locationPointSymbol
       })
-      locationPointGraphicsLayer.add(locationPointGraphic)
+      customMeasurementGraphicsLayer.add(locationPointGraphic)
     }
-  }, [activeTool, clickPoint, locationPointGraphicsLayer])
+  }, [activeTool, clickPoint, customMeasurementGraphicsLayer])
 
   // when jimuMapView is available, initialize the measurement widget and setup mouse position tracking
   useEffect(() => {
@@ -188,14 +188,14 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       })
       setMeasurementWidget(measurement)
 
-      // add GraphicsLayer for location tool
-      const locationPointGraphicsLayer = new GraphicsLayer({
-        id: 'measurementPointGraphicsLayer',
-        title: 'Measurement Point Graphics Layer',
+      // add GraphicsLayer for custom graphics
+      const customMeasurementGraphics = new GraphicsLayer({
+        id: 'customMeasurementGraphics',
+        title: 'Custom measurement GraphicsLayer',
         listMode: 'hide'
       })
-      jimuMapView.view.map.add(locationPointGraphicsLayer)
-      setLocationPointGraphicsLayer(locationPointGraphicsLayer)
+      jimuMapView.view.map.add(customMeasurementGraphics)
+      setCustomMeasurementGraphicsLayer(customMeasurementGraphics)
 
       // get current mouse position on map as map coordinates
       jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
@@ -235,7 +235,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   }
 
   const resetMeasurementWidget = () => {
-    locationPointGraphicsLayer?.removeAll()
+    customMeasurementGraphicsLayer?.removeAll()
     measurementValueWatchHandle?.remove()
     measurementWidget.clear()
     originalLengthResultNode.current = undefined
