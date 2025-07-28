@@ -105,7 +105,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     duplicateAreaResultNode.current.innerText = roundedAreaString
   }, [duplicateAreaResultNode, roundedAreaString])
 
-  // get the original measurement display node and create a duplicate to show the rounded value. We're not using the original node because this would cause a flicker effect.
   useEffect(() => {
     // reset stuff when starting / restarting measurement
     if (measurementWidgetState === 'ready') {
@@ -123,7 +122,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       measurementLayer.visible = false
     }
 
-    // observe and round value while measuring
+    // measurementWidget state to React state
     if (measurementWidgetState === 'measuring' &&
         (activeTool === 'distance' || activeTool === 'area')) {
       const measurementValueWatchHandle = reactiveUtils.watch(
@@ -152,18 +151,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     }
   }, [activeTool, measurementWidgetState])
 
-  // setup watchers for display updates and value rounding
-  useEffect(() => {
-    if (!measurementWidget) return
-
-    reactiveUtils.watch(
-      () => measurementWidget.viewModel.state,
-      () => {
-        setMeasurementWidgetState(measurementWidget.viewModel.state)
-      }
-    )
-  }, [measurementWidget])
-
+  // location tool: draw point
   useEffect(() => {
     if (!clickPoint || !customMeasurementGraphicsLayer) return
     if (activeTool === 'location') {
@@ -185,6 +173,15 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
         container: measurementWidgetNode.current,
         linearUnit: 'meters',
         areaUnit: 'square-meters'
+      })
+      // sync measurementWidget state to React state
+      measurement.when(() => {
+        reactiveUtils.watch(
+          () => measurement.viewModel.state,
+          () => {
+            setMeasurementWidgetState(measurement.viewModel.state)
+          }
+        )
       })
       setMeasurementWidget(measurement)
 
@@ -223,17 +220,14 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     }
   }, [jimuMapView])
 
-  const isConfigured = () => {
-    return props.useMapWidgetIds?.length > 0
-  }
-
-  // catching the map view from settings
+  // catch the map view from the settings page
   const onActiveViewChange = async (jmv: JimuMapView) => {
     if (jmv) {
       setJimuMapView(jmv)
     }
   }
 
+  // reset the measurement widget and related variables. used when switching tools or clearing measurements.
   const resetMeasurementWidget = () => {
     customMeasurementGraphicsLayer?.removeAll()
     measurementValueWatchHandle?.remove()
@@ -242,6 +236,10 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     originalAreaResultNode.current = undefined
     duplicateLengthResultNode.current = undefined
     duplicateAreaResultNode.current = undefined
+  }
+
+  const isConfigured = () => {
+    return props.useMapWidgetIds?.length > 0
   }
 
   if (!isConfigured()) {
