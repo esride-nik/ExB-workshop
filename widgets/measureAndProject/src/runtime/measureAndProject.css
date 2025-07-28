@@ -1,3 +1,7 @@
+.esri-measurement-widget-content__settings {
+    display: none;
+}
+
 #toolbarDiv {
     display: inline-flex;
     background: none;

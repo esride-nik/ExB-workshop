@@ -335,16 +335,22 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   const formatMeasurementStringDistance = (mRound: number, fractionDigits: number): string => {
     // implemented just like the original measurement widget behaves => could be changed or made configurable
-    mRound = mRound > 3000 ? mRound / 1000 : mRound
-    const unit = mRound >= 3 ? 'km' : 'm'
+    let unit = 'm'
+    if (mRound > 3000) {
+      mRound = mRound / 1000
+      unit = 'km'
+    }
     const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as meters including the unit (because it's in the standard) in local number format
     return `${numberFormat.format(mRound)} ${unit}`
   }
 
   const formatMeasurementStringArea = (mRound: number, fractionDigits: number): string => {
     // implemented just like the original measurement widget behaves => could be changed or made configurable
-    mRound = mRound > 3000000 ? mRound / 1000000 : mRound
-    const unit = mRound >= 3 ? 'km²' : 'm²'
+    let unit = 'm²'
+    if (mRound > 3000000) {
+      mRound = mRound / 1000000
+      unit = 'km²'
+    }
     const numberFormat = new Intl.NumberFormat(props.locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as decimal in local number format
     return `${numberFormat.format(mRound)} ${unit}`
   }
