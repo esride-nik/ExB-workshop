@@ -105,6 +105,24 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     duplicateAreaResultNode.current.innerText = roundedAreaString
   }, [duplicateAreaResultNode, roundedAreaString])
 
+  // react to clickPoint change:
+  // location tool: draw point
+  // TODO Other tools: draw measurement graphics
+  useEffect(() => {
+    if (!clickPoint || !customMeasurementGraphicsLayer) return
+    if (activeTool === 'location') {
+      customMeasurementGraphicsLayer.removeAll()
+      const locationPointGraphic = new Graphic({
+        geometry: clickPoint,
+        symbol: locationPointSymbol
+      })
+      customMeasurementGraphicsLayer.add(locationPointGraphic)
+    }
+  }, [activeTool, clickPoint, customMeasurementGraphicsLayer])
+
+  // when state and active tool change:
+  // reset the measurement widget and related variables
+  // sync measurement value, mouse position and click point to React state
   useEffect(() => {
     // reset stuff when starting / restarting measurement
     if (measurementWidgetState === 'ready') {
@@ -122,9 +140,9 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       measurementLayer.visible = false
     }
 
-    // measurementWidget state to React state
     if (measurementWidgetState === 'measuring' &&
         (activeTool === 'distance' || activeTool === 'area')) {
+      // sync measurement value to React state
       const measurementValueWatchHandle = reactiveUtils.watch(
         () => measurementWidget?.viewModel?.activeViewModel?.measurement,
         () => {
@@ -132,6 +150,8 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
         }
       )
       setMeasurementValueWatchHandle(measurementValueWatchHandle)
+
+      // sync mouse position to React state
       const pointerMoveHandle = jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
         const mouseMapPoint = jimuMapView.view.toMap({
           x: event.x,
@@ -140,6 +160,8 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
         setMouseMapPoint(mouseMapPoint)
       })
       setPointerMoveHandle(pointerMoveHandle)
+
+      // sync click point to React state
       const clickHandle = jimuMapView.view.on('click', (event: __esri.ViewClickEvent) => {
         const clickPoint = jimuMapView.view.toMap({
           x: event.x,
@@ -151,20 +173,10 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
     }
   }, [activeTool, measurementWidgetState])
 
-  // location tool: draw point
-  useEffect(() => {
-    if (!clickPoint || !customMeasurementGraphicsLayer) return
-    if (activeTool === 'location') {
-      customMeasurementGraphicsLayer.removeAll()
-      const locationPointGraphic = new Graphic({
-        geometry: clickPoint,
-        symbol: locationPointSymbol
-      })
-      customMeasurementGraphicsLayer.add(locationPointGraphic)
-    }
-  }, [activeTool, clickPoint, customMeasurementGraphicsLayer])
-
-  // when jimuMapView is available, initialize the measurement widget and setup mouse position tracking
+  // when jimuMapView is available:
+  // initialize the measurement widget
+  // setup mouse position tracking
+  // sync measurementWidget state to React state
   useEffect(() => {
     if (jimuMapView) {
       // init Measurement widget
@@ -193,24 +205,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
       })
       jimuMapView.view.map.add(customMeasurementGraphics)
       setCustomMeasurementGraphicsLayer(customMeasurementGraphics)
-
-      // get current mouse position on map as map coordinates
-      jimuMapView.view.on('pointer-move', (event: __esri.ViewPointerMoveEvent) => {
-        const mouseMapPoint = jimuMapView.view.toMap({
-          x: event.x,
-          y: event.y
-        })
-        setMouseMapPoint(mouseMapPoint)
-      })
-
-      // get click point as map coordinates. To be used by location tool.
-      jimuMapView.view.on('click', (event: __esri.ViewClickEvent) => {
-        const clickPoint = jimuMapView.view.toMap({
-          x: event.x,
-          y: event.y
-        })
-        setClickPoint(clickPoint)
-      })
 
       // in case of lost WebGL context
       reactiveUtils.when(
