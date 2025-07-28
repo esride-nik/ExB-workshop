@@ -12,11 +12,9 @@ import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.
 import locationPointSymbol from './locationPointSymbol'
 import { MeterValueOption } from '../config'
 import { allowedSrs, formatMeasurementStringArea, formatMeasurementStringDistance, getFormattedLatitude, getFormattedLongitude } from './measureAndProjectUtils'
-import { type Polyline, type Point } from 'esri/geometry'
+import { type Point } from 'esri/geometry'
 
 import './measureAndProject.css'
-import { distance } from 'esri/geometry/geometryEngine'
-import distanceLineSymbol from './distanceLineSymbol'
 
 interface MeasurementValue {
   length: number
@@ -29,7 +27,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const [measurementWidget, setMeasurementWidget] = useState<Measurement>(undefined)
   const [measurementWidgetState, setMeasurementWidgetState] = useState<string>(undefined)
   const [measurementValue, setMeasurementValue] = useState<MeasurementValue>(undefined)
-  const [distanceLineGeometry, setDistanceLineGeometry] = useState<Polyline>(undefined)
   const [mouseMapPoint, setMouseMapPoint] = useState<Point>(undefined)
   const [clickPoint, setClickPoint] = useState<Point>(undefined)
   const [activeTool, setActiveTool] = useState<string>(undefined)
@@ -108,7 +105,6 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
 
   // react to clickPoint change:
   // location tool: draw point
-  // TODO Other tools: draw measurement graphics
   useEffect(() => {
     if (!clickPoint || !customMeasurementGraphicsLayer || !activeTool) return
     if (activeTool === 'location') {
