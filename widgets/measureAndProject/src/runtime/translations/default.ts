@@ -1,5 +1,5 @@
 export default {
-  _widgetLabel: 'Measure and Project',
+  _widgetLabel: 'Measurement',
   cfgDataSources: 'Please configure data sources',
   distanceMeasurementTool: 'Distance Measurement Tool',
   areaMeasurementTool: 'Area Measurement Tool',

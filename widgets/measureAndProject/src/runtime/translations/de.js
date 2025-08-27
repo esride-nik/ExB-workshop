@@ -1,5 +1,5 @@
 System.register([], function (_export) {return {execute: function () {_export({
-  _widgetLabel: 'Messen und Projizieren',
+  _widgetLabel: 'Messen',
   cfgDataSources: 'Bitte Datenquellen konfigurieren',
   distanceMeasurementTool: 'Distanzmessung',
   areaMeasurementTool: 'Flächenmessung',
