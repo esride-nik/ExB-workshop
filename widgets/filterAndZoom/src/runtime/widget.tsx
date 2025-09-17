@@ -1,4 +1,4 @@
-import { DataSourceManager, React, type AllWidgetProps, type FeatureLayerDataSource } from 'jimu-core'
+import { DataSourceManager, getAppStore, React, WidgetManager, type AllWidgetProps, type FeatureLayerDataSource } from 'jimu-core'
 import { JimuMapViewComponent, type JimuMapView } from 'jimu-arcgis'
 import Graphic from 'esri/Graphic'
 import { useEffect } from 'react'
@@ -17,10 +17,21 @@ useEffect(() => {
     const session = SessionManager.getInstance().getMainSession() // ArcGISIdentityManager
     console.log(session)
 
-    const portal = new Portal({ url: session.portal, authMode: "immediate" });
-    await portal.load();
-    const items = await portal.user.fetchItems(); // all owned items
-    console.log('User items', items);
+    const portal = new Portal({ url: session.portal, authMode: "immediate" })
+    await portal.load()
+    const items = await portal.user.fetchItems()
+    console.log('User items', items)
+    const groups = await portal.user.fetchGroups()
+    console.log('User groups', groups)
+    const tags = await portal.user.fetchTags()
+    console.log('User tags', tags)
+
+    const appStore = getAppStore().getState()
+    console.log('App Store', appStore)
+
+    const widgets = WidgetManager.getInstance()
+    console.log('Widgets', widgets)
+    widgets.destroyWidget('widget_13')
   }
   fetchPortalData();
 }, [])

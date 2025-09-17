@@ -1,6 +1,6 @@
 'use client'
 import { React, type AllWidgetProps, getAppStore, type SectionNavInfo, appActions, jimuHistory } from 'jimu-core'
-import { type IMConfig } from '../config'
+import type { IMConfig } from '../config'
 import { useEffect, useRef } from 'react'
 import { Button } from 'jimu-ui'
 
