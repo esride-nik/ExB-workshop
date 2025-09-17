@@ -82,6 +82,7 @@ export const formatMeasurementStringDistance = (mRound: number, fractionDigits: 
   if (mRound > 3000) {
     mRound = mRound / 1000
     unit = 'km'
+    fractionDigits = 3 // override fraction digits to 3 when using km
   }
   const numberFormat = new Intl.NumberFormat(locale, { style: 'decimal', minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }) // format as meters including the unit (because it's in the standard) in local number format
   return `${numberFormat.format(mRound)} ${unit}`

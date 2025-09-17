@@ -12,7 +12,7 @@ import * as coordinateFormatter from '@arcgis/core/geometry/coordinateFormatter.
 import locationPointSymbol from './locationPointSymbol'
 import { MeterValueOption } from '../config'
 import { allowedSrs, formatMeasurementStringArea, formatMeasurementStringDistance, getFormattedLatitude, getFormattedLongitude } from './measureAndProjectUtils'
-import { type Point } from 'esri/geometry'
+import type { Point } from 'esri/geometry'
 
 import './measureAndProject.css'
 
