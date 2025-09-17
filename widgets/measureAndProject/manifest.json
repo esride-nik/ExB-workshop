@@ -3,7 +3,7 @@
   "label": "Measurement and Projection",
   "type": "widget",
   "dependency": ["jimu-arcgis"],
-  "version": "1.0.0",
+  "version": "1.1.0",
   "exbVersion": "1.14.0",
   "author": "Niklas Köhn, Esri Deutschland GmbH",
   "description": "Uses the measurement widget from JSSDK to measure distances and areas. Custom location tool using a local reference system.",
