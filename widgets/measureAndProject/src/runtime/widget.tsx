@@ -42,6 +42,9 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
   const duplicateLengthResultNode = useRef(null)
   const duplicateAreaResultNode = useRef(null)
 
+  // assets
+  const locationIcon = require('./assets/LocationIcon.png')
+
   useEffect(() => {
     projection.load()
     coordinateFormatter.load()
@@ -331,7 +334,7 @@ export default function (props: AllWidgetProps<any>): React.JSX.Element {
                 <div id="coordinateIcon" className="esri-measurement-location-coordinate-icon">
                   <h5></h5>
                   <p><calcite-icon icon="arrow-bold-left" class="coordinate-icon-mouse" /></p>
-                  {clickPoint && <p><calcite-icon icon="pin-tear-f" class="coordinate-icon-location" /></p>}
+                  {clickPoint && <p><img className="locationIcon" src={locationIcon} /></p>}
                 </div>
                 <div id="latitude" className="esri-measurement-location-coordinate">
                   <h5><FormattedMessage id="latitude" defaultMessage={defaultMessages.latitude} /></h5>

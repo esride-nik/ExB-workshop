@@ -76,3 +76,10 @@
     --calcite-color-brand: #767676;
     --calcite-color-brand-hover: #666;
 }
+
+.locationIcon {
+    height: 22px;
+    padding-left: 13px;
+    bottom: 7px;
+    position: relative;
+}
